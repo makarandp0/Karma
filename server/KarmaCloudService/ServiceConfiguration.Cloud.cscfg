@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ServiceConfiguration serviceName="KarmaCloudService" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceConfiguration" osFamily="3" osVersion="*" schemaVersion="2013-10.2.2">
+  <Role name="karmawebapp">
+    <Instances count="1" />
+    <ConfigurationSettings>
+      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="DefaultEndpointsProtocol=https;AccountName=karmacloud;AccountKey=DbIJAD4YxcBnhxMxv5ydeLgyh5WoRl3G9tKo7uZjkoI9gJrN63A/UwHmz9ZrSHSe+VXj4tBLNg9mnlfMDf8+Lw==" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.Enabled" value="true" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.AccountUsername" value="makarand" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.AccountEncryptedPassword" value="MIIBnQYJKoZIhvcNAQcDoIIBjjCCAYoCAQAxggFOMIIBSgIBADAyMB4xHDAaBgNVBAMME1dpbmRvd3MgQXp1cmUgVG9vbHMCECFw47tKMNm7RYJR7kQGXy0wDQYJKoZIhvcNAQEBBQAEggEAtEQIFy1jYohbxoZfVjj9l6QRwtD7Xt4h7QreaGXD5FY6zMyPQzCavbvI6CvOcnHrU0JHcqPZuAOGt5AyTVv+fUQsPGdfxCOpSaagpRdgWj3vsu1YC7u7jA+q/XolK72UX0XQhQG95KYQRZqSx4MX9GqxCNA7F5DhTh+ZR+XGGUIqYYS3VWnYeblIY5gbPm7DisuX7BfhIulbU/H0xy5x5wxLCpR5nJa4GQRDkRe3hpioPfd7v4Q2mhVUcahilzlREqJMp5NHl5SPcYli8Ky9fQWxkGKlG/8BA+vQvYjCWzhoV1RdFL3HyaJi/oHy8Gp1yprSUvgIsj/X+BowpqgO5TAzBgkqhkiG9w0BBwEwFAYIKoZIhvcNAwcECAOF3WWEOQh/gBAc4Bzwt/ZHOtMDdVwb51KX" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.AccountExpiration" value="2014-12-07T23:59:59.0000000-08:00" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteForwarder.Enabled" value="true" />
+    </ConfigurationSettings>
+    <Certificates>
+      <Certificate name="Microsoft.WindowsAzure.Plugins.RemoteAccess.PasswordEncryption" thumbprint="F710821436F7BC21EFD93197185B033617D212F8" thumbprintAlgorithm="sha1" />
+    </Certificates>
+  </Role>
+</ServiceConfiguration>

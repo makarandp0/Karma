@@ -1,0 +1,767 @@
+﻿@model KarmaWebApp.Models.MobileSessionModel
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <title>Karma Mobile!</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css" rel="stylesheet">
+    <script type='text/javascript' src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script type='text/javascript' src="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
+    <script type='text/javascript' src='/Scripts/knockout-3.0.0.js'></script>
+    <!-- JavaScript jQuery code from Bootply.com editor -->
+    <script type='text/javascript'>
+        $(document).ready(function () {
+            $('[data-toggle=offcanvas]').click(function () {
+                $('.row-offcanvas').toggleClass('active');
+            });
+
+            $('.btn-toggle').click(function () {
+                $(this).find('.btn').toggleClass('active').toggleClass('btn-default').toggleClass('btn-primary');
+            });
+
+            // setup viewmodel for our data.
+            var myViewModel = {
+                personName: "@Model.name",
+                selectedfriend: ko.observable(),
+                retrivingFriends: ko.observable(true),
+                errorRetrivingFriends: ko.observable("Wait...Loading your friend list"),
+                friends: ko.observableArray([]),        // friends array
+                requestText: ko.observable(""),         // request header text value.
+                showRequestError: ko.observable(false), // need to show error message about next button?
+                selectfriend: function (item) {
+                    this.selectedfriend(item);
+                },
+                OnSubmit: function () {
+                    if (this.requestText().length < 5) {
+
+                        // if request is not value
+                        // show error message
+                        // and setup callback to remove the error message.
+                        this.showRequestError(true);
+                        $('#textticker').focus(function () {
+                            myViewModel.showRequestError(false);
+                        });
+
+                    } else {
+                        $.post('/Api/createrequest', { 'Title': this.requestText() },
+                                function (data, statusText) {
+                                    console.log('server returned. data.error ' + data.error + ', data.errorcode:' + data.errorcode + ', statusText' + statusText);
+                                });
+                    }
+                }
+            };
+
+            // bind view model with Ko
+            ko.applyBindings(myViewModel);
+
+            // Assign handlers immediately after making the request,
+            // and remember the jqxhr object for this request
+            var jqxhr = $.getJSON("/Api/getFriends", function () {
+                console.log("success");
+            })
+              .done(function (data) {
+                  if (!data.error) {
+                      myViewModel.friends(data.friends);
+                      if (data.friends == 0) {
+                          myViewModel.errorRetrivingFriends("sorry you have no friends");
+                      }
+                      else {
+                          myViewModel.errorRetrivingFriends("got them!");
+                          myViewModel.selectedfriend(data.friends[0]);
+                      }
+                  }
+                  else {
+                      myViewModel.errorRetrivingFriends("Error retriving Friends" + data.errorcode);
+                  }
+              })
+              .fail(function () {
+                  myViewModel.errorRetrivingFriends("unknown error retriving friends");
+              })
+              .always(function () {
+                  myViewModel.retrivingFriends(false);
+              });
+
+            // Perform other work here ...
+
+            // Set another completion function for the request above
+            jqxhr.complete(function () {
+                console.log("second complete");
+            });
+
+            /*
+            $.getJSON("/Api/getFriends", function (data) {
+                // Now use this data to update your view models,
+                // and Knockout will update your UI automatically
+                // get list of friends from ajax call.
+                console.log("got ajax data from API:" + data.error + data.errorcode);
+                if (error)
+                friendsRetrived = true;
+            })
+            */
+        });
+    </script>
+
+    <!-- newsticker for editbox -->
+    <script>
+        // ticker messages inside "I Need" edit box
+        $(document).ready(function () {
+            $(function () {
+                var timerId = 0;
+                var tickerMessages = [
+                        "a ride to airport on this tuesday.     ",
+                        "to borrow some powertools for my weekend project.    ",
+                        "some help feeding my cat for while I am gone.    ",
+                        "to borrow latest John Grisham book.   ",
+                        "help moving next saturday.   "
+                ];
+                var row = 0;
+                var col = 1;
+
+                function timerfunction() {
+                    $('#textticker').attr('placeholder', tickerMessages[row].substring(0, col));
+                    if (++col == tickerMessages[row].length) {
+                        col = 1;
+                        row = ++row % tickerMessages.length;
+                    }
+                }
+
+                // on gaining focus clear the timer.
+                $('#textticker').focus(function () {
+                    var input = $(this);
+                    input.attr('placeholder', tickerMessages[row]);
+                    if (timerId) clearInterval(timerId);
+                });
+
+                // or loosing focus start timer if the placeholder==text.
+                $('#textticker').blur(function () {
+                    var input = $(this);
+                    if (timerId) clearInterval(timerId);
+
+                    if (input.val() == '' || input.val() == input.attr('placeholder')) {
+                        timerId = setInterval(timerfunction, 100);
+                    }
+                });
+                timerId = setInterval(timerfunction, 100);
+            });
+        })
+    </script>
+
+    <!--[if lt IE 9]>
+      <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!-- CSS code from Bootply.com editor -->
+
+    <style type="text/css">
+        @@import url(http://fonts.googleapis.com/css?family=Droid+Sans+Mono);
+
+        html, body {
+            height: 100%;
+            font-family: 'Droid Sans Mono', sans-serif;
+        }
+
+        p, h1, h2, h3, h4 {
+            font-family: 'Droid Sans Mono', sans-serif;
+        }
+
+        hr {
+            border-color: #191919;
+        }
+
+        /* wrapper for page content to push down footer */
+        .page-container {
+            min-height: 100%;
+            height: auto !important;
+            height: 100%;
+            /* negative indent footer by its height */
+            margin: 0 auto -120px;
+            /* pad bottom by footer height */
+            padding: 0 0 70px;
+        }
+
+        /* set the fixed height of the footer here */
+        #footer {
+            height: 120px;
+            background-color: #222222;
+            border: 0 solid #080808;
+            border-top-width: 1px;
+            margin-top: 50px;
+        }
+
+            #footer > .container {
+                padding: 20px;
+            }
+
+        body {
+            padding-top: 51px;
+            background: #1E1E1E;
+            color: #f9f9f9;
+        }
+
+        a {
+            color: #bcbcbc;
+        }
+
+        .text-center {
+            padding-top: 20px;
+        }
+
+        #sidebar {
+            height: 100%;
+            padding-right: 0;
+            padding-top: 20px;
+        }
+
+            #sidebar .affix {
+                position: fixed;
+                top: 55;
+                width: 220px;
+            }
+
+            #sidebar .affix-bottom {
+                position: fixed;
+                top: 55;
+                width: 220px;
+            }
+
+            #sidebar .nav {
+                width: 95%;
+            }
+
+            #sidebar li {
+                border: 0 #1e1e1e solid;
+                border-bottom-width: 1px;
+            }
+
+                #sidebar li a {
+                    padding-left: 1px;
+                }
+
+                    #sidebar li a:hover {
+                        background-color: #222222;
+                        color: #ffffff;
+                    }
+
+        /* collapsed sidebar styles */
+        @@media screen and (max-width: 767px) {
+            .row-offcanvas {
+                position: relative;
+                -webkit-transition: all 0.25s ease-out;
+                -moz-transition: all 0.25s ease-out;
+                transition: all 0.25s ease-out;
+            }
+
+            .row-offcanvas-right .sidebar-offcanvas {
+                right: -41.6%;
+            }
+
+            .row-offcanvas-left .sidebar-offcanvas {
+                left: -41.6%;
+            }
+
+            .row-offcanvas-right.active {
+                right: 41.6%;
+            }
+
+            .row-offcanvas-left.active {
+                left: 41.6%;
+            }
+
+            .sidebar-offcanvas {
+                position: absolute;
+                top: 0;
+                width: 41.6%;
+            }
+
+            #sidebar {
+                background-color: #3b3b3b;
+                padding-top: 0;
+            }
+
+                #sidebar .nav > li {
+                    color: #ddd;
+                    background: linear-gradient(#3E3E3E, #383838);
+                    border-top: 1px solid #484848;
+                    border-bottom: 1px solid #2E2E2E;
+                    padding-left: 10px;
+                }
+
+                    #sidebar .nav > li:first-child {
+                        border-top: 0;
+                    }
+
+                    #sidebar .nav > li > a {
+                        color: #ddd;
+                    }
+
+                        #sidebar .nav > li > a > img {
+                            max-width: 14px;
+                        }
+
+                        #sidebar .nav > li > a:hover, #sidebar .nav > li > a:focus {
+                            text-decoration: none;
+                            background: linear-gradient(#373737, #323232);
+                            color: #fff;
+                        }
+
+                #sidebar .nav .caret {
+                    border-top-color: #fff;
+                    border-bottom-color: #fff;
+                }
+
+                #sidebar .nav a:hover .caret {
+                    border-top-color: #fff;
+                    border-bottom-color: #fff;
+                }
+        }
+
+        /* theme */
+        .btn, .form-control, .alert, .progress, .panel, .list-group, .well, .list-group-item:first-child {
+            border-radius: 1px;
+            box-shadow: 0 0 0;
+        }
+
+        .btn {
+            border-color: transparent;
+        }
+
+        .btn-default, .well {
+            background-color: #cccccc;
+            border-color: #c0c0c0;
+        }
+
+        .btn-primary, .label-primary, .list-group-item.active, .list-group-item.active:hover, .list-group-item.active:focus, .btn.active, a.list-group-item.active, a.list-group-item.active:hover, a.list-group-item.active:focus {
+            background-color: #0099CC;
+            border-color: transparent;
+        }
+
+        .btn-info, .label-info, .progress-bar-info {
+            background-color: #33b5e5;
+        }
+
+        .btn-success, .label-success, .progress-bar-success {
+            background-color: #669900;
+        }
+
+        .btn-danger, .label-danger, .progress-bar-danger {
+            background-color: #FF4444;
+        }
+
+        .btn-warning, .label-warning, .progress-bar-warning {
+            background-color: #FFBB33;
+            color: #444444;
+        }
+
+        .nav-tabs > li > a {
+            border-radius: 0;
+        }
+
+
+
+        h3, h4, h5, .panel {
+            color: #555555;
+        }
+
+            .panel hr {
+                border-color: #efefef;
+            }
+    </style>
+</head>
+
+<!-- HTML code from Bootply.com editor -->
+
+<body>
+
+    <div class="page-container">
+        <!-- top navbar -->
+        <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="offcanvas" data-target=".sidebar-nav">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href=" #">KarmaWeb</a>
+            </div>
+        </div>
+        <div class="col-sm-12">
+            <div class="row row-offcanvas row-offcanvas-left">
+                <!-- sidebar -->
+                <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
+                    <div data-spy="affix" data-offset-top="45" data-offset-bottom="90" class="">
+                        <ul class="nav" id="sidebar-nav">
+                            <li>
+                                <a href="#" class="">home</a>
+                            </li>
+                            <li>
+                                <a href="#inbox" class="">inbox</a>
+                            </li>
+                            <li>
+                                <a href="#outbox" class="">outbox</a>
+                            </li>
+                            <li>
+                                <a href="#settings" class="">settings</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- /sidebar -->
+                <!-- main area -->
+                <div class="col-xs-12 col-sm-9" data-spy="scroll" data-target="#sidebar-nav">
+
+                    <!-- ask your friends for help pannel-->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <img src="@Model.pictureUrl" alt="@Model.name">
+                            <h4 class="">You got Friends <span data-bind="text: personName + '!'">!</span></h4>
+                        </div>
+                        <div class="panel-body">
+                            Everybody needs help and friends love to help each other. Karmaweb makes exchanging favors easy! It will contact
+                            your local
+                            <strong>karma friends</strong> and find somebody who can help. Don't worry we hate spam too. We won't
+                            post on facebook or send emails to your friends. Just type in what you need...
+                            <!--<form class="form">-->
+                            <div class="input-group text-center">
+                                <span class="input-group-addon">I Need</span>
+                                <input id="textticker" type="text" class="form-control input-lg" title="Don't worry. We hate spam, we wont post on facebook."
+                                       placeholder="enter what you need..." data-bind="value: requestText">
+                            </div>
+                            <hr class="">
+
+                            <div data-bind="visible: showRequestError">
+                                <span class="label label-warning"> Are you kidding me...at least type sometime ?</span>
+                            </div>
+                            <button class="btn btn-lg btn-primary pull-right" data-bind="click: OnSubmit" type="button">Submit</button>
+                            <!--</form>-->
+                        </div>
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-sm-6">
+
+                            <!-- Friends List -->
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <a href="#" class="pull-right">View all</a>
+                                    <h4 class="">Friends List:</h4>
+                                </div>
+                                <div class="panel-body" data-bind="foreach: friends">
+                                    <div class="list-group">
+                                        <a href="#" class="list-group-item" data-bind="css: { active: $parent.selectedfriend() == $data}, click: $parent.selectfriend.bind($parent), text: name">Active item</a>
+                                    </div>
+                                </div>
+                                <div class="panel-body" data-bind="visible: retrivingFriends">
+                                    <hr class="">
+                                    <span data-bind="text: errorRetrivingFriends">Loading your Friends list....</span>
+                                </div>
+                            </div>
+
+                            <!-- whats new -->
+                            <div class="well">
+                                <form class="form-horizontal" role="form">
+                                    <h4 class="">What's New</h4>
+
+                                    <div class="form-group" style="padding:14px;">
+                                        <textarea class="form-control" placeholder="Update your status"></textarea>
+                                    </div>
+                                    <button class="btn btn-success pull-right" type="button">Post</button>
+                                    <ul class="list-inline">
+                                        <li>
+                                            <a href="#" class=""><i class="glyphicon glyphicon-align-left"></i></a>
+
+                                        </li>
+                                        <li>
+                                            <a href="#" class=""><i class="glyphicon glyphicon-align-center"></i></a>
+
+                                        </li>
+                                        <li>
+                                            <a href="#" class=""><i class="glyphicon glyphicon-align-right"></i></a>
+
+                                        </li>
+                                    </ul>
+                                </form>
+                            </div>
+
+                        </div>
+                        <div class="col-sm-6">
+                            <!-- Friends Details -->
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <a href="#" class="pull-right">View all</a>
+                                    <h4 class="">Friends Details</h4>
+                                </div>
+                                <div class="panel-body">
+                                    <p class="">
+                                        <img src="//placehold.it/100" class="img-circle pull-right">
+                                        <a href="#" class="">Bootstrap Playground</a>
+                                    </p>
+                                    <div class="clearfix"></div>
+                                    <hr class="">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis pharetra
+                                    varius quam sit amet vulputate. Quisque mauris augue, molestie tincidunt
+                                    condimentum vitae, gravida a libero. Aenean sit amet felis dolor, in sagittis
+                                    nisi. Sed ac orci quis tortor imperdiet venenatis. Duis elementum auctor
+                                    accumsan. Aliquam in felis sit amet augue.
+                                    <hr class="">
+                                    <div class="btn-group pull-right btn-toggle">
+                                        <button class="btn btn-default">ON</button>
+                                        <button class="btn btn-primary active">OFF</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    <!--/Inbox row-->
+                    <h1 id="inbox" class="">inbox</h1>
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <a href="#" class="pull-right">Refresh</a>
+                            <h4 class="">Friend Need:</h4>
+
+                        </div>
+                        <div class="panel-body">
+                            <div class="list-group">
+                                <a href="#" class="list-group-item active">Active item</a>
+                                <a href="#" class="list-group-item">Second item</a>
+                                <a href="#" class="list-group-item">Third item</a>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- outbox -->
+                    <h1 id="outbox" class="">outbox</h1>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <a href="#" class="pull-right">Refresh</a>
+                            <h4 class="">You Need:</h4>
+                        </div>
+                        <div class="panel-body">
+                            <div class="list-group">
+                                <li class="list-group-item">
+                                    <span href="#" class="btn-group btn-toggle pull-right">
+                                        <button class="btn btn-xs btn-default">On</button>
+                                        <button class="btn btn-xs btn-primary active">Off</button>
+                                    </span> ride to airport on Monday
+                                </li>
+                                <li class="list-group-item">
+                                    <span href="#" class="btn-group btn-toggle pull-right">
+                                        <button class="btn btn-xs btn-default">On</button>
+                                        <button class="btn btn-xs btn-primary active">Off</button>
+                                    </span> somebody to feed my cat on saturday Morning
+                                </li>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /outbox -->
+
+                    <p class="">
+                        Fusce sollicitudin lacus lacinia mi tincidunt ullamcorper. Aenean velit
+                        ipsum, vestibulum nec tincidunt eu, lobortis vitae erat. Nullam ultricies
+                        fringilla ultricies. Sed euismod nibh quis tincidunt dapibus. Nulla quam
+                        velit, porta sit amet felis eu, auctor fringilla elit. Donec convallis
+                        tincidunt nibh, quis pellentesque sapien condimentum a. Phasellus purus
+                        dui, rhoncus id suscipit id, ornare et sem. Duis aliquet posuere arcu a
+                        ornare. Pellentesque consequat libero id massa accumsan volutpat. Fusce
+                        a hendrerit lacus. Nam elementum ac eros eu porttitor. Phasellus enim mi,
+                        auctor sit amet luctus a, commodo fermentum arcu. In volutpat scelerisque
+                        quam, nec lacinia libero.
+                    </p>
+                    <hr class="">
+                    <button class="btn btn-primary">View</button>
+                    <button class="btn btn-primary">Download</button>
+                    <h1 id="settings" class="">Settings</h1>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="alert alert-info alert-dismissable" style="display: none;">
+                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">├ù</button>
+                                <strong class="">Heads up!</strong> This alert needs your attention,
+                                but it's not super important.
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <a href="#" class="pull-right">View all</a>
+                                    <h4 class="">Buttons &amp; Labels</h4>
+
+                                </div>
+                                <div class="panel-body">
+                                    <div class="row">
+                                        <div class="col-xs-4">
+                                            <a class="btn btn-default center-block" href="#">Button</a>
+
+                                        </div>
+                                        <div class="col-xs-4">
+                                            <a class="btn btn-primary center-block" href="#">Primary</a>
+
+                                        </div>
+                                        <div class="col-xs-4">
+                                            <a class="btn btn-danger center-block" href="#">Danger</a>
+
+                                        </div>
+                                    </div>
+                                    <br class="">
+                                    <div class="row">
+                                        <div class="col-xs-4">
+                                            <a class="btn btn-warning center-block" href="#">Warning</a>
+
+                                        </div>
+                                        <div class="col-xs-4">
+                                            <a class="btn btn-info center-block" href="#">Info</a>
+
+                                        </div>
+                                        <div class="col-xs-4">
+                                            <a class="btn btn-success center-block" href="#">Success</a>
+
+                                        </div>
+                                    </div>
+                                    <hr class="">
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-default">1</button>
+                                        <button class="btn btn-default">2</button>
+                                        <button class="btn btn-default">3</button>
+                                    </div>
+                                    <hr class="">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <span class="label label-default">Label</span>
+                                            <span class="label label-success">Success</span>
+
+                                        </div>
+                                        <div class="col-md-4">
+                                            <span class="label label-warning">Warning</span>
+                                            <span class="label label-info">Info</span>
+
+                                        </div>
+                                        <div class="col-md-4">
+                                            <span class="label label-danger">Danger</span>
+                                            <span class="label label-primary">Primary</span>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <a href="#" class="pull-right">View all</a>
+                                    <h4 class="">Progress Bars</h4>
+
+                                </div>
+                                <div class="panel-body">
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-info" style="width: 20%"></div>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-success" style="width: 40%"></div>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-warning" style="width: 80%"></div>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-danger" style="width: 50%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <a href="#" class="pull-right">View all</a>
+                                    <h4 class="">Tabs</h4>
+
+                                </div>
+                                <div class="panel-body">
+                                    <ul class="nav nav-tabs">
+                                        <li class="active">
+                                            <a href="#A" data-toggle="tab" class="">Section 1</a>
+                                        </li>
+                                        <li>
+                                            <a href="#B" data-toggle="tab" class="">Section 2</a>
+                                        </li>
+                                        <li>
+                                            <a href="#C" data-toggle="tab" class="">Section 3</a>
+                                        </li>
+                                    </ul>
+                                    <div class="tabbable">
+                                        <div class="tab-content">
+                                            <div class="tab-pane active" id="A">
+                                                <div class="well well-sm">I'm in Section A.</div>
+                                            </div>
+                                            <div class="tab-pane" id="B">
+                                                <div class="well well-sm">Howdy, I'm in Section B.</div>
+                                            </div>
+                                            <div class="tab-pane" id="C">
+                                                <div class="well well-sm">I've decided that I like wells.</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- /tabbable -->
+                                    <div class="col-sm-12 text-center">
+                                        <ul class="pagination center-block" style="display:inline-block;">
+                                            <li>
+                                                <a href="#" class="">┬½</a>
+
+                                            </li>
+                                            <li>
+                                                <a href="#" class="">1</a>
+
+                                            </li>
+                                            <li>
+                                                <a href="#" class="">2</a>
+
+                                            </li>
+                                            <li>
+                                                <a href="#" class="">3</a>
+
+                                            </li>
+                                            <li>
+                                                <a href="#" class="">4</a>
+
+                                            </li>
+                                            <li>
+                                                <a href="#" class="">5</a>
+
+                                            </li>
+                                            <li>
+                                                <a href="#" class="">┬╗</a>
+
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--playground-->
+                        <br class="">
+                        <div class="clearfix"></div>
+                        <hr class="">
+                        <hr class="">
+                    </div>
+                    <!-- /.col-xs-12 main -->
+                </div>
+                <!-- /main area-->
+
+            </div>
+            <!--/.container-->
+        </div>
+        <!--/.page-container-->
+    </div>
+    <div id="push" class=""></div>
+
+
+
+</body>
+</html>
