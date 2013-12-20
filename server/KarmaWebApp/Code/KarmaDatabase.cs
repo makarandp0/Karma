@@ -85,13 +85,13 @@ namespace KarmaWebApp
                     case DbKarmaRequest.RequestState.offered:
                     case DbKarmaRequest.RequestState.accepted:
                     case DbKarmaRequest.RequestState.closed:
-                        Debug.WriteLine("DelayedTask_ProcessRequest: request:{0} state:{1} is incorrect ", workId, request.State);
+                        Logger.WriteLine("DelayedTask_ProcessRequest: request:{0} state:{1} is incorrect ", workId, request.State);
                         break;
                 }
             }
             else
             {
-                Debug.WriteLine("Delayed_OpenRequest: request {0} state is NULL ", workId);
+                Logger.WriteLine("Delayed_OpenRequest: request {0} state is NULL ", workId);
             }
         }
 
@@ -249,7 +249,7 @@ namespace KarmaWebApp
                 // and update each friends database entry with this persons link.
                 foreach (var friendid in person.ReadKarmaFriends())
                 {
-                    Debug.WriteLine("Updating Karmafriends " + friendid);
+                    Logger.WriteLine("Updating Karmafriends " + friendid);
                     var friend = ReadPersonEntryFromDatabase(friendid);
                     friend.AddKarmaFriend(person.FacebookId());
                     var updateFriend = TableOperation.InsertOrReplace(friend);
@@ -268,7 +268,7 @@ namespace KarmaWebApp
             var node = PeopleGraph.AddNode(person.FacebookId(), person);
             foreach (var friendid in person.ReadKarmaFriends())
             {
-                Debug.WriteLine("AddPersonEntry:Updating Karmafriends " + friendid);
+                Logger.WriteLine("AddPersonEntry:Updating Karmafriends " + friendid);
                 KarmaPerson friend;
                 if (PeopleGraph.TryGetValue(friendid, out friend))
                 {
@@ -316,7 +316,7 @@ namespace KarmaWebApp
                     PeopleGraph.AddNode(person.FacebookId(), person);
             }
 
-            Debug.WriteLine("GenerateGraph:Created Nodes:" + PeopleGraph.Count);
+            Logger.WriteLine("GenerateGraph:Created Nodes:" + PeopleGraph.Count);
 
             // now for each entry setup graph links.
             int edges = 0;
@@ -332,7 +332,7 @@ namespace KarmaWebApp
                     edges++;
                 }
             }
-            Debug.WriteLine("GenerateGraph:Done updating edges:" + edges);
+            Logger.WriteLine("GenerateGraph:Done updating edges:" + edges);
         }
 
         
@@ -410,10 +410,10 @@ namespace KarmaWebApp
         /// <param name="person"></param>
         private static KarmaGraphNode<KarmaPerson> AddPersonEntry(KarmaPerson person)
         {
-            Debug.WriteLine("AddPersonEntry: for:" + person.FacebookId());
+            Logger.WriteLine("AddPersonEntry: for:" + person.FacebookId());
             if (PeopleGraph.ContainsKey(person.FacebookId()))
             {
-                Debug.WriteLine("AddPersonEntry:Person already exists:" + person.FacebookId());
+                Logger.WriteLine("AddPersonEntry:Person already exists:" + person.FacebookId());
                 return null;
             }
 
@@ -426,7 +426,7 @@ namespace KarmaWebApp
                 person.ETag = "*"; // this tells azure that overwrite the entry even if its modified before us.
                 var insertPerson = TableOperation.Insert(person);
                 PeopleTable.Execute(insertPerson);
-                Debug.WriteLine("AddPersonEntry:Executed InsertPerson:" + person.FacebookId());
+                Logger.WriteLine("AddPersonEntry:Executed InsertPerson:" + person.FacebookId());
 
                 // let other instances know that graph need to be added to the graph
                 KarmaBackgroundWorker.BroadCastWorkItem("BroadCast_AddToGraph", person.FacebookId());
@@ -459,7 +459,7 @@ namespace KarmaWebApp
             }
             catch (Exception ex)
             {
-                Debug.WriteLine("Failed to add request:" + request.GetRequestId() + "Exception:" + ex);
+                Logger.WriteLine("Failed to add request:" + request.GetRequestId() + "Exception:" + ex);
             }
 
             return null;
@@ -526,7 +526,7 @@ namespace KarmaWebApp
             var existing = ReadKarmaFriends();
             if (existing.Contains(newFriend))
             {
-                Debug.WriteLine("For {0} Cannot Add:({1}), because already exists in ({2})", FacebookId(), newFriend, KarmaFriends);
+                Logger.WriteLine("For {0} Cannot Add:({1}), because already exists in ({2})", FacebookId(), newFriend, KarmaFriends);
                 return false;
             }
             if (string.IsNullOrEmpty(KarmaFriends))

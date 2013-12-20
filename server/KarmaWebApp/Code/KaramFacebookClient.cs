@@ -1,4 +1,5 @@
 ﻿using Facebook;
+using KarmaWebApp.Code;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -55,12 +56,12 @@ namespace KarmaWebApp
                     this.Location = meResults.ContainsKey("location") ? meResults.location.name : "unknown";
                     this.Email = meResults.ContainsKey("email") ? meResults.email : "unknown"; 
                 }
-                Debug.WriteLine("Facebook: Read Basic Information for:" + this.FacebookId);
+                Logger.WriteLine("Facebook: Read Basic Information for:" + this.FacebookId);
                 return true;
             }
             catch (Exception ex)
             {
-                Debug.WriteLine("Exception in ReadBasicInfo:"+ex);
+                Logger.WriteLine("Exception in ReadBasicInfo:" + ex);
                 return false;
             }
         }
@@ -78,14 +79,14 @@ namespace KarmaWebApp
                 {
                     var ex = (Exception)result[0];
                     // handle exception
-                    Debug.WriteLine("result[0] is Exception in ReadExtendedInformation:" + ex);
+                    Logger.WriteLine("result[0] is Exception in ReadExtendedInformation:" + ex);
                 }
 
                 if (result[1] is Exception)
                 {
                     var ex = (Exception)result[1];
                     // handle exception
-                    Debug.WriteLine("result[1] is Exception in ReadExtendedInformation:" + ex);
+                    Logger.WriteLine("result[1] is Exception in ReadExtendedInformation:" + ex);
                 }
                 else
                 {
@@ -101,17 +102,17 @@ namespace KarmaWebApp
                         this.Friends.Add(new FacebookFriend(frienddata));
                     }
 
-                    Debug.WriteLine("Facebook: Read ReadExtendedInformation for:" + this.FacebookId);
+                    Logger.WriteLine("Facebook: Read ReadExtendedInformation for:" + this.FacebookId);
                     return true;
                 }
             }
             catch (FacebookApiException ex)
             {
-                Debug.WriteLine("FacebookApiException in ReadExtendedInformation:" + ex);
+                Logger.WriteLine("FacebookApiException in ReadExtendedInformation:" + ex);
             }
             catch (Exception ex)
             {
-                Debug.WriteLine("Exception in ReadExtendedInformation:" + ex);
+                Logger.WriteLine("Exception in ReadExtendedInformation:" + ex);
             }
             return false;
         }

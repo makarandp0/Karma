@@ -177,6 +177,7 @@
     <Compile Include="Code\IKarmaAPI.cs" />
     <Compile Include="Code\KarmaBackgroundWorker.cs" />
     <Compile Include="Code\KarmaGraph.cs" />
+    <Compile Include="Code\Logger.cs" />
     <Compile Include="Code\Utils.cs" />
     <Compile Include="Controllers\AndroidController.cs" />
     <Compile Include="Controllers\ApiController.cs" />

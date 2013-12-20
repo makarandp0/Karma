@@ -44,7 +44,7 @@ namespace KarmaWebApp.Code
         {
             var queueClient = storageAccount.CreateCloudQueueClient();
             _WorkerQueue = queueClient.GetQueueReference("workQueue");
-            _WorkerQueue.CreateIfNotExists();
+            // _WorkerQueue.CreateIfNotExists();
 
             _Backgroundworker = new Thread(this.DoWork);
         }
@@ -132,7 +132,7 @@ namespace KarmaWebApp.Code
             }
             catch(Exception ex)
             {
-                Debug.WriteLine("Failed to add work item to the queue:" + ex);
+                Logger.WriteLine("Failed to add work item to the queue:" + ex);
             }
 
             return false;

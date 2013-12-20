@@ -47,13 +47,13 @@ namespace KarmaWebApp.Code.Graph
             KarmaGraphNode<T> toNode;
             if (!base.TryGetValue(from, out fromNode))
             {
-                Debug.Write("From node not found:" + from);
+                Logger.WriteLine("From node not found:" + from);
                 return false;
             }
 
             if (!base.TryGetValue(to, out toNode))
             {
-                Debug.Write("To node not found:" + to);
+                Logger.WriteLine("To node not found:" + to);
                 return false;
             }
 
@@ -73,13 +73,13 @@ namespace KarmaWebApp.Code.Graph
             KarmaGraphNode<T> toNode;
             if (!base.TryGetValue(from, out fromNode))
             {
-                Debug.Write("From node not found:" + from);
+                Logger.WriteLine("From node not found:" + from);
                 return false;
             }
 
             if (!base.TryGetValue(to, out toNode))
             {
-                Debug.Write("To node not found:" + to);
+                Logger.WriteLine("To node not found:" + to);
                 return false;
             }
 
