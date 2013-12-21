@@ -24,7 +24,7 @@ namespace KarmaBackEnd
             if (client.ReadBasicInfo())
             {
                 // see if we have the person's info in our cache.
-                if (!KarmaDatabase.GetPersonEntry(client.FacebookId, out person) || ((DateTime.Now - person.GetValue().Timestamp) > RefreUserDataAfterTimeSpan))
+                if (!KarmaDatabase.GetPersonEntry(client.FacebookId, out person))
                 {
                     // we did not find the entry in cache.
                     // or the entry is stale. lets get more info from facebook

@@ -391,7 +391,7 @@ namespace KarmaWebApp
         {
             // retrive perticular user from cache.
             bool success = PeopleGraph.TryGetValue(facebookid, out person);
-            Debug.WriteLine("GetPersonEntry({0} returned:{1} ", facebookid, success);
+            Logger.WriteLine("GetPersonEntry({0} returned:{1} ", facebookid, success);
             return success;
         }
 

@@ -10,6 +10,24 @@
     @Scripts.Render("~/bundles/modernizr")
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
+    <style>
+    .v-center {
+        margin-top: 7%;
+    }
+        .clickableimage {
+            cursor: pointer; /* shows hand cursor*/
+        }
+        #karma_logon_button {
+            height: 46px;
+            width: 202px;
+            background-image: url('/images/active_404.png');
+            margin: 0 auto; /* centers inside outer div*/
+        }
+            #karma_logon_button:hover {
+                background-image: url('/images/pressed_404.png'); /* updates image on hover */
+            }
+    </style>
+
 </head>
 <body>
     <div id="fb-root"></div>
@@ -17,9 +35,8 @@
     $(function () // same as: $( document ).ready(fucntion()
     {
         console.log("document ready for v1.2!");
-
-        // to start with mark as not_authorized.
-        UpdateUserLoggedOnState(null);
+        $(".userisloggedOn").hide();
+        $(".userisloggedOff").show();
 
         // by default, jQuery timestamps asynchronous requests to avoid them being cached by the browser.
         // You’ll want to disable this functionality using the ajaxSetup() method,
@@ -41,96 +58,35 @@
 
                 // register for facebook logon state change.
                 FB.Event.subscribe('auth.authResponseChange', function (response) {
-
                     console.log('auth.authResponseChange:' + response.status);
                     if (response.status === 'connected') {
-                        GetLoggedOnUserInfo(response.authResponse)
+                        FB.api('/me?fields=id,name,picture', function (fb_me_response) {
+                            // setup image, name, enter link.
+                            $("#karma_user_img").attr("src", fb_me_response.picture.data.url);
+                            $("#karma_user_name").html("Hello " + fb_me_response.name + "!")
+                            $("a#MobileLink").attr('href', '/Android/?accessToken=' + response.accessToken);
+
+                            // show loggedOn controls
+                            $(".userisloggedOn").show();
+                            $(".userisloggedOff").hide();
+                        });
                     }
                     else {
-                        console.log('auth.authResponseChange:User cancelled login or did not fully authorize.');
+                        console.log("user logged off")
+                        $(".userisloggedOn").hide();
+                        $(".userisloggedOff").show();
                     }
-
                 });
 
-                // setup the logon button for users logs user on.
-                // this will be enabled/disabled from UpdateUserLoggedOnState.
-                $("#karma_logon_button").show().click(function () {
-                    // no need to handle response here, its hanled in event registration above
+                // setup the logon/logoff buttons. No need to provide response handlers its handled in event registration above
+                $("#karma_logon_button").click(function () {
                     FB.login(function (response) {}, { scope: 'email' });
+                });
+                $("#karma_user_logoff").click(function () {
+                    FB.logout(function (response) {});
                 });
             });
         });
-
-        //
-        function GetLoggedOnUserInfo(authResponse)
-        {
-            // the user is logged in and has authenticated your
-            // app, and response.authResponse supplies
-            // the user's ID, a valid access token, a signed
-            // request, and the time the access token
-            // and signed request each expire
-            FB.api('/me?fields=id,name,picture', function (fb_me_response) {
-                var karma_userinfo =
-                {
-                    id: fb_me_response.id,
-                    name: fb_me_response.name,
-                    pictureurl: fb_me_response.picture.data.url,
-                    uid: authResponse.userID,
-                    accessToken: authResponse.accessToken
-                }
-                UpdateUserLoggedOnState(karma_userinfo);
-            });
-        }
-
-
-        // Here we run a very simple test of the Graph API after login is successful.
-        // This testAPI() function is only called in those cases.
-        function UpdateUserLoggedOnState(karma_userinfo)
-        {
-            var loggedOn = true;
-            if (karma_userinfo === null) {
-                console.log('LogonState: Not Logged On');
-                loggedOn = false;
-            }
-
-
-            if (loggedOn)
-            {
-                $(".userisloggedOn").show();
-                $(".userisloggedOff").hide();
-                setupmobilelink();
-
-                $("#karma_user_img").attr("src", karma_userinfo.pictureurl).show();
-                $("#karma_user_name").html("Hello " + karma_userinfo.name + "!")
-                $("#karma_user_name").show().unbind("click").click(getFriends).prop('disabled', false).show();;
-            }
-            else
-            {
-                $(".userisloggedOn").hide();
-                $(".userisloggedOff").show();
-
-                $("#karma_user_name").show().unbind("click").prop('disabled', true);
-            }
-        }
-
-        function getFriends() {
-            FB.api('/me/friends', function (response) {
-                if (response.data) {
-                    $.each(response.data, function (index, friend) {
-                        console.log(friend.name + ':' + friend.id);
-                    });
-                } else {
-                    console.log('Error retriving friends list');
-                }
-            });
-        }
-
-        function setupmobilelink(accesstoken) {
-            FB.getLoginStatus(function (response) {
-                    var accessToken = response.authResponse.accessToken;
-                    $("a#MobileLink").attr('href', '/Android/?accessToken=' + accessToken);
-            });
-        }
     </script>
 
     <div class="navbar navbar-inverse navbar-fixed-top">
@@ -141,7 +97,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="/">KarmaWeb.com</a>
+                <a class="navbar-brand" href="/">About</a>
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav navbar-right userisloggedOn">
@@ -149,27 +105,28 @@
                     <li>
                         <img id="karma_user_img" src="" alt="some_text">
                     </li>
+                    <li><a id="karma_user_logoff" href="#">Logoff</a></li>
                 </ul>
             </div>
         </div>
     </div>
     <div class="container body-content">
-        <div class="jumbotron">
-            <h2>Build your Karma!</h2>
-            <p><a id="karma_logon_button" href="#" class="btn btn-primary btn-large userisloggedOff">Login with Facebook &raquo;</a></p>
-             <p><a id="MobileLink" href="http://asp.net" class="btn btn-primary btn-large userisloggedOn">Enter &raquo;</a></p>
-
-        </div>
-
+           <div class="col-lg-12 text-center v-center">
+                <h1>πr²</h1>
+               <p class="lead">Making it easy</p>
+               <br><br><br>
+               <p><div id="karma_logon_button" class="userisloggedOff v-center clickableimage"></div></p>
+                   <p><a id="MobileLink" href="http://asp.net" class="btn btn-primary btn-large userisloggedOn">Enter &raquo;</a></p>
+               </div>
         <div class="row">
             <div class="col-md-4">
-                <h2>Everybody needs help</h2>
-                <p>
-                    Need an occassional ride to airport? Need to borrow some powertools for your weekend projecct? Use karmaweb.com to ask help from friends who are
-                    explicitely signed up to help!
-                </p>
-                <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
-            </div>
+                    <h2>Everybody needs help</h2>
+                    <p>
+                        Need an occassional ride to airport? Need to borrow some powertools for your weekend projecct? Use karmaweb.com to ask help from friends who are
+                        explicitely signed up to help!
+                    </p>
+                    <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
+                </div>
             <div class="col-md-4">
                 <h2>Friends love to help</h2>
                 <p>People love to help friends.This app makes it easy to volunteer. By installing this app you are opting in to occasionally give ride to your friends. </p>
@@ -182,9 +139,6 @@
             </div>
         </div>
         <hr />
-        <footer>
-            <p>&copy; @DateTime.Now.Year - KarmaWeb.com</p>
-        </footer>
     </div>
 
     @Scripts.Render("~/bundles/jquery")
