@@ -153,11 +153,14 @@
     <Content Include="images\active_404.png" />
     <Content Include="images\pressed_404.png" />
     <Content Include="Scripts\app\Channel.html" />
+    <Content Include="Scripts\app\mockdata.js" />
+    <Content Include="Scripts\app\textticker.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
+    <Content Include="Scripts\jquery.mockjax.js" />
     <Content Include="Scripts\jquery.ticker.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />

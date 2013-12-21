@@ -64,7 +64,7 @@
                             // setup image, name, enter link.
                             $("#karma_user_img").attr("src", fb_me_response.picture.data.url);
                             $("#karma_user_name").html("Hello " + fb_me_response.name + "!")
-                            $("a#MobileLink").attr('href', '/Android/?accessToken=' + response.accessToken);
+                            $("a#MobileLink").attr('href', '/Android/?accessToken=' + response.authResponse.accessToken);
 
                             // show loggedOn controls
                             $(".userisloggedOn").show();

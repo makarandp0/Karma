@@ -15,9 +15,28 @@
     <script type='text/javascript' src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script type='text/javascript' src="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
     <script type='text/javascript' src='/Scripts/knockout-3.0.0.js'></script>
-    <!-- JavaScript jQuery code from Bootply.com editor -->
+    
+    <script type='text/javascript' src='/Scripts/app/textticker.js'></script>
+
+    <!-- include mockdata to hijack ajax calls.-->
+    <script type='text/javascript' src='/Scripts/jquery.mockjax.js'></script>
+    <!-- setup our own mockdata -->
+    <script type='text/javascript' src='/Scripts/app/mockdata.js'></script>
+
+    
     <script type='text/javascript'>
         $(document).ready(function () {
+
+            // setup textticker.
+            applyTicker("textticker", [
+                        "a ride to airport this tuesday.     ",
+                        "to borrow some powertools for my weekend project.    ",
+                        "help feeding my cat for a day while I am gone.    ",
+                        "to borrow latest John Grisham book.   ",
+                        "help moving my stuff tommorrow.    "
+            ]);
+
+            <!-- JavaScript jQuery code from Bootply.com editor -->
             $('[data-toggle=offcanvas]').click(function () {
                 $('.row-offcanvas').toggleClass('active');
             });
@@ -28,17 +47,21 @@
 
             // setup viewmodel for our data.
             var myViewModel = {
+                usefake: true,
                 personName: "@Model.name",
+                pictureUrl: "@Model.pictureUrl",
                 selectedfriend: ko.observable(),
                 retrivingFriends: ko.observable(true),
                 errorRetrivingFriends: ko.observable("Wait...Loading your friend list"),
                 friends: ko.observableArray([]),        // friends array
                 requestText: ko.observable(""),         // request header text value.
                 showRequestError: ko.observable(false), // need to show error message about next button?
+                inbox: ko.observableArray([]),          // inbox
+                outbox: ko.observableArray([]),         // outbox
                 selectfriend: function (item) {
                     this.selectedfriend(item);
                 },
-                OnSubmit: function () {
+                CreateRequest: function () {
                     if (this.requestText().length < 5) {
 
                         // if request is not value
@@ -94,63 +117,7 @@
             jqxhr.complete(function () {
                 console.log("second complete");
             });
-
-            /*
-            $.getJSON("/Api/getFriends", function (data) {
-                // Now use this data to update your view models,
-                // and Knockout will update your UI automatically
-                // get list of friends from ajax call.
-                console.log("got ajax data from API:" + data.error + data.errorcode);
-                if (error)
-                friendsRetrived = true;
-            })
-            */
         });
-    </script>
-
-    <!-- newsticker for editbox -->
-    <script>
-        // ticker messages inside "I Need" edit box
-        $(document).ready(function () {
-            $(function () {
-                var timerId = 0;
-                var tickerMessages = [
-                        "a ride to airport on this tuesday.     ",
-                        "to borrow some powertools for my weekend project.    ",
-                        "some help feeding my cat for while I am gone.    ",
-                        "to borrow latest John Grisham book.   ",
-                        "help moving next saturday.   "
-                ];
-                var row = 0;
-                var col = 1;
-
-                function timerfunction() {
-                    $('#textticker').attr('placeholder', tickerMessages[row].substring(0, col));
-                    if (++col == tickerMessages[row].length) {
-                        col = 1;
-                        row = ++row % tickerMessages.length;
-                    }
-                }
-
-                // on gaining focus clear the timer.
-                $('#textticker').focus(function () {
-                    var input = $(this);
-                    input.attr('placeholder', tickerMessages[row]);
-                    if (timerId) clearInterval(timerId);
-                });
-
-                // or loosing focus start timer if the placeholder==text.
-                $('#textticker').blur(function () {
-                    var input = $(this);
-                    if (timerId) clearInterval(timerId);
-
-                    if (input.val() == '' || input.val() == input.attr('placeholder')) {
-                        timerId = setInterval(timerfunction, 100);
-                    }
-                });
-                timerId = setInterval(timerfunction, 100);
-            });
-        })
     </script>
 
     <!--[if lt IE 9]>
@@ -396,18 +363,10 @@
                 <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
                     <div data-spy="affix" data-offset-top="45" data-offset-bottom="90" class="">
                         <ul class="nav" id="sidebar-nav">
-                            <li>
-                                <a href="#" class="">home</a>
-                            </li>
-                            <li>
-                                <a href="#inbox" class="">inbox</a>
-                            </li>
-                            <li>
-                                <a href="#outbox" class="">outbox</a>
-                            </li>
-                            <li>
-                                <a href="#settings" class="">settings</a>
-                            </li>
+                            <li> <a href="#" class="">home</a> </li>
+                            <li> <a href="#inbox" class="">inbox</a> </li>
+                            <li> <a href="#outbox" class="">outbox</a> </li>
+                            <li> <a href="#settings" class="">settings</a> </li>
                         </ul>
                     </div>
                 </div>
@@ -418,7 +377,7 @@
                     <!-- ask your friends for help pannel-->
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <img src="@Model.pictureUrl" alt="@Model.name">
+                            <img data-bind="attr:{src: pictureUrl}">
                             <h4 class="">You got Friends <span data-bind="text: personName + '!'">!</span></h4>
                         </div>
                         <div class="panel-body">
@@ -437,7 +396,7 @@
                             <div data-bind="visible: showRequestError">
                                 <span class="label label-warning"> Are you kidding me...at least type sometime ?</span>
                             </div>
-                            <button class="btn btn-lg btn-primary pull-right" data-bind="click: OnSubmit" type="button">Submit</button>
+                            <button class="btn btn-lg btn-primary pull-right" data-bind="click: CreateRequest" type="button">Submit</button>
                             <!--</form>-->
                         </div>
                     </div>
