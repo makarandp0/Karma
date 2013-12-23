@@ -23,6 +23,8 @@ namespace KarmaWebApp.Models
         public string facebookId { get; set; }
         public string name { get; set; }
         public string location { get; set; }
+
+        public bool useMock { get; set; }
     }
 
 }

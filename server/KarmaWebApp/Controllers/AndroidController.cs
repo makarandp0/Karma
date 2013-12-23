@@ -24,6 +24,7 @@ namespace KarmaWebApp.Controllers
                 model.pictureUrl = "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/274191_628825055_1428018580_q.jpg";
                 model.facebookId = "628825055";
                 model.location = "Redmond, WA";
+                model.useMock = true;
                 return View(model);
             }
 

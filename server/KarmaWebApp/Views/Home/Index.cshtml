@@ -35,8 +35,8 @@
     $(function () // same as: $( document ).ready(fucntion()
     {
         console.log("document ready for v1.2!");
-        $(".userisloggedOn").hide();
-        $(".userisloggedOff").show();
+        // $(".userisloggedOn").hide();
+        // $(".userisloggedOff").show();
 
         // by default, jQuery timestamps asynchronous requests to avoid them being cached by the browser.
         // You’ll want to disable this functionality using the ajaxSetup() method,
@@ -45,7 +45,7 @@
 
         // load facebook sdk async
         $.getScript('//connect.facebook.net/en_US/all.js', function () {
-
+            console.log("getscript returned!");
             // when facebook sdk loaded, call init.
             FB.init({
                 // appId: '225642707613078',
@@ -54,39 +54,53 @@
                     status: true, // check login status
                     cookie: true, // enable cookies to allow the server to access the session
                     xfbml: false  // parse XFBML
-                });
-
-                // register for facebook logon state change.
-                FB.Event.subscribe('auth.authResponseChange', function (response) {
-                    console.log('auth.authResponseChange:' + response.status);
-                    if (response.status === 'connected') {
-                        FB.api('/me?fields=id,name,picture', function (fb_me_response) {
-                            // setup image, name, enter link.
-                            $("#karma_user_img").attr("src", fb_me_response.picture.data.url);
-                            $("#karma_user_name").html("Hello " + fb_me_response.name + "!")
-                            $("a#MobileLink").attr('href', '/Android/?accessToken=' + response.authResponse.accessToken);
-
-                            // show loggedOn controls
-                            $(".userisloggedOn").show();
-                            $(".userisloggedOff").hide();
-                        });
-                    }
-                    else {
-                        console.log("user logged off")
-                        $(".userisloggedOn").hide();
-                        $(".userisloggedOff").show();
-                    }
-                });
-
-                // setup the logon/logoff buttons. No need to provide response handlers its handled in event registration above
-                $("#karma_logon_button").click(function () {
-                    FB.login(function (response) {}, { scope: 'email' });
-                });
-                $("#karma_user_logoff").click(function () {
-                    FB.logout(function (response) {});
-                });
             });
-        });
+            console.log("FB.Init'ed!");
+
+            // register for facebook logon state change.
+            FB.Event.subscribe('auth.authResponseChange', function (response) {
+                console.log('auth.authResponseChange:' + response.status);
+                if (response.status === 'connected') {
+                    console.log("fb is connected!");
+                    FB.api('/me?fields=id,name,picture', function (fb_me_response) {
+                        console.log("fb api returned!");
+                        // setup image, name, enter link.
+                        $("#karma_user_img").attr("src", fb_me_response.picture.data.url);
+                        $("#karma_user_name").html("Hello " + fb_me_response.name + "!")
+                        $("#karma_enter_button").attr('href', '/Android/?accessToken=' + response.authResponse.accessToken);
+
+                        // show loggedOn controls
+                        $(".userisloggedOn").show();
+                        $(".userisloggedOff").hide();
+                    });
+                }
+                else {
+                    console.log("user logged off")
+                    $(".userisloggedOn").hide();
+                    $(".userisloggedOff").show();
+                }
+            });
+
+            console.log("FB.Event.subscribed!");
+
+            // setup the logon/logoff buttons. No need to provide response handlers its handled in event registration above
+            $("#karma_logon_button").click(function () {
+                console.log("will call fb.login!");
+                FB.login(function (response) {
+                    console.log("got response from fb.login!");
+                }, { scope: 'email' });
+                console.log("done with fb.login call");
+            });
+
+            $("#karma_user_logoff").click(function () {
+                FB.logout(function (response) {});
+            });
+        }); // getscript
+
+        // set default state.
+        $(".userisloggedOn").hide();
+        $(".userisloggedOff").show();
+    });
     </script>
 
     <div class="navbar navbar-inverse navbar-fixed-top">
@@ -115,9 +129,9 @@
                 <h1>πr²</h1>
                <p class="lead">Making it easy</p>
                <br><br><br>
-               <p><div id="karma_logon_button" class="userisloggedOff v-center clickableimage"></div></p>
-                   <p><a id="MobileLink" href="http://asp.net" class="btn btn-primary btn-large userisloggedOn">Enter &raquo;</a></p>
-               </div>
+               <div id="karma_logon_button" class="userisloggedOff v-center clickableimage"></div>
+               <p><a id="karma_enter_button" href="http://asp.net" class="btn btn-primary btn-large userisloggedOn">Enter &raquo;</a></p>
+           </div>
         <div class="row">
             <div class="col-md-4">
                     <h2>Everybody needs help</h2>
@@ -126,7 +140,7 @@
                         explicitely signed up to help!
                     </p>
                     <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
-                </div>
+            </div>
             <div class="col-md-4">
                 <h2>Friends love to help</h2>
                 <p>People love to help friends.This app makes it easy to volunteer. By installing this app you are opting in to occasionally give ride to your friends. </p>
