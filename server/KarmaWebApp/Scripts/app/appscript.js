@@ -123,12 +123,38 @@ function SetupKnockOut(username, userpic)
             myViewModel.retrivingInbox(false);
         });
 
+    // make a request to get inbox.
+    var getInboxRequest = $.getJSON("/Api/getOutbox", function () {
+        console.log("success");
+    })
+        .done(function (data) {
+            if (!data.error) {
+                myViewModel.outbox(data.outbox);
+                if (data.outbox == 0) {
+                    myViewModel.outboxPanelHeader("no requests to show");
+                }
+                else {
+                    myViewModel.outboxPanelHeader("Outbox:");
+                    myViewModel.selectedoutbox(data.outbox[0]);
+                }
+            }
+            else {
+                myViewModel.outboxPanelHeader("Error retriving Inbox:" + data.errorcode);
+            }
+        })
+        .fail(function () {
+            myViewModel.outboxPanelHeader("unknown error retriving Inbox");
+        })
+        .always(function () {
+            myViewModel.retrivingOutbox(false);
+        });
+
+
     // Perform other work here ...
 
     // Set another completion function for the request above
     getFriendsRequest.complete(function () {
         console.log("getFriendsRequest complete");
     });
-
 }
 

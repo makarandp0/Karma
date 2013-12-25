@@ -1,4 +1,98 @@
-﻿/*
+﻿$(document).ready(function () {
+    $.mockjax({
+        url: '/Api/getFriends',
+        responseTime: 750,
+        responseText: {
+            errorcode: '',
+            error: false,
+            friends: [
+                { blocked: false, name: "Zardosht Kasheff", id: "714575", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash1/211301_714575_201445659_q.jpg" },
+                { blocked: true, name: "Ke Lu", id: "1204652", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/1086377_1204652_160149720_q.jpg" },
+                { blocked: false, name: "Jeffrey Jiang", id: "3114438", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-frc1/369287_3114438_2059822536_q.jpg" },
+                { blocked: false, name: "Karthik Gomadam", id: "4927451", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn2/t5/1116952_4927451_689372175_q.jpg" },
+                { blocked: false, name: "Nilesh Borade", id: "6516458", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash3/161354_6516458_1826043330_q.jpg" },
+                { blocked: false, name: "Novia Wijaya", id: "7937789", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash1/275146_7937789_1510901087_q.jpg" },
+                { blocked: false, name: "Vrushali Shrotri", id: "100004008272532", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn2/203272_100004008272532_1822936541_q.jpg" },
+            ]
+        }
+    });
+
+    // inbox
+    // requestStatus = opened = 1, closed = 0
+    // yourStatus = nostatus = 0, ignored = 1, offered = 2
+    $.mockjax({
+        url: '/Api/getInbox',
+        responseTime: 750,
+        responseText: {
+            errorcode: '',
+            error: false,
+            inbox: [
+                {
+                    from: { name: "Zardosht Kasheff", id: "714575", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash1/211301_714575_201445659_q.jpg" },
+                    request: { name: "Needs some more time", id: "1", requestStatus: 0, yourStatus: 0 }
+                },
+                {
+                    from: { name: "Ke Lu", id: "1204652", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/1086377_1204652_160149720_q.jpg" },
+                    request: { name: "Needs some money management lessons", id: "2", requestStatus: 0, yourStatus: 0 }
+                },
+                {
+                    from: { name: "Novia Wijaya", id: "7937789", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash1/275146_7937789_1510901087_q.jpg" },
+                    request: { name: "Needs a break", id: "3", requestStatus: 0, yourStatus: 0 }
+                }
+            ]
+        }
+    });
+
+    // outbox
+    // helpOffered :
+    // helpIgnored :
+    // helpAccepted :
+    $.mockjax({
+        url: '/Api/getOutbox',
+        responseTime: 750,
+        responseText: {
+            errorcode: '',
+            error: false,
+            outbox: [
+                {
+                    name: "Need a Ride to Airport",
+                    id: "1",
+                    helpOffered: [
+                        { name: "Novia Wijaya", id: "7937789", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash1/275146_7937789_1510901087_q.jpg" },
+                        { name: "Vrushali Shrotri", id: "100004008272532", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn2/203272_100004008272532_1822936541_q.jpg" },
+                    ],
+                    helpIgnored: [
+                    ],
+                    helpAccepted: [
+                    ]
+                },
+                {
+                    name: "Help feeding my cat",
+                    id: "2",
+                    helpOffered: [
+                        { name: "Zardosht Kasheff", id: "714575", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash1/211301_714575_201445659_q.jpg" }, 
+                    ],
+                    helpIgnored: [
+                    ],
+                    helpAccepted: [
+                    ]
+                },
+                {
+                    name: "No Help offers on this one",
+                    id: "2",
+                    helpOffered: [
+                    ],
+                    helpIgnored: [
+                    ],
+                    helpAccepted: [
+                    ]
+                }
+            ]
+        }
+    });
+});
+
+/*
     { name: "Zardosht Kasheff",id: "714575",pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash1/211301_714575_201445659_q.jpg"},
     { name: "Ke Lu",id: "1204652",pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/1086377_1204652_160149720_q.jpg"},
     { name: "Jeffrey Jiang",id: "3114438",pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-frc1/369287_3114438_2059822536_q.jpg"},
@@ -274,91 +368,3 @@
 
 
 */
-$(document).ready(function () {
-    $.mockjax({
-        url: '/Api/getFriends',
-        responseTime: 750,
-        responseText: {
-            errorcode: '',
-            error: false,
-            friends: [
-                { blocked: false, name: "Zardosht Kasheff", id: "714575", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash1/211301_714575_201445659_q.jpg" },
-                { blocked: true, name: "Ke Lu", id: "1204652", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/1086377_1204652_160149720_q.jpg" },
-                { blocked: false, name: "Jeffrey Jiang", id: "3114438", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-frc1/369287_3114438_2059822536_q.jpg" },
-                { blocked: false, name: "Karthik Gomadam", id: "4927451", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn2/t5/1116952_4927451_689372175_q.jpg" },
-                { blocked: false, name: "Nilesh Borade", id: "6516458", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash3/161354_6516458_1826043330_q.jpg" },
-                { blocked: false, name: "Novia Wijaya", id: "7937789", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash1/275146_7937789_1510901087_q.jpg" },
-                { blocked: false, name: "Vrushali Shrotri", id: "100004008272532", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn2/203272_100004008272532_1822936541_q.jpg" },
-            ]
-        }
-    });
-
-    // inbox
-    // requestStatus = opened = 1, closed = 0
-    // yourStatus = nostatus = 0, ignored = 1, offered = 2
-    $.mockjax({
-        url: '/Api/getInbox',
-        responseTime: 750,
-        responseText: {
-            errorcode: '',
-            error: false,
-            inbox: [
-                {
-                    from: { name: "Zardosht Kasheff", id: "714575", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash1/211301_714575_201445659_q.jpg" },
-                    request: { name: "Needs some more time", id: "1", requestStatus: 0, yourStatus: 0 }
-                },
-                {
-                    from: { name: "Ke Lu", id: "1204652", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/1086377_1204652_160149720_q.jpg" },
-                    request: { name: "Needs some money management lessons", id: "2", requestStatus: 0, yourStatus: 0 }
-                },
-                {
-                    from: { name: "Novia Wijaya", id: "7937789", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash1/275146_7937789_1510901087_q.jpg" },
-                    request: { name: "Needs a break", id: "3", requestStatus: 0, yourStatus: 0 }
-                }
-            ]
-        }
-    });
-
-    // outbox
-    // helpOffered :
-    // helpIgnored :
-    // helpAccepted :
-    $.mockjax({
-        url: '/Api/getOutBox',
-        responseTime: 750,
-        responseText: {
-            errorcode: '',
-            error: false,
-            outbox: [
-                {
-                    name: "Need a Ride to Airport",
-                    id: "1",
-                    helpOffered: [
-                        { name: "Novia Wijaya", id: "7937789", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash1/275146_7937789_1510901087_q.jpg" },
-                        { name: "Vrushali Shrotri", id: "100004008272532", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn2/203272_100004008272532_1822936541_q.jpg" },
-                    ],
-                    helpIgnored: [
-                        { name: "Lata Mangeshkar", id: "latamangeshkar", karmapoints: 0, pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/274191_628825055_1428018580_q.jpg" },
-                    ],
-                    helpAccepted: [
-                        { name: "Chetana Deshpande", id: "100002861329156", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash1/275826_100002861329156_1885920_q.jpg" },
-                    ]
-                },
-                {
-                    name: "Help feeding my cat",
-                    id: "2",
-                    helpOffered: [
-                        { name: "Guru Dutt", id: "gurudutt", karmapoints: 0, pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/274191_628825055_1428018580_q.jpg" },
-                        { name: "Lata Mangeshkar", id: "latamangeshkar", karmapoints: 0, pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/274191_628825055_1428018580_q.jpg" },
-                    ],
-                    helpIgnored: [
-                        { name: "Lata Mangeshkar", id: "latamangeshkar", karmapoints: 0, pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/274191_628825055_1428018580_q.jpg" },
-                    ],
-                    helpAccepted: [
-                        { name: "Guru Dutt", id: "gurudutt", karmapoints: 0, pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/274191_628825055_1428018580_q.jpg" },
-                    ]
-                }
-            ]
-        }
-    });
-});

@@ -79,7 +79,7 @@
                 <div class="col-xs-4 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
                     <div data-spy="affix" data-offset-top="45" data-offset-bottom="90" class="">
                         <ul class="nav" id="sidebar-nav">
-                            <li> <a href="#you" class="">home</a> </li>
+                            <li> <a href="#you" class="">you</a> </li>
                             <li> <a href="#friends" class=""><span class="badge pull-right" data-bind="text: friends().length">0</span>friends</a> </li>
                             <li> <a href="#inbox" class=""><span class="badge pull-right" data-bind="text: inbox().length">0</span>inbox</a> </li>
                             <li> <a href="#outbox" class=""><span class="badge pull-right" data-bind="text: outbox().length">0</span>outbox</a> </li>
@@ -92,7 +92,7 @@
                 <div class="col-xs-12 col-sm-9" data-spy="scroll" data-target="#sidebar-nav">
 
                     <!-- ask your friends for help pannel-->
-                    <h1 id="you" class="">You</h1>
+                    <h1 id="you" class="">you</h1>
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <img data-bind="attr:{src: pictureUrl}">
@@ -144,17 +144,17 @@
                         </div>
                         <div class="col-sm-6">
                             <!-- Friends Details -->
-                            <div class="panel panel-default">
+                            <div class="panel panel-default" data-bind="if: selectedfriend()">
                                 <div class="panel-heading">
                                     <a href="#" class="pull-right">View all</a>
-                                    <h4 class="" data-bind="text: selectedfriend() ? selectedfriend().name : ''">Friends Details</h4>
+                                    <h4 class="" data-bind="text: selectedfriend().name">Friends Details</h4>
                                 </div>
                                 <div class="panel-body">
                                     <p class="">
-                                        <img class="img-polaroid pull-left" data-bind="attr:{src: selectedfriend() ? selectedfriend().pic : ''}">
+                                        <img class="img-polaroid pull-left" data-bind="attr:{src: selectedfriend().pic}">
                                     </p>
                                     <div class="clearfix"></div>
-                                    <div class="realFriend" data-bind="visible: selectedfriend() ? !selectedfriend().blocked : false">
+                                    <div class="realFriend" data-bind="ifnot: selectedfriend().blocked">
                                         <hr class="">
                                         if this person is not really a "friend", you can block him/her.
                                         Once Blocked this person will see any help requests from you and you will not
@@ -165,7 +165,7 @@
                                             <button class="btn btn-warning" data-bind="click: BlockSelectedFriend">Block this friend</button>
                                         </div>
                                     </div>
-                                    <div class="blockedFriend" data-bind="visible: selectedfriend() ? selectedfriend().blocked : false">
+                                    <div class="blockedFriend" data-bind="if: selectedfriend().blocked">
                                         <hr class="">
                                         You have blocked this "friend". that means you will not see any help
                                         requests from him nor will he see your help requests. if you have changed your mind
@@ -175,14 +175,12 @@
                                             <button class="btn btn-success" data-bind="click: UnBlockSelectedFriend">UnBlock this friend</button>
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
-
                         </div>
                     </div>
 
-                    <h1 id="inbox" class="">Inbox</h1>
+                    <h1 id="inbox" class="">inbox</h1>
                     <div class="row">
                         <!--Inbox-->
                         <div class="col-sm-6">
@@ -207,21 +205,21 @@
 
                         <div class="col-sm-6">
                             <!-- InboxDetails -->
-                            <div class="panel panel-default">
+                            <div class="panel panel-default" data-bind="if: selectedinbox()">
                                 <div class="panel-heading">
                                     <a href="#" class="pull-right">View all</a>
-                                    <h4 class="" data-bind="text: selectedinbox() ? selectedinbox().from.name : ''">Inbox Details</h4>
+                                    <h4 class="" data-bind="text: selectedinbox().from.name">Inbox Details</h4>
                                 </div>
                                 <div class="panel-body">
                                     <div style="float:left;padding-right:10px">
-                                        <img class="img-polaroid pull-left" data-bind="attr:{src: selectedinbox() ? selectedinbox().from.pic : ''}">
+                                        <img class="img-polaroid pull-left" data-bind="attr:{src: selectedinbox().from.pic}">
 
                                     </div>
-                                    <h4 class="list-group-item-heading" data-bind="text: selectedinbox() ? selectedinbox().request.name : ''"></h4>
+                                    <h4 class="list-group-item-heading" data-bind="text: selectedinbox().request.name"></h4>
                                     <div class="clearfix"></div>
 
                                     <hr class="">This is your chance to help your friend. if you choose to help, we will notify
-                                    <span data-bind="text: selectedinbox() ? selectedinbox().from.name : ''">your friend</span> about
+                                    <span data-bind="text: selectedinbox().from.name">your friend</span> about
                                     it. if s/he hasn't gotten help already, he/she will accept your request and get back to you.
                                     if you choose to not help. its okay! We won't tell her that you saw the request.
                                     <div class="clearfix"></div>
@@ -236,31 +234,73 @@
 
                     </div>
 
-                    <!-- outbox -->
                     <h1 id="outbox" class="">outbox</h1>
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <a href="#" class="pull-right">Refresh</a>
-                            <h4 class="">You Need:</h4>
-                        </div>
-                        <div class="panel-body">
-                            <ul class="list-group">
-                                <li class="list-group-item">
-                                    <span class="btn-group btn-toggle pull-right">
-                                        <button class="btn btn-xs btn-default">On</button>
-                                        <button class="btn btn-xs btn-primary active">Off</button>
-                                    </span> ride to airport on Monday
-                                </li>
-                                <li class="list-group-item">
-                                    <span class="btn-group btn-toggle pull-right">
-                                        <button class="btn btn-xs btn-default">On</button>
-                                        <button class="btn btn-xs btn-primary active">Off</button>
-                                    </span> somebody to feed my cat on saturday Morning
-                                </li>
-                            </ul>
-                        </div>
+                    <div class="row">
+                        <!--Outbox-->
+                        <div class="col-sm-6">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <a href="#" class="pull-right">Refresh</a>
+                                    <h4 class="" data-bind="text: outboxPanelHeader">Inbox:</h4>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="list-group" data-bind="foreach: outbox">
+                                        <a href="#" class="inboxListContainer list-group-item" data-bind="css: { active: $parent.selectedoutbox() == $data}, click: $parent.selectOutboxItem.bind($parent)">
+                                            <h4 class="list-group-item-heading" data-bind="text: name"></h4>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> <!--/outbox-->
+
+                        <div class="col-sm-6">
+                            <!-- OutboxDetails -->
+                            <div class="panel panel-default" data-bind="if: selectedoutbox()">
+                                <div class="panel-heading">
+                                    <a href="#" class="pull-right">Refresh</a>
+                                    <h4 class="" data-bind="text: selectedoutbox().name">Need a Ride</h4>
+                                </div>
+                                <div class="panel-body">
+                                    <div style="float:left;padding-right:10px">
+                                        <img class="img-polaroid pull-left" data-bind="attr:{src: pictureUrl}">
+                                    </div>
+                                    <h4 class="list-group-item-heading" data-bind="text: 'You:' + selectedoutbox().name"></h4>
+                                    <div class="clearfix"></div>
+
+                                    
+                                    <div data-bind="if: selectedoutbox()">
+
+                                        <!-- people who offered help -->
+                                        <div data-bind="if: selectedoutbox().helpOffered.length > 0">
+                                            <div data-bind="foreach: selectedoutbox().helpOffered">
+                                                <div>
+                                                    <div class="clearfix"></div>
+                                                    <hr class="">
+                                                    <img data-bind="attr:{src: pic}">
+                                                    <span data-bind="text: name"> </span> has offered Help!
+                                                    <div class="btn-group pull-right">
+                                                        <button type="button" class="btn btn-success btn-lg ">Accept Help!</button>
+                                                        <button type="button" class="btn btn-default btn-lg ">Ignore</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- nobody offered help-->
+                                        <div data-bind="if: selectedoutbox().helpOffered.length == 0">
+                                            
+                                            <hr class="">
+                                            Your request is in transit. Please be patient, and check back later. We will send 
+                                            your request to your friends one by one. When somebody offers help we will notify 
+                                            you.
+                                            <hr class="">
+
+                                        </div>
+                                </div>
+                            </div>
+                        </div><!-- /InboxDetails -->
+
                     </div>
-                    <!-- /outbox -->
 
                     <h1 id="settings" class="">Settings</h1>
                     <div class="row">
