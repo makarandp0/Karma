@@ -54,6 +54,5 @@ namespace KarmaWebApp.Controllers
                 return RedirectToAction("Index", "Home");
             }
         }
-
 	}
 }

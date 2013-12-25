@@ -135,6 +135,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\app\appstyle.css" />
     <Content Include="Content\BootStrampTemplate.html" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
@@ -153,6 +154,7 @@
     <Content Include="images\active_404.png" />
     <Content Include="images\pressed_404.png" />
     <Content Include="Scripts\app\Channel.html" />
+    <Content Include="Scripts\app\appscript.js" />
     <Content Include="Scripts\app\mockdata.js" />
     <Content Include="Scripts\app\textticker.js" />
     <Content Include="Scripts\bootstrap.js" />
@@ -172,7 +174,6 @@
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />
     <None Include="Scripts\_references.js" />
-    <Content Include="Views\Android\friendslist.html" />
     <Content Include="Web.config" />
     <Content Include="Scripts\jquery-1.10.2.min.map" />
   </ItemGroup>
@@ -205,9 +206,8 @@
     <Content Include="packages.config" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
-    <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\Home\landing.cshtml" />
     <Content Include="Views\Android\Index.cshtml" />
-    <Content Include="Views\Home\NewsTIcker.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

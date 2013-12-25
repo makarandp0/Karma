@@ -13,13 +13,7 @@ namespace KarmaWebApp.Controllers
         // GET: /Home/
         public ActionResult Index()
         {
-            return View(new MainModel());
-        }
-
-        // GET: /Home/NewsTicker
-        public ActionResult NewsTicker()
-        {
-            return View(new MainModel());
+            return View("landing", new MainModel());
         }
 	}
 }

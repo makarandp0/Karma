@@ -15,373 +15,49 @@
     <script type='text/javascript' src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script type='text/javascript' src="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
     <script type='text/javascript' src='/Scripts/knockout-3.0.0.js'></script>
-    
-    <script type='text/javascript' src='/Scripts/app/textticker.js'></script>
 
+    <!-- ticker-->    
+    <script type='text/javascript' src='../../Scripts/app/textticker.js'></script>
 
     @if (Model.useMock)
     {
-        <!-- include mockdata to hijack ajax calls.-->
-        <script type='text/javascript' src='/Scripts/jquery.mockjax.js'></script>
-        
-        <!-- setup our own mockdata -->
-        <script type='text/javascript' src='/Scripts/app/mockdata.js'></script>
+        <script type='text/javascript' src='../../Scripts/jquery.mockjax.js'></script>
+        <script type='text/javascript' src='../../Scripts/app/mockdata.js'></script>
+
+        <script>
+            var username = "@Model.name";
+            var userpic = "@Model.pictureUrl";
+        </script>
     }
-
     
-    <script type='text/javascript'>
-        $(document).ready(function () {
+    <link rel="stylesheet" type="text/css" href="../../Content/app/appstyle.css">
+    <script type='text/javascript' src='../../Scripts/app/appscript.js'></script>
+    
+<script>
+    $(document).ready(function () {
 
-            // setup textticker.
-            applyTicker("textticker", [
-                        "a ride to airport this tuesday.     ",
-                        "to borrow some powertools for my weekend project.    ",
-                        "help feeding my cat for a day while I am gone.    ",
-                        "to borrow latest John Grisham book.   ",
-                        "help moving my stuff tommorrow.    "
-            ]);
+        // setup textticker.
+        applyTicker("textticker", [
+            "a ride to airport this tuesday.     ",
+            "to borrow some powertools for my weekend project.    ",
+            "help feeding my cat for a day while I am gone.    ",
+            "to borrow latest John Grisham book.   ",
+            "help moving my stuff tommorrow.    "
+        ]);
 
-            //  JavaScript jQuery code from Bootply.com editor
-            $('[data-toggle=offcanvas]').click(function () {
-                $('.row-offcanvas').toggleClass('active');
-            });
-
-            $('.btn-toggle').click(function () {
-                $(this).find('.btn').toggleClass('active').toggleClass('btn-default').toggleClass('btn-primary');
-            });
-
-            // setup viewmodel for our data.
-            var myViewModel = {
-                personName: "@Model.name",
-                pictureUrl: "@Model.pictureUrl",
-
-                // my friends.
-                selectedfriend: ko.observable(),
-                retrivingFriends: ko.observable(true),
-                friendsPanelHeader: ko.observable("Loading your friend list..."),
-                friends: ko.observableArray([]),        // friends array
-                selectfriend: function (item) {
-                    this.selectedfriend(item);
-                },
-
-                // new request
-                requestText: ko.observable(""),         // request header text value.
-                showRequestError: ko.observable(false), // need to show error message about next button?
-
-                // inbox 
-                inbox: ko.observableArray([]),          // inbox
-                selectedinbox: ko.observable(),
-                retrivingInbox: ko.observable(true),
-                inboxPanelHeader: ko.observable("Loading your Inbox..."),
-                selectInboxItem : function(item) {
-                    this.selectedinbox(item);
-                },
-
-                CreateRequest: function () {
-                    if (this.requestText().length < 5) {
-
-                        // if request is not value
-                        // show error message
-                        // and setup callback to remove the error message.
-                        this.showRequestError(true);
-                        $('#textticker').focus(function () {
-                            myViewModel.showRequestError(false);
-                        });
-
-                    } else {
-                        $.post('/Api/createrequest', { 'Title': this.requestText() },
-                                function (data, statusText) {
-                                    console.log('server returned. data.error ' + data.error + ', data.errorcode:' + data.errorcode + ', statusText' + statusText);
-                                });
-                    }
-                },
-
-
-
-            };
-
-            // bind view model with Ko
-            ko.applyBindings(myViewModel);
-
-            // make a request to get friends.
-            var getFriendsRequest = $.getJSON("/Api/getFriends", function () {
-                console.log("success");
-            })
-              .done(function (data) {
-                  if (!data.error) {
-                      myViewModel.friends(data.friends);
-                      if (data.friends == 0) {
-                          myViewModel.friendsPanelHeader("sorry you have no requests");
-                      }
-                      else {
-                          myViewModel.friendsPanelHeader("Your Frineds:");
-                          myViewModel.selectedfriend(data.friends[0]);
-                      }
-                  }
-                  else {
-                      myViewModel.friendsPanelHeader("Error retriving Friends" + data.errorcode);
-                  }
-              })
-              .fail(function () {
-                  myViewModel.friendsPanelHeader("unknown error retriving friends");
-              })
-              .always(function () {
-                  myViewModel.retrivingFriends(false);
-              });
-
-            // make a request to get inbox.
-            var getInboxRequest = $.getJSON("/Api/getInbox", function () {
-                console.log("success");
-            })
-              .done(function (data) {
-                  if (!data.error) {
-                      myViewModel.inbox(data.inbox);
-                      if (data.inbox == 0) {
-                          myViewModel.inboxPanelHeader("no requests to show");
-                      }
-                      else {
-                          myViewModel.inboxPanelHeader("Friends Need:");
-                          myViewModel.selectInboxItem(data.inbox[0]);
-                      }
-                  }
-                  else {
-                      myViewModel.inboxPanelHeader("Error retriving Inbox:" + data.errorcode);
-                  }
-              })
-              .fail(function () {
-                  myViewModel.inboxPanelHeader("unknown error retriving Inbox");
-              })
-              .always(function () {
-                  myViewModel.retrivingInbox(false);
-              });
-
-            // Perform other work here ...
-
-            // Set another completion function for the request above
-            getFriendsRequest.complete(function () {
-                console.log("getFriendsRequest complete");
-            });
-
+        $('[data-toggle=offcanvas]').click(function () {
+            $('.row-offcanvas').toggleClass('active');
         });
-    </script>
 
-    <style type="text/css">
-        @@import url(http://fonts.googleapis.com/css?family=Droid+Sans+Mono);
+        $('.btn-toggle').click(function () {
+            $(this).find('.btn').toggleClass('active').toggleClass('btn-default').toggleClass('btn-primary');
+        });
 
-        html, body {
-            height: 100%;
-            font-family: 'Droid Sans Mono', sans-serif;
-        }
+        SetupKnockOut(username, userpic);
 
-        p, h1, h2, h3, h4 {
-            font-family: 'Droid Sans Mono', sans-serif;
-        }
-
-        hr {
-            border-color: #191919;
-        }
-
-        /* wrapper for page content to push down footer */
-        .page-container {
-            min-height: 100%;
-            height: auto !important;
-            height: 100%;
-            /* negative indent footer by its height */
-            margin: 0 auto -120px;
-            /* pad bottom by footer height */
-            padding: 0 0 70px;
-        }
-
-        /* set the fixed height of the footer here */
-        #footer {
-            height: 120px;
-            background-color: #222222;
-            border: 0 solid #080808;
-            border-top-width: 1px;
-            margin-top: 50px;
-        }
-
-            #footer > .container {
-                padding: 20px;
-            }
-
-        body {
-            padding-top: 51px;
-            background: #1E1E1E;
-            color: #f9f9f9;
-        }
-
-        a {
-            color: #bcbcbc;
-        }
-
-        .text-center {
-            padding-top: 20px;
-        }
-
-        #sidebar {
-            height: 100%;
-            padding-right: 0;
-            padding-top: 20px;
-        }
-
-            #sidebar .affix {
-                position: fixed;
-                top: 55;
-                width: 220px;
-            }
-
-            #sidebar .affix-bottom {
-                position: fixed;
-                top: 55;
-                width: 220px;
-            }
-
-            #sidebar .nav {
-                width: 95%;
-            }
-
-            #sidebar li {
-                border: 0 #1e1e1e solid;
-                border-bottom-width: 1px;
-            }
-
-                #sidebar li a {
-                    padding-left: 1px;
-                }
-
-                    #sidebar li a:hover {
-                        background-color: #222222;
-                        color: #ffffff;
-                    }
-
-        /* collapsed sidebar styles */
-        @@media screen and (max-width: 767px) {
-            .row-offcanvas {
-                position: relative;
-                -webkit-transition: all 0.25s ease-out;
-                -moz-transition: all 0.25s ease-out;
-                transition: all 0.25s ease-out;
-            }
-
-            .row-offcanvas-right .sidebar-offcanvas {
-                right: -41.6%;
-            }
-
-            .row-offcanvas-left .sidebar-offcanvas {
-                left: -41.6%;
-            }
-
-            .row-offcanvas-right.active {
-                right: 41.6%;
-            }
-
-            .row-offcanvas-left.active {
-                left: 41.6%;
-            }
-
-            .sidebar-offcanvas {
-                position: absolute;
-                top: 0;
-                width: 41.6%;
-            }
-
-            #sidebar {
-                background-color: #3b3b3b;
-                padding-top: 0;
-            }
-
-                #sidebar .nav > li {
-                    color: #ddd;
-                    background: linear-gradient(#3E3E3E, #383838);
-                    border-top: 1px solid #484848;
-                    border-bottom: 1px solid #2E2E2E;
-                    padding-left: 10px;
-                }
-
-                    #sidebar .nav > li:first-child {
-                        border-top: 0;
-                    }
-
-                    #sidebar .nav > li > a {
-                        color: #ddd;
-                    }
-
-                        #sidebar .nav > li > a > img {
-                            max-width: 14px;
-                        }
-
-                        #sidebar .nav > li > a:hover, #sidebar .nav > li > a:focus {
-                            text-decoration: none;
-                            background: linear-gradient(#373737, #323232);
-                            color: #fff;
-                        }
-
-                #sidebar .nav .caret {
-                    border-top-color: #fff;
-                    border-bottom-color: #fff;
-                }
-
-                #sidebar .nav a:hover .caret {
-                    border-top-color: #fff;
-                    border-bottom-color: #fff;
-                }
-        }
-
-        /* theme */
-        .btn, .form-control, .alert, .progress, .panel, .list-group, .well, .list-group-item:first-child {
-            border-radius: 1px;
-            box-shadow: 0 0 0;
-        }
-
-        .btn {
-            border-color: transparent;
-        }
-
-        .btn-default, .well {
-            background-color: #cccccc;
-            border-color: #c0c0c0;
-        }
-
-        .btn-primary, .label-primary, .list-group-item.active, .list-group-item.active:hover, .list-group-item.active:focus, .btn.active, a.list-group-item.active, a.list-group-item.active:hover, a.list-group-item.active:focus {
-            background-color: #0099CC;
-            border-color: transparent;
-        }
-
-        .btn-info, .label-info, .progress-bar-info {
-            background-color: #33b5e5;
-        }
-
-        .btn-success, .label-success, .progress-bar-success {
-            background-color: #669900;
-        }
-
-        .btn-danger, .label-danger, .progress-bar-danger {
-            background-color: #FF4444;
-        }
-
-        .btn-warning, .label-warning, .progress-bar-warning {
-            background-color: #FFBB33;
-            color: #444444;
-        }
-
-        .nav-tabs > li > a {
-            border-radius: 0;
-        }
-
-
-
-        h3, h4, h5, .panel {
-            color: #555555;
-        }
-
-            .panel hr {
-                border-color: #efefef;
-            }
-    </style>
+    });
+</script>
 </head>
-
-<!-- HTML code from Bootply.com editor -->
 
 <body>
 
@@ -400,12 +76,13 @@
         <div class="col-sm-12">
             <div class="row row-offcanvas row-offcanvas-left">
                 <!-- sidebar -->
-                <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
+                <div class="col-xs-4 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
                     <div data-spy="affix" data-offset-top="45" data-offset-bottom="90" class="">
                         <ul class="nav" id="sidebar-nav">
-                            <li> <a href="#" class="">home</a> </li>
-                            <li> <a href="#inbox" class="">inbox</a> </li>
-                            <li> <a href="#outbox" class="">outbox</a> </li>
+                            <li> <a href="#you" class="">home</a> </li>
+                            <li> <a href="#friends" class=""><span class="badge pull-right" data-bind="text: friends().length">0</span>friends</a> </li>
+                            <li> <a href="#inbox" class=""><span class="badge pull-right" data-bind="text: inbox().length">0</span>inbox</a> </li>
+                            <li> <a href="#outbox" class=""><span class="badge pull-right" data-bind="text: outbox().length">0</span>outbox</a> </li>
                             <li> <a href="#settings" class="">settings</a> </li>
                         </ul>
                     </div>
@@ -415,6 +92,7 @@
                 <div class="col-xs-12 col-sm-9" data-spy="scroll" data-target="#sidebar-nav">
 
                     <!-- ask your friends for help pannel-->
+                    <h1 id="you" class="">You</h1>
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <img data-bind="attr:{src: pictureUrl}">
@@ -441,11 +119,9 @@
                         </div>
                     </div>
 
-                    <!-- friends row -->
+                    <h1 id="friends" class="">friends</h1>
                     <div class="row">
-
                         <div class="col-sm-6">
-
                             <!-- Friends List -->
                             <div class="panel panel-default">
                                 <div class="panel-heading">
@@ -456,7 +132,7 @@
                                     <div class="list-group" data-bind="foreach: friends">
                                         <a href="#" class="friendinListContainer list-group-item" data-bind="css: { active: $parent.selectedfriend() == $data}, click: $parent.selectfriend.bind($parent)">
                                             <div style="float:left;padding-right:10px">
-                                                <img style="float:left" src="//placehold.it/75x75" class="img-polaroid" data-bind="attr:{src: pic}">
+                                                <img style="float:left" class="img-polaroid" data-bind="attr:{src: pic}">
                                             </div>
                                             <h4 class="list-group-item-heading" data-bind="text: name"></h4>
                                             <p class="list-group-item-text">...</p>
@@ -471,51 +147,95 @@
                             <div class="panel panel-default">
                                 <div class="panel-heading">
                                     <a href="#" class="pull-right">View all</a>
-                                    <h4 class="">Friends Details</h4>
+                                    <h4 class="" data-bind="text: selectedfriend() ? selectedfriend().name : ''">Friends Details</h4>
                                 </div>
                                 <div class="panel-body">
                                     <p class="">
-                                        <img src="//placehold.it/100" class="img-circle pull-right">
-                                        <a href="#" class="">Bootstrap Playground</a>
+                                        <img class="img-polaroid pull-left" data-bind="attr:{src: selectedfriend() ? selectedfriend().pic : ''}">
                                     </p>
                                     <div class="clearfix"></div>
-                                    <hr class="">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis pharetra
-                                    varius quam sit amet vulputate. Quisque mauris augue, molestie tincidunt
-                                    condimentum vitae, gravida a libero. Aenean sit amet felis dolor, in sagittis
-                                    nisi. Sed ac orci quis tortor imperdiet venenatis. Duis elementum auctor
-                                    accumsan. Aliquam in felis sit amet augue.
-                                    <hr class="">
-                                    <div class="btn-group pull-right btn-toggle">
-                                        <button class="btn btn-default">ON</button>
-                                        <button class="btn btn-primary active">OFF</button>
+                                    <div class="realFriend" data-bind="visible: selectedfriend() ? !selectedfriend().blocked : false">
+                                        <hr class="">
+                                        if this person is not really a "friend", you can block him/her.
+                                        Once Blocked this person will see any help requests from you and you will not
+                                        see any requests from him. And don't worry we won't tell him/her that you
+                                        blocked him.
+                                        <hr class="">
+                                        <div class="btn-group pull-right">
+                                            <button class="btn btn-warning" data-bind="click: BlockSelectedFriend">Block this friend</button>
+                                        </div>
                                     </div>
+                                    <div class="blockedFriend" data-bind="visible: selectedfriend() ? selectedfriend().blocked : false">
+                                        <hr class="">
+                                        You have blocked this "friend". that means you will not see any help
+                                        requests from him nor will he see your help requests. if you have changed your mind
+                                        you can unblock him her anytime!
+                                        <hr class="">
+                                        <div class="btn-group pull-right">
+                                            <button class="btn btn-success" data-bind="click: UnBlockSelectedFriend">UnBlock this friend</button>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
 
                         </div>
                     </div>
 
-
-                    <!--/Inbox row-->
-                    <h1 id="inbox" class="">inbox</h1>
-
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <a href="#" class="pull-right">Refresh</a>
-                            <h4 class="" data-bind="text: inboxPanelHeader">Friends Need:</h4>
-                        </div>
-                        <div class="panel-body">
-                            <div class="list-group" data-bind="foreach: inbox">
-                                <a href="#" class="inboxListContainer list-group-item" data-bind="css: { active: $parent.selectedinbox() == $data}, click: $parent.selectInboxItem.bind($parent)">
-                                    <div style="float:left;padding-right:10px">
-                                            <img src="//placehold.it/75x75" class="img-polaroid" data-bind="attr:{src: from.pic}">
+                    <h1 id="inbox" class="">Inbox</h1>
+                    <div class="row">
+                        <!--Inbox-->
+                        <div class="col-sm-6">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <a href="#" class="pull-right">Refresh</a>
+                                    <h4 class="" data-bind="text: inboxPanelHeader">Inbox:</h4>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="list-group" data-bind="foreach: inbox">
+                                        <a href="#" class="inboxListContainer list-group-item" data-bind="css: { active: $parent.selectedinbox() == $data}, click: $parent.selectInboxItem.bind($parent)">
+                                            <div style="float:left;padding-right:10px">
+                                                <img class="img-polaroid" data-bind="attr:{src: from.pic}">
+                                            </div>
+                                            <p class="list-group-item-text" data-bind="text: from.name">...</p>
+                                            <h4 class="list-group-item-heading" data-bind="text: request.name"></h4>
+                                        </a>
                                     </div>
-                                    <p class="list-group-item-text" data-bind="text: from.name">...</p>
-                                    <h4 class="list-group-item-heading" data-bind="text: request.name"></h4>
-                                </a>
+                                </div>
                             </div>
-                        </div>
+                        </div> <!--/Inbox-->
+
+                        <div class="col-sm-6">
+                            <!-- InboxDetails -->
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <a href="#" class="pull-right">View all</a>
+                                    <h4 class="" data-bind="text: selectedinbox() ? selectedinbox().from.name : ''">Inbox Details</h4>
+                                </div>
+                                <div class="panel-body">
+                                    <div style="float:left;padding-right:10px">
+                                        <img class="img-polaroid pull-left" data-bind="attr:{src: selectedinbox() ? selectedinbox().from.pic : ''}">
+
+                                    </div>
+                                    <h4 class="list-group-item-heading" data-bind="text: selectedinbox() ? selectedinbox().request.name : ''"></h4>
+                                    <div class="clearfix"></div>
+
+                                    <hr class="">This is your chance to help your friend. if you choose to help, we will notify
+                                    <span data-bind="text: selectedinbox() ? selectedinbox().from.name : ''">your friend</span> about
+                                    it. if s/he hasn't gotten help already, he/she will accept your request and get back to you.
+                                    if you choose to not help. its okay! We won't tell her that you saw the request.
+                                    <div class="clearfix"></div>
+                                    <hr class="">
+                                    <span>
+                                        <button type="button" class="btn btn-success btn-lg btn-block">Sure, I Can Help!</button>
+                                        <button type="button" class="btn btn-default btn-lg btn-block">Sorry, Cant help this time</button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div><!-- /InboxDetails -->
+
                     </div>
+
                     <!-- outbox -->
                     <h1 id="outbox" class="">outbox</h1>
                     <div class="panel panel-default">
@@ -543,7 +263,6 @@
                     <!-- /outbox -->
 
                     <h1 id="settings" class="">Settings</h1>
-
                     <div class="row">
                         <div class="col-md-12">
                             <div class="alert alert-info alert-dismissable" style="display: none;">
@@ -557,36 +276,29 @@
                                 <div class="panel-heading">
                                     <a href="#" class="pull-right">View all</a>
                                     <h4 class="">Buttons &amp; Labels</h4>
-
                                 </div>
                                 <div class="panel-body">
                                     <div class="row">
                                         <div class="col-xs-4">
                                             <a class="btn btn-default center-block" href="#">Button</a>
-
                                         </div>
                                         <div class="col-xs-4">
                                             <a class="btn btn-primary center-block" href="#">Primary</a>
-
                                         </div>
                                         <div class="col-xs-4">
                                             <a class="btn btn-danger center-block" href="#">Danger</a>
-
                                         </div>
                                     </div>
                                     <br class="">
                                     <div class="row">
                                         <div class="col-xs-4">
                                             <a class="btn btn-warning center-block" href="#">Warning</a>
-
                                         </div>
                                         <div class="col-xs-4">
                                             <a class="btn btn-info center-block" href="#">Info</a>
-
                                         </div>
                                         <div class="col-xs-4">
                                             <a class="btn btn-success center-block" href="#">Success</a>
-
                                         </div>
                                     </div>
                                     <hr class="">
@@ -600,17 +312,14 @@
                                         <div class="col-md-4">
                                             <span class="label label-default">Label</span>
                                             <span class="label label-success">Success</span>
-
                                         </div>
                                         <div class="col-md-4">
                                             <span class="label label-warning">Warning</span>
                                             <span class="label label-info">Info</span>
-
                                         </div>
                                         <div class="col-md-4">
                                             <span class="label label-danger">Danger</span>
                                             <span class="label label-primary">Primary</span>
-
                                         </div>
                                     </div>
                                 </div>
@@ -621,7 +330,6 @@
                                 <div class="panel-heading">
                                     <a href="#" class="pull-right">View all</a>
                                     <h4 class="">Progress Bars</h4>
-
                                 </div>
                                 <div class="panel-body">
                                     <div class="progress">
@@ -644,7 +352,6 @@
                                 <div class="panel-heading">
                                     <a href="#" class="pull-right">View all</a>
                                     <h4 class="">Tabs</h4>
-
                                 </div>
                                 <div class="panel-body">
                                     <ul class="nav nav-tabs">
@@ -690,8 +397,6 @@
         <!--/.page-container-->
     </div>
     <div id="push" class=""></div>
-
-
 
 </body>
 </html>
