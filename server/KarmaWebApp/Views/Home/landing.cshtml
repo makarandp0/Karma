@@ -62,12 +62,21 @@
                 console.log('auth.authResponseChange:' + response.status);
                 if (response.status === 'connected') {
                     console.log("fb is connected!");
-                    FB.api('/me?fields=id,name,picture', function (fb_me_response) {
+                    FB.api('/me?fields=id,name,picture,location', function (fb_me_response) {
                         console.log("fb api returned!");
                         // setup image, name, enter link.
                         $("#karma_user_img").attr("src", fb_me_response.picture.data.url);
                         $("#karma_user_name").html("Hello " + fb_me_response.name + "!")
                         $("#karma_enter_button").attr('href', '/Android/?accessToken=' + response.authResponse.accessToken);
+                        // save stuff in localstorage.
+                        localStorage.setItem("karma_accesstoken", response.authResponse.accessToken);
+                        localStorage.setItem("karma_username", fb_me_response.name);
+                        localStorage.setItem("karma_fbuserid", fb_me_response.id);
+                        localStorage.setItem("karma_userpic", fb_me_response.picture.data.url);
+                        if (fb_me_response.location && fb_me_response.location.name)
+                        {
+                            localStorage.setItem("karma_userlocation", fb_me_response.location.name);
+                        }
 
                         // show loggedOn controls
                         $(".userisloggedOn").show();
@@ -78,6 +87,12 @@
                     console.log("user logged off")
                     $(".userisloggedOn").hide();
                     $(".userisloggedOff").show();
+
+                    // clear stuff from localstorage
+                    localStorage.removeItem("karma_accesstoken", response.authResponse.accessToken);
+                    localStorage.removeItem("karma_username", fb_me_response.name);
+                    localStorage.removeItem("karma_fbuserid", fb_me_response.id);
+                    localStorage.removeItem("karma_userpic", fb_me_response.picture.data.url);
                 }
             });
 
