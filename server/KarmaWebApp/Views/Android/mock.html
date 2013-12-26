@@ -91,7 +91,6 @@
                             <li> <a href="#friends" class=""><span class="badge pull-right" data-bind="text: friends().length">0</span>friends</a> </li>
                             <li> <a href="#inbox" class=""><span class="badge pull-right" data-bind="text: inbox().length">0</span>inbox</a> </li>
                             <li> <a href="#outbox" class=""><span class="badge pull-right" data-bind="text: outbox().length">0</span>outbox</a> </li>
-                            <li> <a href="#settings" class="">settings</a> </li>
                         </ul>
                     </div>
                 </div>
@@ -199,36 +198,36 @@
                         </div>
                         <div class="col-sm-6">
                             <!-- Friends Details -->
-                            <div class="panel panel-default" data-bind="if: selectedfriend()">
+                            <div class="panel panel-default" data-bind="with: selectedfriend()">
                                 <div class="panel-heading">
                                     <a href="#" class="pull-right">View all</a>
-                                    <h4 class="" data-bind="text: selectedfriend().name">Friends Details</h4>
+                                    <h4 class="" data-bind="text: name">Friends Details</h4>
                                 </div>
                                 <div class="panel-body">
-                                    <p class="">
-                                        <img class="img-polaroid pull-left" data-bind="attr:{src: selectedfriend().pic}">
+                                    <p class=" ">
+                                        <img class=" img-polaroid pull-left" data-bind="attr:{src: pic}">
                                     </p>
                                     <div class="clearfix"></div>
-                                    <div class="realFriend" data-bind="ifnot: selectedfriend().blocked">
+                                    <div class="realFriend" data-bind="ifnot: blocked">
                                         <hr class="">
-                                        if <span data-bind="text: $root.firstName(selectedfriend())"></span> is not really a "friend", you can block <span data-bind="text: $root.hehimhis(selectedfriend(), 'him')"></span>.
-                                        Once blocked <span data-bind="text: $root.hehimhis(selectedfriend(), 'he')"></span> will not see any help requests from you and you will not
-                                        see any requests from <span data-bind="text: $root.hehimhis(selectedfriend(), 'him')"></span>. And don't worry we won't tell on you. 
-                                        <span data-bind="text: $root.hehimhis(selectedfriend(), 'He')"></span> won't know  that you blocked <span data-bind="text: $root.hehimhis(selectedfriend(), 'him')"></span>.
+                                        if <span data-bind="text: $root.firstName($data)"></span> is not really a "friend", you can block <span data-bind="text: $root.hehimhis($data, 'him')"></span>.
+                                        Once blocked <span data-bind="text: $root.hehimhis($data, 'he')"></span> will not see any help requests from you and you will not
+                                        see any requests from <span data-bind="text: $root.hehimhis($data, 'him')"></span>. And don't worry we won't tell on you.
+                                        <span data-bind="text: $root.hehimhis($data, 'He')"></span> won't know  that you blocked <span data-bind="text: $root.hehimhis($data, 'him')"></span>.
                                         <hr class="">
                                         <div class="btn-group pull-right">
-                                            <button class="btn btn-warning" data-bind="click: BlockSelectedFriend">Block <span data-bind="text: $root.firstName(selectedfriend())"></span></button>
+                                            <button class="btn btn-warning" data-bind="click: $root.BlockSelectedFriend">Block <span data-bind="text: $root.firstName($data)"></span></button>
                                         </div>
                                     </div>
-                                    <div class="blockedFriend" data-bind="if: selectedfriend().blocked">
+                                    <div class="blockedFriend" data-bind="if: blocked">
                                         <hr class="">
-                                        You have blocked <span data-bind="text: $root.firstName(selectedfriend())"></span>. that means you will not see any help
-                                        requests from <span data-bind="text: $root.hehimhis(selectedfriend(), 'him')"></span> nor will 
-                                        <span data-bind="text: $root.hehimhis(selectedfriend(), 'he')"></span> see any of your help requests. if you change your mind
-                                        you can unblock <span data-bind="text: $root.hehimhis(selectedfriend(), 'him')"></span> anytime!
+                                        You have blocked <span data-bind="text: $root.firstName($data)"></span>. that means you will not see any help
+                                        requests from <span data-bind="text: $root.hehimhis($data, 'him')"></span> nor will
+                                        <span data-bind="text: $root.hehimhis($data, 'he')"></span> see any of your help requests. if you change your mind
+                                        you can unblock <span data-bind="text: $root.hehimhis($data, 'him')"></span> anytime!
                                         <hr class="">
                                         <div class="btn-group pull-right">
-                                            <button class="btn btn-success" data-bind="click: UnBlockSelectedFriend">UnBlock <span data-bind="text: $root.firstName(selectedfriend())"></span></button>
+                                            <button class="btn btn-success" data-bind="click: $root.UnBlockSelectedFriend">UnBlock <span data-bind="text: $root.firstName($data)"></span></button>
                                         </div>
                                     </div>
                                 </div>
@@ -261,23 +260,23 @@
 
                         <div class="col-sm-6">
                             <!-- InboxDetails -->
-                            <div class="panel panel-default" data-bind="if: selectedinbox()">
+                            <div class="panel panel-default" data-bind="with: selectedinbox()">
                                 <div class="panel-heading">
                                     <a href="#" class="pull-right">View all</a>
-                                    <h4 class="" data-bind="text: selectedinbox().from.name">Inbox Details</h4>
+                                    <h4 class="" data-bind="text: from.name">Inbox Details</h4>
                                 </div>
                                 <div class="panel-body">
                                     <div style="float:left;padding-right:10px">
-                                        <img class="img-polaroid pull-left" data-bind="attr:{src: selectedinbox().from.pic}">
+                                        <img class="img-polaroid pull-left" data-bind="attr:{src: from.pic}">
 
                                     </div>
-                                    <h4 class="list-group-item-heading" data-bind="text: selectedinbox().request.name"></h4>
+                                    <h4 class="list-group-item-heading" data-bind="text: request.name"></h4>
                                     <div class="clearfix"></div>
 
-                                    <hr class="">This is your chance to help <span data-bind="text: $root.firstName(selectedinbox().from)"></span>. if you choose to help, we will notify
-                                    <span data-bind="text: $root.hehimhis(selectedinbox().from, 'him')"></span> about it. if <span data-bind="text: $root.hehimhis(selectedinbox().from, 'he')"></span> 
-                                    hasn't gotten help already,  <span data-bind="text: $root.hehimhis(selectedinbox().from, 'he')"></span> will accept your request and get back to you.
-                                    if you choose to not help. its okay! We won't tell <span data-bind="text: $root.hehimhis(selectedinbox().from, 'him')"></span> that you saw the request.
+                                    <hr class="">This is your chance to help <span data-bind="text: $root.firstName(from)"></span>. if you choose to help, we will notify
+                                    <span data-bind="text: $root.hehimhis(from, 'him')"></span> about it. if <span data-bind="text: $root.hehimhis(from, 'he')"></span> 
+                                    hasn't gotten help already,  <span data-bind="text: $root.hehimhis(from, 'he')"></span> will accept your request and get back to you.
+                                    if you choose to not help. its okay! We won't tell <span data-bind="text: $root.hehimhis(from, 'him')"></span> that you saw the request.
                                     <div class="clearfix"></div>
                                     <hr class="">
                                     <span>
@@ -311,180 +310,49 @@
 
                         <div class="col-sm-6">
                             <!-- OutboxDetails -->
-                            <div class="panel panel-default" data-bind="if: selectedoutbox()">
+                            <div class="panel panel-default" data-bind="with: selectedoutbox()">
                                 <div class="panel-heading">
                                     <a href="#" class="pull-right">Refresh</a>
-                                    <h4 class="" data-bind="text: selectedoutbox().name">Need a Ride</h4>
+                                    <h4 class="" data-bind="text: name">Need a Ride</h4>
                                 </div>
                                 <div class="panel-body">
                                     <div style="float:left;padding-right:10px">
-                                        <img class="img-polaroid pull-left" data-bind="attr:{src: pictureUrl}">
+                                        <img class="img-polaroid pull-left" data-bind="attr:{src: $root.pictureUrl}">
                                     </div>
-                                    <h4 class="list-group-item-heading" data-bind="text: 'You:' + selectedoutbox().name"></h4>
+                                    <h4 class="list-group-item-heading" data-bind="text: 'You:' + name"></h4>
                                     <div class="clearfix"></div>
 
-
-                                    <div data-bind="if: selectedoutbox()">
-
-                                        <!-- people who offered help -->
-                                        <div data-bind="if: selectedoutbox().helpOffered.length > 0">
-                                            <div data-bind="foreach: selectedoutbox().helpOffered">
-                                                <div>
-                                                    <div class="clearfix"></div>
-                                                    <hr class="">
-                                                    <img data-bind="attr:{src: pic}">
-                                                    <span data-bind="text: name"> </span> has offered Help!
-                                                    <div class="btn-group pull-right">
-                                                        <button type="button" class="btn btn-success btn-lg ">Accept Help!</button>
-                                                        <button type="button" class="btn btn-default btn-lg ">Ignore</button>
-                                                    </div>
+                                    <!-- people who offered help -->
+                                    <div data-bind="if: helpOffered.length > 0">
+                                        <div data-bind="foreach: helpOffered">
+                                            <div>
+                                                <div class="clearfix"></div>
+                                                <hr class="">
+                                                <img data-bind="attr:{src: pic}">
+                                                <span data-bind="text: name"> </span> has offered Help!
+                                                <div class="btn-group pull-right">
+                                                    <button type="button" class="btn btn-success btn-lg ">Accept Help!</button>
+                                                    <button type="button" class="btn btn-default btn-lg ">Ignore</button>
                                                 </div>
                                             </div>
                                         </div>
+                                    </div>
 
-                                        <!-- nobody offered help-->
-                                        <div data-bind="if: selectedoutbox().helpOffered.length == 0">
+                                    <!-- nobody offered help-->
+                                    <div data-bind="if: helpOffered.length == 0">
 
-                                            <hr class="">
-                                            Your request is in transit. Please be patient, and check back later. We will send
-                                            your request to your friends one by one. When somebody offers help we will notify
-                                            you.
-                                            <hr class="">
+                                        <hr class="">
+                                        Your request is in transit. Please be patient, and check back later. We will send
+                                        your request to your friends one by one. When somebody offers help we will notify
+                                        you.
+                                        <hr class="">
 
-                                        </div>
                                     </div>
                                 </div>
                             </div><!-- /InboxDetails -->
 
                         </div>
                     </div> <!-- outbox row-->
-
-                    <h1 id="settings" class="">Settings</h1>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="alert alert-info alert-dismissable" style="display: none;">
-                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">├ù</button>
-                                <strong class="">Heads up!</strong> This alert needs your attention,
-                                but it's not super important.
-                            </div>
-                        </div>
-                        <div class="col-md-6 col-sm-6">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <a href="#" class="pull-right">View all</a>
-                                    <h4 class="">Buttons &amp; Labels</h4>
-                                </div>
-                                <div class="panel-body">
-                                    <div class="row">
-                                        <div class="col-xs-4">
-                                            <a class="btn btn-default center-block" href="#">Button</a>
-                                        </div>
-                                        <div class="col-xs-4">
-                                            <a class="btn btn-primary center-block" href="#">Primary</a>
-                                        </div>
-                                        <div class="col-xs-4">
-                                            <a class="btn btn-danger center-block" href="#">Danger</a>
-                                        </div>
-                                    </div>
-                                    <br class="">
-                                    <div class="row">
-                                        <div class="col-xs-4">
-                                            <a class="btn btn-warning center-block" href="#">Warning</a>
-                                        </div>
-                                        <div class="col-xs-4">
-                                            <a class="btn btn-info center-block" href="#">Info</a>
-                                        </div>
-                                        <div class="col-xs-4">
-                                            <a class="btn btn-success center-block" href="#">Success</a>
-                                        </div>
-                                    </div>
-                                    <hr class="">
-                                    <div class="btn-group btn-group-sm">
-                                        <button class="btn btn-default">1</button>
-                                        <button class="btn btn-default">2</button>
-                                        <button class="btn btn-default">3</button>
-                                    </div>
-                                    <hr class="">
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <span class="label label-default">Label</span>
-                                            <span class="label label-success">Success</span>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <span class="label label-warning">Warning</span>
-                                            <span class="label label-info">Info</span>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <span class="label label-danger">Danger</span>
-                                            <span class="label label-primary">Primary</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 col-sm-6">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <a href="#" class="pull-right">View all</a>
-                                    <h4 class="">Progress Bars</h4>
-                                </div>
-                                <div class="panel-body">
-                                    <div class="progress">
-                                        <div class="progress-bar progress-bar-info" style="width: 20%"></div>
-                                    </div>
-                                    <div class="progress">
-                                        <div class="progress-bar progress-bar-success" style="width: 40%"></div>
-                                    </div>
-                                    <div class="progress">
-                                        <div class="progress-bar progress-bar-warning" style="width: 80%"></div>
-                                    </div>
-                                    <div class="progress">
-                                        <div class="progress-bar progress-bar-danger" style="width: 50%"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 col-sm-6">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <a href="#" class="pull-right">View all</a>
-                                    <h4 class="">Tabs</h4>
-                                </div>
-                                <div class="panel-body">
-                                    <ul class="nav nav-tabs">
-                                        <li class="active">
-                                            <a href="#A" data-toggle="tab" class="">Section 1</a>
-                                        </li>
-                                        <li>
-                                            <a href="#B" data-toggle="tab" class="">Section 2</a>
-                                        </li>
-                                        <li>
-                                            <a href="#C" data-toggle="tab" class="">Section 3</a>
-                                        </li>
-                                    </ul>
-                                    <div class="tabbable">
-                                        <div class="tab-content">
-                                            <div class="tab-pane active" id="A">
-                                                <div class="well well-sm">I'm in Section A.</div>
-                                            </div>
-                                            <div class="tab-pane" id="B">
-                                                <div class="well well-sm">Howdy, I'm in Section B.</div>
-                                            </div>
-                                            <div class="tab-pane" id="C">
-                                                <div class="well well-sm">I've decided that I like wells.</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!--playground-->
-                        <br class="">
-                        <div class="clearfix"></div>
-                        <hr class="">
-                        <hr class="">
-                    </div>
-                    <!-- /.col-xs-12 main -->
                 </div>
                 <!-- /main area-->
 

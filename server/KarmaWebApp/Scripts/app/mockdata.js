@@ -1,17 +1,13 @@
 ﻿$(document).ready(function () {
-    $.mockjax({
-        url: '/Api/getdata',
-        responseTime: 750,
-        responseText: {
-            errorcode: '',
-            error: false,
+
+    // this global variable contains all our data!
+    var mockdata = {
             friends: [
                 { blocked: false, id: "100003794306037", gender: "female", name: "Sucheta Desai", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash1/211272_100003794306037_59011785_q.jpg" },
                 { blocked: false, id: "100004008272532", gender: "female", name: "Vrushali Shrotri", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn2/203272_100004008272532_1822936541_q.jpg" },
                 { blocked: false, id: "100004066370422", gender: "male", name: "Anish Patwardhan", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/1086622_100004066370422_1811447981_q.jpg" },
-                { blocked: false, id: "100004081128591", gender: "female", name: "Sandhya Prasade", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash3/157780_100004081128591_2133113783_q.jpg" },
+                { blocked: true, id: "100004081128591", gender: "female", name: "Sandhya Prasade", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash3/157780_100004081128591_2133113783_q.jpg" },
                 { blocked: false, id: "100004890999167", gender: "female", name: "Anila Puranik Halbe", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn2/1118410_100004890999167_2007089240_q.jpg" },
-                { blocked: false, id: "100005356593486", gender: "male", name: "Kapil Chiravarambath", pic: "https://fbcdn-profile-a.akamaihd.net/static-ak/rsrc.php/v2/yo/r/UlIqmHJn-SK.gif" },
                 { blocked: false, id: "100005435892032", gender: "male", name: "Appa Patwardhan", pic: "https://fbcdn-profile-a.akamaihd.net/static-ak/rsrc.php/v2/yo/r/UlIqmHJn-SK.gif" },
                 { blocked: false, id: "100005516403683", gender: "male", name: "Suhas Vaidya", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash1/623591_100005516403683_1681623943_q.jpg" },
             ],
@@ -64,26 +60,19 @@
                     ]
                 }
             ]
-        }
-    });
+    };
 
 
     $.mockjax({
         url: '/Api/getFriends',
         responseTime: 750,
-        responseText: {
-            errorcode: '',
-            error: false,
-            friends: [
-                { blocked: false, id: "100003794306037", gender: "female", name: "Sucheta Desai", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash1/211272_100003794306037_59011785_q.jpg" },
-                { blocked: false, id: "100004008272532", gender: "female", name: "Vrushali Shrotri", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn2/203272_100004008272532_1822936541_q.jpg" },
-                { blocked: false, id: "100004066370422", gender: "male", name: "Anish Patwardhan", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/1086622_100004066370422_1811447981_q.jpg" },
-                { blocked: false, id: "100004081128591", gender: "female", name: "Sandhya Prasade", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash3/157780_100004081128591_2133113783_q.jpg" },
-                { blocked: false, id: "100004890999167", gender: "female", name: "Anila Puranik Halbe", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn2/1118410_100004890999167_2007089240_q.jpg" },
-                { blocked: false, id: "100005356593486", gender: "male", name: "Kapil Chiravarambath", pic: "https://fbcdn-profile-a.akamaihd.net/static-ak/rsrc.php/v2/yo/r/UlIqmHJn-SK.gif" },
-                { blocked: false, id: "100005435892032", gender: "male", name: "Appa Patwardhan", pic: "https://fbcdn-profile-a.akamaihd.net/static-ak/rsrc.php/v2/yo/r/UlIqmHJn-SK.gif" },
-                { blocked: false, id: "100005516403683", gender: "male", name: "Suhas Vaidya", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash1/623591_100005516403683_1681623943_q.jpg" },
-            ]
+        response: function ()
+        {
+            this.responseText =  {
+                errorcode: '',
+                error: false,
+            }
+            this.responseText.friends = mockdata.friends;
         }
     });
 
@@ -93,23 +82,12 @@
     $.mockjax({
         url: '/Api/getInbox',
         responseTime: 750,
-        responseText: {
-            errorcode: '',
-            error: false,
-            inbox: [
-                {
-                    from: { id: "100004066370422", gender: "male", name: "Anish Patwardhan", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/1086622_100004066370422_1811447981_q.jpg" },
-                    request: { name: "Needs some more time", id: "1", requestStatus: 0, yourStatus: 0 }
-                },
-                {
-                    from: { id: "100004008272532", gender: "female", name: "Vrushali Shrotri", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn2/203272_100004008272532_1822936541_q.jpg" },
-                    request: { name: "Needs some money management lessons", id: "2", requestStatus: 0, yourStatus: 0 }
-                },
-                {
-                    from: { id: "100005356593486", gender: "male", name: "Kapil Chiravarambath", pic: "https://fbcdn-profile-a.akamaihd.net/static-ak/rsrc.php/v2/yo/r/UlIqmHJn-SK.gif" },
-                    request: { name: "Needs a break", id: "3", requestStatus: 0, yourStatus: 0 }
-                }
-            ]
+        response: function () {
+            this.responseText =  {
+                errorcode: '',
+                error: false,
+            }
+            this.responseText.inbox = mockdata.inbox;
         }
     });
 
@@ -120,44 +98,12 @@
     $.mockjax({
         url: '/Api/getOutbox',
         responseTime: 750,
-        responseText: {
-            errorcode: '',
-            error: false,
-            outbox: [
-                {
-                    name: "Need a Ride to Airport",
-                    id: "1",
-                    helpOffered: [
-                        { id: "100005356593486", gender: "male", name: "Kapil Chiravarambath", pic: "https://fbcdn-profile-a.akamaihd.net/static-ak/rsrc.php/v2/yo/r/UlIqmHJn-SK.gif" },
-                        { id: "100003794306037", gender: "female", name: "Sucheta Desai", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash1/211272_100003794306037_59011785_q.jpg" },
-                    ],
-                    helpIgnored: [
-                    ],
-                    helpAccepted: [
-                    ]
-                },
-                {
-                    name: "Help feeding my cat",
-                    id: "2",
-                    helpOffered: [
-                        { id: "100003794306037", gender: "female", name: "Sucheta Desai", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash1/211272_100003794306037_59011785_q.jpg" },
-                    ],
-                    helpIgnored: [
-                    ],
-                    helpAccepted: [
-                    ]
-                },
-                {
-                    name: "No Help offers on this one",
-                    id: "2",
-                    helpOffered: [
-                    ],
-                    helpIgnored: [
-                    ],
-                    helpAccepted: [
-                    ]
-                }
-            ]
+        response: function () {
+            this.responseText =  {
+                errorcode: '',
+                error: false,
+            }
+            this.responseText.outbox = mockdata.outbox;
         }
     });
 });

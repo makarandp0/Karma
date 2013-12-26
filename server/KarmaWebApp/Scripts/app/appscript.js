@@ -122,12 +122,12 @@ var ViewModelClass = (function (name, pic) {
         }
 
         this.BlockSelectedFriend = function () {
-            this.selectedfriend().blocked = true;
-            this.selectedfriend.valueHasMutated();
+            self.selectedfriend().blocked = true;
+            self.selectedfriend.valueHasMutated();
         };
         this.UnBlockSelectedFriend = function () {
-            this.selectedfriend().blocked = false;
-            this.selectedfriend.valueHasMutated();
+            self.selectedfriend().blocked = false;
+            self.selectedfriend.valueHasMutated();
         };
     }
     return ViewModel;
