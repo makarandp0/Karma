@@ -61,11 +61,11 @@ var ViewModelClass = (function (name, pic) {
             alert("implement this:" + this.inviteText());
         };
 
-        this.GotoPrevPage = function () {
+        this.GotoPrevRequestPage = function () {
             self.requestOnPage(self.requestOnPage()-1 );
         }
 
-        this.GotoNextPage = function () {
+        this.GotoNextRequestPage = function () {
             if (this.requestText().length < 5) {
 
                 // if request is not value
@@ -82,39 +82,48 @@ var ViewModelClass = (function (name, pic) {
         };
 
         this.CreateRequest = function () {
-            {
-                $.post('/Api/createrequest', { 'Title': this.requestText() },
-                        function (data, statusText) {
-                            console.log('server returned. data.error ' + data.error + ', data.errorcode:' + data.errorcode + ', statusText' + statusText);
-                        });
-            }
+            var createrequestURL = '/Api/createrequest/?title='+ encodeURIComponent(this.requestText()) + '&date=' + encodeURIComponent(this.requestDateTime()) +'&location=' + encodeURIComponent(this.request_location());
+            var createRequest = $.getJSON(createrequestURL, function () {
+                console.log(createrequestURL + ":success");
+            })
+                .done(function (data) {
+                    if (!data.error) {
+                        self.outbox.push(data.request);
+                    }
+                    else {
+                        console.log(createrequestURL + ":returned error:" + data.error + ", errorcode:" + data.errorcode);
+                    }
+                })
+                .fail(function () {
+                    console.log(createrequestURL + ":failed");
+                })
+                .always(function () {
+                });
         };
-        function showposition(position) {
-            console.log("got current location");
-            console.log("lat:" + position.coords.latitude);
-            console.log("lan:" + position.coords.longitude);
-            self.request_location("lat:" + position.coords.latitude + ",lan:" + position.coords.longitude);
-        }
-        function showError(error) {
-            switch (error.code) {
-                case error.PERMISSION_DENIED:
-                    console.log("User denied the request for Geolocation.");
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    console.log("Location information is unavailable.");
-                    break;
-                case error.TIMEOUT:
-                    console.log("The request to get user location timed out.");
-                    break;
-                case error.UNKNOWN_ERROR:
-                    console.log("An unknown error occurred.");
-                    break;
-            }
-        }
+
         this.UseCurrentLocation = function () {
             console.log("WIll user current location");
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(showposition, showError);
+                navigator.geolocation.getCurrentPosition(function (position) {
+                        console.log("got current location:" + "lat:" + position.coords.latitude + ",lan:" + position.coords.longitude);
+                        self.request_location("lat:" + position.coords.latitude + ",lan:" + position.coords.longitude);
+                    }, 
+                    function (error) {
+                    switch (error.code) {
+                        case error.PERMISSION_DENIED:
+                            console.log("User denied the request for Geolocation.");
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            console.log("Location information is unavailable.");
+                            break;
+                        case error.TIMEOUT:
+                            console.log("The request to get user location timed out.");
+                            break;
+                        case error.UNKNOWN_ERROR:
+                            console.log("An unknown error occurred.");
+                            break;
+                    }
+        });
             }
             else {
                 console.log("!navigator.geolocation");
@@ -129,6 +138,34 @@ var ViewModelClass = (function (name, pic) {
             self.selectedfriend().blocked = false;
             self.selectedfriend.valueHasMutated();
         };
+        this.OfferHelp = function (inboxItem) {
+            inboxItem.request.yourStatus = 1;
+            self.OfferDenyHelp(inboxItem, "yes");
+        };
+        
+        this.DenyHelp = function (inboxItem) {
+            inboxItem.request.yourStatus = 2;
+            self.OfferDenyHelp(inboxItem, "no");
+        };
+
+        this.OfferDenyHelp = function (inboxItem, offer) {
+            var createOfferURL = '/Api/offerhelp/?requestId=' + encodeURIComponent(inboxItem.request.id) + '&offer=' + encodeURIComponent(offer);
+            var createRequest = $.getJSON(createOfferURL, function () {
+                console.log(createOfferURL + ":success");
+            })
+                .done(function (data) {
+                    if (!data || data.error) {
+                        console.log(createOfferURL + ":returned error:" + data.error + ", errorcode:" + data.errorcode);
+                    }
+                })
+                .fail(function () {
+                    console.log(createOfferURL + ":failed");
+                })
+                .always(function () {
+                    self.selectedinbox.valueHasMutated();
+                });
+        };
+
     }
     return ViewModel;
 })();
@@ -141,7 +178,7 @@ function SetupKnockOut(username, userpic)
 
     // make a request to get friends.
     var getFriendsRequest = $.getJSON("/Api/getFriends", function () {
-        console.log("success");
+        console.log("/Api/getFriends:success");
     })
         .done(function (data) {
             if (!data.error) {
@@ -167,7 +204,7 @@ function SetupKnockOut(username, userpic)
 
     // make a request to get inbox.
     var getInboxRequest = $.getJSON("/Api/getInbox", function () {
-        console.log("success");
+        console.log("/Api/getInbox:success");
     })
         .done(function (data) {
             if (!data.error) {
@@ -193,7 +230,7 @@ function SetupKnockOut(username, userpic)
 
     // make a request to get inbox.
     var getInboxRequest = $.getJSON("/Api/getOutbox", function () {
-        console.log("success");
+        console.log("/Api/getOutbox:success");
     })
         .done(function (data) {
             if (!data.error) {

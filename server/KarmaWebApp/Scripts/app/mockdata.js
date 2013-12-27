@@ -1,6 +1,7 @@
 ﻿$(document).ready(function () {
 
     // this global variable contains all our data!
+    var lastId = 100;
     var mockdata = {
             friends: [
                 { blocked: false, id: "100003794306037", gender: "female", name: "Sucheta Desai", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash1/211272_100003794306037_59011785_q.jpg" },
@@ -29,6 +30,7 @@
                 {
                     name: "Need a Ride to Airport",
                     id: "1",
+                    date: "12/13", // TODO: think more about date format
                     helpOffered: [
                         { id: "100004081128591", gender: "female", name: "Sandhya Prasade", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash3/157780_100004081128591_2133113783_q.jpg" },
                         { id: "100004890999167", gender: "female", name: "Anila Puranik Halbe", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn2/1118410_100004890999167_2007089240_q.jpg" },
@@ -40,6 +42,7 @@
                 },
                 {
                     name: "Help feeding my cat",
+                    date: "12/12", // TODO: think more about date format
                     id: "2",
                     helpOffered: [
                         { id: "100004008272532", gender: "female", name: "Vrushali Shrotri", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn2/203272_100004008272532_1822936541_q.jpg" },
@@ -51,6 +54,7 @@
                 },
                 {
                     name: "No Help offers on this one",
+                    date: "12/14", // TODO: think more about date format
                     id: "2",
                     helpOffered: [
                     ],
@@ -106,6 +110,55 @@
             this.responseText.outbox = mockdata.outbox;
         }
     });
+
+    function getURLParameter(paramname, url) {
+        return decodeURIComponent((new RegExp('[?|&]' + paramname + '=' + '([^&;]+?)(&|#|;|$)').exec(url) || [, ""])[1].replace(/\+/g, '%20')) || null
+    }
+    $.mockjax({
+        url: '/Api/createrequest/*',
+        responseTime: 750,
+        response: function (settings) {
+            console.log("url:" + settings.url);
+            var titleEntered = getURLParameter('title', settings.url);
+            var dateEntered = getURLParameter('date', settings.url);
+            var locationEntered = getURLParameter('location', settings.url);;
+            var idGenerated = (++lastId).toString();
+            console.log('id:' + idGenerated);
+            console.log('title:' + titleEntered);
+            console.log('date:' + dateEntered);
+            console.log('location:' + locationEntered);
+            this.responseText =  {
+                errorcode: '',
+                error: false,
+                request: {
+                    name: titleEntered,
+                    date: dateEntered,
+                    id: idGenerated,
+                    helpOffered: [
+                    ],
+                    helpIgnored: [
+                    ],
+                    helpAccepted: [
+                    ]
+                },
+            }
+        }
+    });
+
+    $.mockjax({
+        url: '/Api/offerhelp/*',
+        responseTime: 750,
+        response: function (settings) {
+            console.log("url:" + settings.url);
+            console.log("requestId:" + getURLParameter('requestId', settings.url));
+            console.log("offer:" + getURLParameter('offer', settings.url));
+            this.responseText = {
+                errorcode: '',
+                error: false,
+            }
+        }
+    });
+
 });
 
 /*
