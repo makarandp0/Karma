@@ -1,7 +1,63 @@
 ﻿$(document).ready(function () {
 
+    // requestid = userid_requestdatetime 
+    // offerid = requestid_helperId_datetimeoffered
+    // 
+
     // this global variable contains all our data!
-    var lastId = 100;
+    var mockdata2 = {
+        type: "all1.0", // every json object from our server would have a data type associated with it.
+        error: 0,
+        errocode: "",
+        me: { id: "628825055", ismale: true, name: "Makarand Patwardhan"},
+        friends: [
+            { blocked: false, id: "676783107", ismale: true, name: "Lloyd Bond", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn2/1117691_676783107_853903468_q.jpg" },
+            { blocked: false, id: "631784108", ismale: true, name: "Daniel Dinu", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash3/260677_631784108_1701214824_q.jpg" },
+            { blocked: false, id: "615700133", ismale: false, name: "LiChean Ng", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn2/186460_615700133_437735881_q.jpg" },
+            { blocked: false, id: "575635813", ismale: false, name: "Swapna Medi", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-frc1/372584_575635813_1343373760_q.jpg" },
+            { blocked: false, id: "100003142340770", ismale: true, name: "Steve Palmer", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/1118633_100003142340770_1866995702_q.jpg" },
+            { blocked: false, id: "622449773", ismale: true, name: "Vladimir Stoyanov", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash1/211449_622449773_1448160153_q.jpg" },
+            { blocked: false, id: "648352020", ismale: false, name: "Imelda Kirby", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn1/573007_648352020_1317477714_q.jpg" },
+            { blocked: false, id: "100000475566141", ismale: true, name: "Piotr Slatala", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn1/50106_100000475566141_4909_q.jpg" },
+        ],
+        inbox: [
+                { id: "676783107_201312302020", date: "12/13", requestStatus: "open", yourStatus: "noresponse", from: "676783107", title: "Need some hardware" },
+                { id: "615700133_201312312020", date: "12/23", requestStatus: "open", yourStatus: "noresponse", from: "615700133", title: "a job" },
+                { id: "100003142340770_201412312020", date: "12/13", requestStatus: "open", yourStatus: "noresponse", from: "100003142340770", title: "some english friends", }
+        ],
+        outbox: [
+            {
+                id: "628825055_201412312020",
+                date: "12/13", // TODO: think more about date format
+                title: "Need a Ride to Airport",
+                requestStatus: "open",
+                helpOffers: [
+                    { id: "628825055_201412312020_648352020", yourStatus: "noresponse", from: "648352020" },
+                    { id: "628825055_201412312020_631784108", yourStatus: "noresponse", from: "631784108" },
+                ]
+            },
+            {
+                id: "628825055_201412312020",
+                date: "12/15", // TODO: think more about date format
+                title: "need some peanuts",
+                requestStatus: "open",
+                helpOffers: [
+                    { id: "628825055_201412312020_575635813", yourStatus: "noresponse", from: "575635813" },
+                    { id: "628825055_201412312020_622449773", yourStatus: "noresponse", from: "622449773" },
+                ]
+            },
+            {
+                id: "628825055_201412312020",
+                date: "12/13", // TODO: think more about date format
+                title: "a break",
+                requestStatus: "open",
+                helpOffers: [
+                    { id: "628825055_201412312020_100000475566141", yourStatus: "noresponse", from: "100000475566141" },
+                    { id: "628825055_201412312020_648352020", yourStatus: "noresponse", from: "648352020" },
+                ]
+            },
+        ]
+    }
     var mockdata = {
             friends: [
                 { blocked: false, id: "100003794306037", gender: "female", name: "Sucheta Desai", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash1/211272_100003794306037_59011785_q.jpg" },
@@ -15,57 +71,52 @@
             inbox: [
                 {
                     from: { id: "100004890999167", gender: "female", name: "Anila Puranik Halbe", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn2/1118410_100004890999167_2007089240_q.jpg" },
-                    request: { name: "Needs some more time", id: "1", requestStatus: 0, yourStatus: 0 }
+                    request: { name: "Needs some more time", id: "100004890999167_201312302020", requestStatus: 0, yourStatus: 0 }
                 },
                 {
                     from: { id: "100004066370422", gender: "male", name: "Anish Patwardhan", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/1086622_100004066370422_1811447981_q.jpg" },
-                    request: { name: "Needs some money management lessons", id: "2", requestStatus: 0, yourStatus: 0 }
+                    request: { name: "Needs some money management lessons", id: "100004066370422_201312312020", requestStatus: 0, yourStatus: 0 }
                 },
                 {
                     from: { id: "100003794306037", gender: "female", name: "Sucheta Desai", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash1/211272_100003794306037_59011785_q.jpg" },
-                    request: { name: "Needs a break", id: "3", requestStatus: 0, yourStatus: 0 }
+                    request: { name: "Needs a break", id: "100003794306037_201412312020", requestStatus: 0, yourStatus: 0 }
                 }
             ],
             outbox: [
                 {
                     name: "Need a Ride to Airport",
-                    id: "1",
+                    id: "628825055_201412312020",
                     date: "12/13", // TODO: think more about date format
                     helpOffered: [
-                        { id: "100004081128591", gender: "female", name: "Sandhya Prasade", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash3/157780_100004081128591_2133113783_q.jpg" },
-                        { id: "100004890999167", gender: "female", name: "Anila Puranik Halbe", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn2/1118410_100004890999167_2007089240_q.jpg" },
-                    ],
-                    helpIgnored: [
-                    ],
-                    helpAccepted: [
+                        { offerid: "628825055_201412312020_100004081128591", yourStatus: 0, friendid: "100004081128591", gender: "female", name: "Sandhya Prasade", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash3/157780_100004081128591_2133113783_q.jpg" },
+                        { offerid: "628825055_201412312020_100004890999167", yourStatus: 0, friendid: "100004890999167", gender: "female", name: "Anila Puranik Halbe", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn2/1118410_100004890999167_2007089240_q.jpg" },
                     ]
                 },
                 {
                     name: "Help feeding my cat",
                     date: "12/12", // TODO: think more about date format
-                    id: "2",
+                    id: "628825055_201312312020",
                     helpOffered: [
-                        { id: "100004008272532", gender: "female", name: "Vrushali Shrotri", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn2/203272_100004008272532_1822936541_q.jpg" },
+                        { offerid: "628825055_201312312020_100004008272532", yourStatus: 0, friendid: "100004008272532", gender: "female", name: "Vrushali Shrotri", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn2/203272_100004008272532_1822936541_q.jpg" },
                     ],
-                    helpIgnored: [
-                    ],
-                    helpAccepted: [
-                    ]
                 },
                 {
                     name: "No Help offers on this one",
                     date: "12/14", // TODO: think more about date format
-                    id: "2",
+                    id: "628825055_201401312020",
                     helpOffered: [
                     ],
-                    helpIgnored: [
-                    ],
-                    helpAccepted: [
-                    ]
                 }
             ]
     };
 
+    $.mockjax({
+        url: '/Api/getAll',
+        responseTime: 750,
+        response: function () {
+            this.responseText = mockdata2;
+        }
+    });
 
     $.mockjax({
         url: '/Api/getFriends',
@@ -122,7 +173,14 @@
             var titleEntered = getURLParameter('title', settings.url);
             var dateEntered = getURLParameter('date', settings.url);
             var locationEntered = getURLParameter('location', settings.url);;
-            var idGenerated = (++lastId).toString();
+            var d = new Date();
+            var idGenerated =
+                d.getFullYear().toString() +
+                (d.getMonth() + 1).toString() +
+                d.getDate().toString() +
+                d.getHours().toString() +
+                d.getMinutes();
+
             console.log('id:' + idGenerated);
             console.log('title:' + titleEntered);
             console.log('date:' + dateEntered);
@@ -152,6 +210,20 @@
             console.log("url:" + settings.url);
             console.log("requestId:" + getURLParameter('requestId', settings.url));
             console.log("offer:" + getURLParameter('offer', settings.url));
+            this.responseText = {
+                errorcode: '',
+                error: false,
+            }
+        }
+    });
+
+    $.mockjax({
+        url: '/Api/accepthelp/*',
+        responseTime: 750,
+        response: function (settings) {
+            console.log("url:" + settings.url);
+            console.log("requestId:" + getURLParameter('requestId', settings.url));
+            console.log("accept:" + getURLParameter('accept', settings.url));
             this.responseText = {
                 errorcode: '',
                 error: false,

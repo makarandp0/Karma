@@ -138,18 +138,10 @@ var ViewModelClass = (function (name, pic) {
             self.selectedfriend().blocked = false;
             self.selectedfriend.valueHasMutated();
         };
-        this.OfferHelp = function (inboxItem) {
-            inboxItem.request.yourStatus = 1;
-            self.OfferDenyHelp(inboxItem, "yes");
-        };
-        
-        this.DenyHelp = function (inboxItem) {
-            inboxItem.request.yourStatus = 2;
-            self.OfferDenyHelp(inboxItem, "no");
-        };
 
+        // offer = yes|no
         this.OfferDenyHelp = function (inboxItem, offer) {
-            var createOfferURL = '/Api/offerhelp/?requestId=' + encodeURIComponent(inboxItem.request.id) + '&offer=' + encodeURIComponent(offer);
+            var createOfferURL = '/Api/offerhelp/?requestId=' + inboxItem.request.id + '&offer=' + offer;
             var createRequest = $.getJSON(createOfferURL, function () {
                 console.log(createOfferURL + ":success");
             })
@@ -166,6 +158,55 @@ var ViewModelClass = (function (name, pic) {
                 });
         };
 
+        this.OfferHelp = function (inboxItem) {
+            self.OfferDenyHelp(inboxItem, "yes");
+            inboxItem.request.yourStatus = 1;  // offered help
+            self.selectedinbox.valueHasMutated();
+        };
+        
+        this.DenyHelp = function (inboxItem) {
+            self.OfferDenyHelp(inboxItem, "no");
+            inboxItem.request.yourStatus = 2; // denied help
+            self.selectedinbox.valueHasMutated();
+        };
+
+        // accept=yes|no
+        this.AcceptIgnoreOffer = function (offerId, accept) {
+            var createOfferURL = '/Api/accepthelp/?requestId=' + offerId + '&accept=' + accept;
+            var acceptIgnore = $.getJSON(createOfferURL, function () {
+                console.log(createOfferURL + ":success");
+            })
+                .done(function (data) {
+                    if (!data || data.error) {
+                        console.log(createOfferURL + ":returned error:" + data.error + ", errorcode:" + data.errorcode);
+                    }
+                })
+                .fail(function () {
+                    console.log(createOfferURL + ":failed");
+                })
+                .always(function () {
+                    // todo: add a notification here.
+                });
+        };
+
+        this.AcceptHelp = function (outboxItem, offer) {
+
+            console.log("will accept:");
+            console.log("outboxItem.name:" + outboxItem.name);
+            console.log("friend.name:" + offer.name);
+            self.AcceptIgnoreOffer(offer.offerid, "yes");
+            offer.yourStatus = 1; // accepted offer.
+            self.selectedoutbox.valueHasMutated();
+        };
+
+        this.IgnoreHelp = function (outboxItem, offer) {
+            console.log("will ignore:");
+            console.log("outboxItem.name:" + outboxItem.name);
+            console.log("friend.name:" + offer.name);
+            self.AcceptIgnoreOffer(offer.offerid, "no");
+            offer.yourStatus = 2; // ignored offer.
+            self.selectedoutbox.valueHasMutated();
+        };
     }
     return ViewModel;
 })();

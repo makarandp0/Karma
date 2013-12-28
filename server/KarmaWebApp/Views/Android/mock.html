@@ -339,15 +339,27 @@
                                     <!-- people who offered help -->
                                     <div data-bind="if: helpOffered.length > 0">
                                         <div data-bind="foreach: helpOffered">
-                                            <div>
+                                            <div data-bind="if: yourStatus == 0">
                                                 <div class="clearfix"></div>
                                                 <hr class="">
                                                 <img data-bind="attr:{src: pic}">
                                                 <span data-bind="text: name"> </span> has offered Help!
                                                 <div class="btn-group pull-right">
-                                                    <button type="button" class="btn btn-success">Accept Help!</button>
-                                                    <button type="button" class="btn btn-default">Ignore</button>
+                                                    <button type="button" class="btn btn-success" data-bind="click: $root.AcceptHelp.bind($root, $parent, $data)">Accept Help!</button>
+                                                    <button type="button" class="btn btn-default" data-bind="click: $root.IgnoreHelp.bind($root, $parent, $data)">Ignore</button>
                                                 </div>
+                                            </div>
+                                            <div data-bind="if: yourStatus == 1">
+                                                <div class="clearfix"></div>
+                                                <hr class="">
+                                                <img data-bind="attr:{src: pic}">
+                                                You accepted help offer from <span data-bind="text: name"> </span>!
+                                            </div>
+                                            <div data-bind="if: yourStatus == 2">
+                                                <div class="clearfix"></div>
+                                                <hr class="">
+                                                <img data-bind="attr:{src: pic}">
+                                                You ignored help offer from <span data-bind="text: name"> </span>!
                                             </div>
                                         </div>
                                     </div>
