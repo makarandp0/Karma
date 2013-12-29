@@ -57,11 +57,12 @@ module KarmaTypes {
 
     export class Friend extends User {
         public IsBlocked = ko.observable(true);
-        constructor(jsondata: any) {
+        private _parent : KarmaViewModel;
+        constructor(jsondata: any, parent: KarmaViewModel) {
             // { blocked: false, id: "676783107", ismale: true, name: "Lloyd Bond", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn2/1117691_676783107_853903468_q.jpg" },
             super(jsondata);
             this.IsBlocked(jsondata.blocked);
-
+            this._parent = parent;
         }
 
         public BlockFriend() {
@@ -99,20 +100,50 @@ module KarmaTypes {
     export class HelpOffer {
         public Id: string;
         public From: Friend;
-        public Response: string;
+        public Response = ko.observable<string>("noresponse");
 
         constructor(jsonOffer: any) {
             // { id: "628825055_201412312020_575635813", response: "noresponse", from: "575635813" },
             this.Id = jsonOffer.id;
-            this.Response = jsonOffer.response;
+            this.Response(jsonOffer.response);
             this.From = KarmaViewModel.staticFriendsDictionary.GetByKey(jsonOffer.from);
         }
+
+        public AcceptHelp() {
+            this.AcceptIgnoreOffer("yes");
+        }
+
+        public IgnoreHelp() {
+            this.AcceptIgnoreOffer("no");
+        }
+
+        // accept=yes|no
+        public AcceptIgnoreOffer(accept: string) {
+            this.Response(accept);
+            var createOfferURL = '/Api/accepthelp/?requestId=' + this.Id + '&accept=' + accept;
+            var acceptIgnore = $.getJSON(createOfferURL, function () {
+                console.log(createOfferURL + ":success");
+            })
+                .done(function (data) {
+                    if (!data || data.error) {
+                        console.log(createOfferURL + ":returned error:" + data.error + ", errorcode:" + data.errorcode);
+                    }
+                })
+                .fail(function () {
+                    console.log(createOfferURL + ":failed");
+                })
+                .always(function () {
+                    // todo: add a notification here.
+                });
+        }
+
     }
 
     export class MyRequest extends Request{
         public helpOffered: HelpOffer[] = [];
+        private _parent: KarmaViewModel;
 
-        constructor(jsonRequest: any) {
+        constructor(jsonRequest: any, parent: KarmaViewModel) {
             /*
             {
                 ...
@@ -123,19 +154,20 @@ module KarmaTypes {
             },
             */
             super(jsonRequest);
+            this._parent = parent;
             for (var i = 0; i < jsonRequest.helpOffers.length; ++i) {
                 var offer = new HelpOffer(jsonRequest.helpOffers[i]);
                 this.helpOffered.push(offer);
             }
-            console.log("Request:" + this.Id + ", Name:" + this.Name);
         }
     }
 
     export class FriendsRequest extends Request{
         public From: Friend;
         public Response: KnockoutObservable<string>;
+        private _parent: KarmaViewModel;
 
-        constructor(jsonRequest: any) {
+        constructor(jsonRequest: any, parent: KarmaViewModel) {
             /*
             {
                 id: "615700133_201312312020",
@@ -149,33 +181,61 @@ module KarmaTypes {
 
             },
             */
-
+            
             super(jsonRequest);
+            this._parent = parent;
             this.From = KarmaViewModel.staticFriendsDictionary.GetByKey(jsonRequest.from);
             this.Response = ko.observable<string>(jsonRequest.response);
         }
 
         public OfferHelp() {
-            this.Response("yes");
+            this.OfferDenyHelp("yes");
         }
         public DenyHelp() {
-            this.Response("no");
+            this.OfferDenyHelp("no");
         }
+
+        // offer = yes|no
+        public OfferDenyHelp(offer: string) {
+            var self = this;
+            this.Response(offer);
+            var createOfferURL = '/Api/offerhelp/?requestId=' + this.Id + '&offer=' + offer;
+            var createRequest = $.getJSON(createOfferURL, function () {
+                console.log(createOfferURL + ":success");
+            })
+                .done(function (data) {
+                    if (!data || data.error) {
+                        console.log(createOfferURL + ":returned error:" + data.error + ", errorcode:" + data.errorcode);
+                    }
+                })
+                .fail(function () {
+                    console.log(createOfferURL + ":failed");
+                })
+                .always(function () {
+                    // self.selectedinbox.valueHasMutated();
+                });
+        }
+
     }
 
     export class SelectableList<T> {
 
         public Items = ko.observableArray<T>(null);
         public SelectedItem = ko.observable<T>(null);
-        public PanelHeader = ko.observable<string>("Header");
+        public PanelHeader = ko.observable<string>("Loading...");
 
         public SelectItem(item: T) {
             this.SelectedItem(item);
         }
 
-        public SelectDefault() {
-            if (this.Items.length > 0) {
-                this.SelectedItem(this.Items[0]);
+        // sets the header and selects the 1st time
+        public SelectDefault(header: string) {
+            if (this.Items().length > 0) {
+                this.SelectedItem(this.Items()[0]);
+                this.SetHeader(header);
+            }
+            else {
+                this.SetHeader(header + " none found!");
             }
         }
 
@@ -186,7 +246,6 @@ module KarmaTypes {
         public RefreshSelection() {
             this.SelectedItem.valueHasMutated();
         }
-
     }
 
     export class KarmaViewModel {
@@ -197,52 +256,33 @@ module KarmaTypes {
         // reads all the information from json object passed.
         public ReadFromJSON(jsonObject:any) {
 
+            console.log("reading from Json");
             this.Me(new User(jsonObject.me));
 
             // setup friends dictionary and the friends observable array.
-            this.MyFriends.SetHeader("Loading...");
             for (var i = 0; i < jsonObject.friends.length; ++i) {
-                var friend = new Friend(jsonObject.friends[i]);
+                var friend = new Friend(jsonObject.friends[i], this);
                 KarmaViewModel.staticFriendsDictionary.Add(friend.Id, friend);
                 this.MyFriends.Items.push(friend);
             }
 
-            this.MyFriends.SelectDefault();
-            if (this.MyFriends.Items().length == 0) {
-                this.MyFriends.SetHeader("sorry you have no friends :(");
-            }
-            else {
-                this.MyFriends.SetHeader("Your Frineds:");
-            }
+            this.MyFriends.SelectDefault("Your Friends:");
 
             // setup inbox
             for (var i = 0; i < jsonObject.inbox.length; ++i) {
-                var inboxItem = new FriendsRequest(jsonObject.inbox[i]);
+                var inboxItem = new FriendsRequest(jsonObject.inbox[i], this);
                 this.MyInbox.Items.push(inboxItem);
             }
 
-            this.MyInbox.SelectDefault();
-            if (this.MyInbox.Items().length == 0) {
-                this.MyInbox.SetHeader("You have no pending requests");
-            }
-            else {
-                this.MyInbox.SetHeader("Your Inbox:");
-            }
+            this.MyInbox.SelectDefault("Your Inbox:");
 
             // setup outbox.
             for (var i = 0; i < jsonObject.outbox.length; ++i) {
-                var outboxItem = new MyRequest(jsonObject.outbox[i]);
+                var outboxItem = new MyRequest(jsonObject.outbox[i], this);
                 this.MyOutbox.Items.push(outboxItem);
             }
 
-            this.MyOutbox.SelectDefault();
-            if (this.MyOutbox.Items().length == 0) {
-                this.MyOutbox.SetHeader("You have no pending requests");
-            }
-            else {
-                this.MyOutbox.SetHeader("Your Outbox:");
-            }
-
+            this.MyOutbox.SelectDefault("Your Outbox:");
         }
 
         public Me = ko.observable<User>(null);
@@ -293,7 +333,7 @@ module KarmaTypes {
             })
                 .done(function (data) {
                     if (!data.error) {
-                        var newrequest = new MyRequest(data.request);
+                        var newrequest = new MyRequest(data.request, self);
                         self.MyOutbox.Items.push(newrequest);
                     }
                     else {
@@ -336,70 +376,27 @@ module KarmaTypes {
             }
         }
 
-        // offer = yes|no
-        public OfferDenyHelp(inboxItem: FriendsRequest, offer: string) {
-            var self = this;
-            var createOfferURL = '/Api/offerhelp/?requestId=' + inboxItem.Id + '&offer=' + offer;
-            var createRequest = $.getJSON(createOfferURL, function () {
-                console.log(createOfferURL + ":success");
-            })
-                .done(function (data) {
-                    if (!data || data.error) {
-                        console.log(createOfferURL + ":returned error:" + data.error + ", errorcode:" + data.errorcode);
-                    }
-                })
-                .fail(function () {
-                    console.log(createOfferURL + ":failed");
-                })
-                .always(function () {
-                    // self.selectedinbox.valueHasMutated();
-                });
-        }
 
-        // accept=yes|no
-        public AcceptIgnoreOffer (offerId:string, accept:string) {
-            var createOfferURL = '/Api/accepthelp/?requestId=' + offerId + '&accept=' + accept;
-            var acceptIgnore = $.getJSON(createOfferURL, function () {
-                console.log(createOfferURL + ":success");
-            })
-                .done(function (data) {
-                    if (!data || data.error) {
-                        console.log(createOfferURL + ":returned error:" + data.error + ", errorcode:" + data.errorcode);
-                    }
-                })
-                .fail(function () {
-                    console.log(createOfferURL + ":failed");
-                })
-                .always(function () {
-                    // todo: add a notification here.
-                });
-        }
-
-        public AcceptHelp(outboxItem: MyRequest, offer: HelpOffer) {
-
-            console.log("will accept:");
-            console.log("outboxItem.name:" + outboxItem.Name);
-            console.log("friend.name:" + offer.From.Name);
-            this.AcceptIgnoreOffer(offer.Id, "yes");
-            offer.Response = "yes"; // accepted offer.
-            this.MyOutbox.RefreshSelection();
-        }
-
-        public IgnoreHelp(outboxItem: MyRequest, offer :HelpOffer) {
-            console.log("will ignore:");
-            console.log("outboxItem.name:" + outboxItem.Name);
-            console.log("friend.name:" + offer.From.Name);
-            this.AcceptIgnoreOffer(offer.Id, "no");
-            offer.Response = "no"; // ignored offer.
-            this.MyOutbox.RefreshSelection();
+        static getURLParameter(name: string) {
+            return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [, ""])[1].replace(/\+/g, '%20')) || null;
         }
 
         static SetupKnockOut() {
             var myViewModel = new KarmaViewModel();
             ko.applyBindings(myViewModel);
 
-            var getFriendsRequest = $.getJSON("/Api/getAll", function () {
-                console.log("/Api/getAll:success");
+            // check if url has parameter specified for accesstoken
+            // 
+            var getAllUrl = "/Api/getAll/";
+            var accessToken = KarmaViewModel.getURLParameter("accessToken");
+            console.log("accessToken:" + accessToken);
+            if (accessToken == null) {
+                accessToken = "fake";
+            } 
+            getAllUrl += "?accessToken=" + encodeURIComponent(accessToken);
+
+            var getAllRequest = $.getJSON(getAllUrl, function () {
+                console.log(getAllUrl + ":success");
             })
                 .done(function (data) {
                     if (!data.error) {

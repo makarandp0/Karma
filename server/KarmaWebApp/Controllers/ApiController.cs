@@ -42,10 +42,12 @@ namespace KarmaWebApp.Controllers
 
         public class JsonData
         {
+            public string type { get; private set; }
             public bool error { get; private set; }
             public string errorcode { get; private set; }
             public JsonData()
             {
+                this.type = this.GetType().ToString();
                 this.error = false;
                 this.errorcode = "";
             }
@@ -79,6 +81,52 @@ namespace KarmaWebApp.Controllers
         {
             public List<JsonFriend> friends = new List<JsonFriend>();
         }
+
+        public class JsonUser
+        {
+            public string id;
+            public string name;
+            public string pic;
+            public bool   ismale;
+        }
+        public class JsonFriend2 : JsonUser
+        {
+            public bool blocked;
+        }
+
+        public class JsonrequestEntry
+        {
+            public string id;       // id should be in the format cretorid_datestamp.
+            public string date;     // date 
+            public string status;   // status - open/closed/...
+            public string location; // request location
+            public string title;    // request title
+        }
+
+        public class JsonInboxEntry : JsonrequestEntry
+        {
+            public string response; // response of the curernt user: noresponse, yes, no
+            public string from;     // id of the friend who created this request.
+        }
+
+        public class JsonhelpOfferEntry
+        {
+            public string id; // requestid_responderid;
+            public string response; // response from the user "noresponse" "yes", "no"
+            public string from; // responderid.
+        }
+        public class JsonOutboxEntry : JsonrequestEntry
+        {
+            public List<JsonhelpOfferEntry> helpOffers;
+        }
+
+        public class JsonGetAllResponse : JsonData
+        {
+            public JsonUser me;
+            public List<JsonFriend2> friends;
+            public List<JsonInboxEntry> inbox;
+            public JsonOutboxEntry outbox;
+        }
         //
         // GET: /Api/getFriends
         public JsonResult getFriends(string client)
@@ -102,6 +150,7 @@ namespace KarmaWebApp.Controllers
             return Json(data, JsonRequestBehavior.AllowGet);
         }
 
+
         // creates a new request and returns its id.
         public JsonResult createRequest(string Title)
         {
@@ -121,6 +170,14 @@ namespace KarmaWebApp.Controllers
             var karmaRequest = sessionContext.ActiveUser.CreateRequest(Title, "no message", DateTime.MaxValue);
             data.id = karmaRequest.Id;
             return Json(data, JsonRequestBehavior.AllowGet);
+        }
+
+        // GET: /Api/getAll/?accessToeken=<>
+        public JsonResult getAll(string accessToken)
+        {
+            var data = new JsonGetAllResponse();
+            return Json(data, JsonRequestBehavior.AllowGet);
+
         }
 	}
 }

@@ -177,7 +177,6 @@
     <Content Include="Scripts\respond.min.js" />
     <None Include="Scripts\_references.js" />
     <Content Include="Views\Android\mock.html" />
-    <Content Include="Views\Android\mock2.html" />
     <Content Include="Web.config" />
     <Content Include="Scripts\jquery-1.10.2.min.map" />
   </ItemGroup>

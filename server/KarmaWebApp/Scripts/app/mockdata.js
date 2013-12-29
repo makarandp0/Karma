@@ -144,9 +144,9 @@
     };
 
     $.mockjax({
-        url: '/Api/getAll',
+        url: '/Api/getAll/*',
         responseTime: 750,
-        response: function () {
+        response: function (settings) {
             this.responseText = mockdata2;
         }
     });
@@ -198,6 +198,7 @@
     function getURLParameter(paramname, url) {
         return decodeURIComponent((new RegExp('[?|&]' + paramname + '=' + '([^&;]+?)(&|#|;|$)').exec(url) || [, ""])[1].replace(/\+/g, '%20')) || null
     }
+
     $.mockjax({
         url: '/Api/createrequest/*',
         responseTime: 750,

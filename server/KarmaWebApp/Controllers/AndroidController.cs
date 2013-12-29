@@ -11,6 +11,13 @@ namespace KarmaWebApp.Controllers
 {
     public class AndroidController : KarmaBaseController
     {
+
+        // GET: /Android/Mock
+        public ActionResult Mock()
+        {
+            return File(Server.MapPath("~/Views/Android/") + "mock.html", "text/html"); 
+        }
+
         //
         // GET: /Android/
         public ActionResult Index(string accessToken)
