@@ -123,7 +123,7 @@ var ViewModelClass = (function (name, pic) {
                             console.log("An unknown error occurred.");
                             break;
                     }
-        });
+            });
             }
             else {
                 console.log("!navigator.geolocation");

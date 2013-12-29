@@ -9,7 +9,7 @@
         type: "all1.0", // every json object from our server would have a data type associated with it.
         error: 0,
         errocode: "",
-        me: { id: "628825055", ismale: true, name: "Makarand Patwardhan"},
+        me: { id: "628825055", ismale: true, name: "Makarand Patwardhan", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/274191_628825055_1428018580_q.jpg"},
         friends: [
             { blocked: false, id: "676783107", ismale: true, name: "Lloyd Bond", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn2/1117691_676783107_853903468_q.jpg" },
             { blocked: false, id: "631784108", ismale: true, name: "Daniel Dinu", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash3/260677_631784108_1701214824_q.jpg" },
@@ -21,39 +21,72 @@
             { blocked: false, id: "100000475566141", ismale: true, name: "Piotr Slatala", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn1/50106_100000475566141_4909_q.jpg" },
         ],
         inbox: [
-                { id: "676783107_201312302020", date: "12/13", requestStatus: "open", yourStatus: "noresponse", from: "676783107", title: "Need some hardware" },
-                { id: "615700133_201312312020", date: "12/23", requestStatus: "open", yourStatus: "noresponse", from: "615700133", title: "a job" },
-                { id: "100003142340770_201412312020", date: "12/13", requestStatus: "open", yourStatus: "noresponse", from: "100003142340770", title: "some english friends", }
+            {
+                 id: "676783107_201312302020",
+                 date: "12/13",
+                 status: "open",
+                 location: "seattle, WA",
+                 title: "Need some hardware",
+
+                 response: "noresponse",
+                 from: "676783107",
+                 
+            },
+            {
+                id: "615700133_201312312020",
+                date: "12/23",
+                status: "open",
+                location: "seattle, WA",
+                title: "a job",
+
+                response: "noresponse",
+                from: "615700133"
+
+            },
+            {
+                id: "100003142340770_201412312020",
+                date: "12/13",
+                status: "open",
+                location: "seattle, WA",
+                title: "some english friends",
+
+                response: "noresponse",
+                from: "100003142340770",
+            }
         ],
         outbox: [
             {
                 id: "628825055_201412312020",
                 date: "12/13", // TODO: think more about date format
                 title: "Need a Ride to Airport",
-                requestStatus: "open",
+                status: "open",
+                location: "seattle, WA",
+
                 helpOffers: [
-                    { id: "628825055_201412312020_648352020", yourStatus: "noresponse", from: "648352020" },
-                    { id: "628825055_201412312020_631784108", yourStatus: "noresponse", from: "631784108" },
+                    { id: "628825055_201412312020_648352020", response: "noresponse", from: "648352020" },
+                    { id: "628825055_201412312020_631784108", response: "noresponse", from: "631784108" },
                 ]
             },
             {
                 id: "628825055_201412312020",
                 date: "12/15", // TODO: think more about date format
                 title: "need some peanuts",
-                requestStatus: "open",
+                status: "open",
+                location: "seattle, WA",
                 helpOffers: [
-                    { id: "628825055_201412312020_575635813", yourStatus: "noresponse", from: "575635813" },
-                    { id: "628825055_201412312020_622449773", yourStatus: "noresponse", from: "622449773" },
+                    { id: "628825055_201412312020_575635813", response: "noresponse", from: "575635813" },
+                    { id: "628825055_201412312020_622449773", response: "noresponse", from: "622449773" },
                 ]
             },
             {
                 id: "628825055_201412312020",
                 date: "12/13", // TODO: think more about date format
                 title: "a break",
-                requestStatus: "open",
+                status: "open",
+                location: "seattle, WA",
                 helpOffers: [
-                    { id: "628825055_201412312020_100000475566141", yourStatus: "noresponse", from: "100000475566141" },
-                    { id: "628825055_201412312020_648352020", yourStatus: "noresponse", from: "648352020" },
+                    { id: "628825055_201412312020_100000475566141", response: "noresponse", from: "100000475566141" },
+                    { id: "628825055_201412312020_648352020", response: "noresponse", from: "648352020" },
                 ]
             },
         ]
@@ -175,6 +208,7 @@
             var locationEntered = getURLParameter('location', settings.url);;
             var d = new Date();
             var idGenerated =
+                mockdata2.me.id + "_" +
                 d.getFullYear().toString() +
                 (d.getMonth() + 1).toString() +
                 d.getDate().toString() +
@@ -185,19 +219,31 @@
             console.log('title:' + titleEntered);
             console.log('date:' + dateEntered);
             console.log('location:' + locationEntered);
+            /*
+            {
+                id: "628825055_201412312020",
+                date: "12/13", // TODO: think more about date format
+                title: "Need a Ride to Airport",
+                status: "open",
+                location: "seattle, WA",
+
+                helpOffers: [
+                    { id: "628825055_201412312020_648352020", response: "noresponse", from: "648352020" },
+                    { id: "628825055_201412312020_631784108", response: "noresponse", from: "631784108" },
+                ]
+            },
+           */
             this.responseText =  {
                 errorcode: '',
                 error: false,
                 request: {
-                    name: titleEntered,
-                    date: dateEntered,
                     id: idGenerated,
-                    helpOffered: [
+                    date: dateEntered,
+                    title: titleEntered,
+                    location: locationEntered,
+                    status:"open",
+                    helpOffers: [
                     ],
-                    helpIgnored: [
-                    ],
-                    helpAccepted: [
-                    ]
                 },
             }
         }
@@ -479,7 +525,4 @@
     { id: "100005810231812", gender: "female", name: "Sucheta Krishnan", pic:  "https://fbcdn-profile-a.akamaihd.net/static-ak/rsrc.php/v2/y9/r/IB7NOFmPw2a.gif" },
     { id: "100005915079954", gender: "female", name: "Supriya Bhate", pic:  "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/1076366_100005915079954_166290348_q.jpg" },
     { id: "100006678160254", gender: "male", name: "Aakash Patwardhan", pic:  "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/1118585_100006678160254_275339760_q.jpg" }
-
-
-
 */
