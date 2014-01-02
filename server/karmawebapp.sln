@@ -9,6 +9,14 @@ Project("{CC5FD16D-436D-48AD-A40C-5A424C6E3E79}") = "KarmaCloudService", "KarmaC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KarmaWinPhone", "..\client\win\KarmaWinPhone\KarmaWinPhone.csproj", "{76878C1F-AA6A-4C89-8272-AEF160972295}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureLibrary", "AzureLibrary\AzureLibrary.csproj", "{2EF323B1-2427-4D67-8A0D-BF522E3D49E6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utilities", "Utilities\Utilities.csproj", "{60B50DDC-14A6-4313-9C43-B15FCDC20B8A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KarmaTest", "KarmaTest\KarmaTest.csproj", "{94D95A5F-E6BF-413A-BFF2-C0FD74C2C58A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KarmaDb", "KarmaDb\KarmaDb.csproj", "{BF97FEA1-2731-490A-B625-91A3411DA61F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +61,38 @@ Global
 		{76878C1F-AA6A-4C89-8272-AEF160972295}.Release|x86.ActiveCfg = Release|x86
 		{76878C1F-AA6A-4C89-8272-AEF160972295}.Release|x86.Build.0 = Release|x86
 		{76878C1F-AA6A-4C89-8272-AEF160972295}.Release|x86.Deploy.0 = Release|x86
+		{2EF323B1-2427-4D67-8A0D-BF522E3D49E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2EF323B1-2427-4D67-8A0D-BF522E3D49E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2EF323B1-2427-4D67-8A0D-BF522E3D49E6}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{2EF323B1-2427-4D67-8A0D-BF522E3D49E6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2EF323B1-2427-4D67-8A0D-BF522E3D49E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2EF323B1-2427-4D67-8A0D-BF522E3D49E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2EF323B1-2427-4D67-8A0D-BF522E3D49E6}.Release|ARM.ActiveCfg = Release|Any CPU
+		{2EF323B1-2427-4D67-8A0D-BF522E3D49E6}.Release|x86.ActiveCfg = Release|Any CPU
+		{60B50DDC-14A6-4313-9C43-B15FCDC20B8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60B50DDC-14A6-4313-9C43-B15FCDC20B8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60B50DDC-14A6-4313-9C43-B15FCDC20B8A}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{60B50DDC-14A6-4313-9C43-B15FCDC20B8A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{60B50DDC-14A6-4313-9C43-B15FCDC20B8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60B50DDC-14A6-4313-9C43-B15FCDC20B8A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{60B50DDC-14A6-4313-9C43-B15FCDC20B8A}.Release|ARM.ActiveCfg = Release|Any CPU
+		{60B50DDC-14A6-4313-9C43-B15FCDC20B8A}.Release|x86.ActiveCfg = Release|Any CPU
+		{94D95A5F-E6BF-413A-BFF2-C0FD74C2C58A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94D95A5F-E6BF-413A-BFF2-C0FD74C2C58A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94D95A5F-E6BF-413A-BFF2-C0FD74C2C58A}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{94D95A5F-E6BF-413A-BFF2-C0FD74C2C58A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{94D95A5F-E6BF-413A-BFF2-C0FD74C2C58A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94D95A5F-E6BF-413A-BFF2-C0FD74C2C58A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{94D95A5F-E6BF-413A-BFF2-C0FD74C2C58A}.Release|ARM.ActiveCfg = Release|Any CPU
+		{94D95A5F-E6BF-413A-BFF2-C0FD74C2C58A}.Release|x86.ActiveCfg = Release|Any CPU
+		{BF97FEA1-2731-490A-B625-91A3411DA61F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF97FEA1-2731-490A-B625-91A3411DA61F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF97FEA1-2731-490A-B625-91A3411DA61F}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{BF97FEA1-2731-490A-B625-91A3411DA61F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BF97FEA1-2731-490A-B625-91A3411DA61F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF97FEA1-2731-490A-B625-91A3411DA61F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF97FEA1-2731-490A-B625-91A3411DA61F}.Release|ARM.ActiveCfg = Release|Any CPU
+		{BF97FEA1-2731-490A-B625-91A3411DA61F}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

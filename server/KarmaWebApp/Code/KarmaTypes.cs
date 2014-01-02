@@ -5,7 +5,5 @@ using System.Web;
 
 namespace KarmaWebApp.Code
 {
-    public class Utils
-    {
-    }
+    public enum Gender { Male, Female, Unknown};
 }

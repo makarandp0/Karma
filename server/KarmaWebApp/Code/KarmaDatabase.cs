@@ -116,7 +116,7 @@ namespace KarmaWebApp
             if (nearbyFriends != null && nearbyFriends.Count != 0)
             {
                 // add these friends to "showto" field.
-                request.ShowTo = string.Join(",", nearbyFriends);
+                request.FriendsNearBy = string.Join(",", nearbyFriends);
 
                 // update the state to opend
                 request.State = DbKarmaRequest.RequestState.opened;
@@ -146,33 +146,30 @@ namespace KarmaWebApp
         /// <param name="request"></param>
         private void SendToNextFriends(DbKarmaRequest request)
         {
+            var friendsNearBy = request.FriendsNearBy.Split(',').ToList();
+
             // friends whom we need to show this request to
-            var showToFriends = request.ShowTo.Split(',').ToList();
+            var friendsToSendThisTime = new List<string>();
 
             // friends whom we have already shown the request.
-            var sentToFriends = request.SendTo.Split(',').ToList();
+            var delieveredTo = request.DelieveredTo.Split(',').ToList();
 
-            // number of friends to whom will send this request this time.
-            var numfriendsToTake  = Math.Min(showToFriends.Count(), NUM_FRIENDS_TO_SEND_REQUEST_PER_BATCH);
-
-            // friends whome we are going to send the request this time.
-            var friendsToSendThisTime = showToFriends.Take(numfriendsToTake);
-
-            // update showToFriends to contain only remaining..
-            showToFriends = showToFriends.Skip(numfriendsToTake).ToList();
-
-            if (showToFriends.Count > 0)
+            foreach (var nearbyFriend in friendsNearBy)
             {
-                request.ShowTo = string.Join(",", showToFriends);
+                if (!delieveredTo.Contains(nearbyFriend))
+                {
+                    // lets add him to our list to send this time.
+                    friendsToSendThisTime.Add(nearbyFriend);
+                    delieveredTo.Add(nearbyFriend);
+                    if (friendsToSendThisTime.Count >= NUM_FRIENDS_TO_SEND_REQUEST_PER_BATCH)
+                    {
+                        break; // we got enough people for this batch
+                    }
+                }
             }
-            else
-            {
-                request.ShowTo = "";
-            }
-            
-            // update sentToFriends to reflect this new batch.
-            sentToFriends.AddRange(friendsToSendThisTime);
-            request.SendTo = string.Join(",", sentToFriends);
+
+            // update DelieveredTo to reflect this new batch.
+            request.DelieveredTo = string.Join(",", delieveredTo);
 
             foreach (var friend in friendsToSendThisTime)
             {
@@ -180,15 +177,15 @@ namespace KarmaWebApp
             }
 
             TimeSpan nextProcessTimeAfter = TIME_BEFORE_NEW_FRIENDS_BATCH;
-            if (showToFriends.Count > 0)
-            {
-                // if there are more freiends in showToFriends list.
-                request.State = DbKarmaRequest.RequestState.intransitPatial;
-            }
-            else
+            if (delieveredTo.Count == friendsNearBy.Count)
             {
                 request.State = DbKarmaRequest.RequestState.intransitFull;
                 nextProcessTimeAfter = TIME_BEFORE_REQUEST_CLOSES_FOR_LACK_OF_RESPONSE;
+            }
+            else
+            {
+                // if there are more freiends in showToFriends list.
+                request.State = DbKarmaRequest.RequestState.intransitPatial;
             }
 
             KarmaBackgroundWorker.QueueWorkItem("DelayedTask_ProcessRequest", request.GetRequestId(), nextProcessTimeAfter);
@@ -395,20 +392,11 @@ namespace KarmaWebApp
             return success;
         }
 
-        internal static KarmaGraphNode<KarmaPerson> CreatePersonEntry(string facebookId, string firstName, string fullname, string pictureUrl, string location, string email, List<string> karmaFriends, List<string> nonKarmaFriends)
-        {
-            string karmaFriendString = string.Join(",", karmaFriends);
-            string nonKarmaFriendString = string.Join(",", nonKarmaFriends);
-
-            var person = new KarmaPerson(facebookId, firstName, fullname, pictureUrl, location, email, karmaFriendString, nonKarmaFriendString);
-            return AddPersonEntry(person);
-        }
-
         /// <summary>
         /// adds a new user persons.
         /// </summary>
         /// <param name="person"></param>
-        private static KarmaGraphNode<KarmaPerson> AddPersonEntry(KarmaPerson person)
+        public static KarmaGraphNode<KarmaPerson> AddPersonEntry(KarmaPerson person)
         {
             Logger.WriteLine("AddPersonEntry: for:" + person.FacebookId());
             if (PeopleGraph.ContainsKey(person.FacebookId()))
@@ -465,6 +453,7 @@ namespace KarmaWebApp
             return null;
         }
 
+
     }
 
     /// <summary>
@@ -475,25 +464,57 @@ namespace KarmaWebApp
     {
         public const string ROW_ID = "basic_info";
 
-        public KarmaPerson(string facebookId, string firstName, string fullname, string pictureUrl, string location, string email, string karmaFriends, string nonKarmaFriends)
-        {
-            this.PartitionKey = facebookId;
-            this.RowKey = KarmaPerson.ROW_ID;
-
-            this.Name = fullname;
-            this.FirstName = firstName;
-            this.PictureUrl = pictureUrl;
-            this.Location = location;
-            this.Email = email;
-            this.NonKarmaFriends = nonKarmaFriends;
-            this.KarmaFriends = karmaFriends;
-        }
-
         // TODO: this is method and not property because we dont want to get autoserialized.
         // figure out better way to control this.
         public string FacebookId() { return this.PartitionKey; }
 
-        public KarmaPerson() { }
+        public KarmaPerson() {}
+
+        public KarmaPerson(KaramFacebookUser client)
+        {
+            foreach (var fbFriend in client.FbFriends)
+            {
+                if (fbFriend.IsKarmaUser)
+                {
+                    if (!String.IsNullOrEmpty(this.KarmaFriends))
+                    {
+                        this.KarmaFriends += ",";;
+                    }
+                    this.KarmaFriends += fbFriend.FacebookId;
+                }
+                else
+                {
+                    if (!String.IsNullOrEmpty(this.NonKarmaFriends))
+                    {
+                        this.NonKarmaFriends += ","; ;
+                    }
+                    this.NonKarmaFriends += fbFriend.FacebookId;
+                }
+            }
+
+            foreach (var fbGroup in client.FbGroups)
+            {
+                // TODO: for now just store all the groups seperated by ","  (group and name seperates by "!")
+                // will need to create a seperate entry for groups.
+                if (!String.IsNullOrEmpty(this.Groups))
+                {
+                    this.Groups += ",";
+                }
+
+                this.Groups += fbGroup.Id + "!#!" + fbGroup.Name;
+            }
+
+            this.PartitionKey = client.FacebookId;
+
+            this.RowKey = KarmaPerson.ROW_ID;
+
+            this.Name = client.Name;
+            this.FirstName = client.FirstName;
+            this.PictureUrl = client.PictureUrl;
+            this.Location = client.Location;
+            this.Email = client.Email;
+            this.Gender = client.Gender;
+        }
 
         public string Name { get; set; }
 
@@ -505,10 +526,13 @@ namespace KarmaWebApp
 
         public string Email { get; set; }
 
+        public Gender Gender { get; set; }
+
         public string NonKarmaFriends { get; set; }
 
         public string KarmaFriends { get; set; }
 
+        public string Groups { get; set; }
         public int KarmaPoints { get; set; }
 
         internal IEnumerable<string> ReadKarmaFriends()
@@ -539,6 +563,8 @@ namespace KarmaWebApp
             }
             return true;
         }
+
+        
     }
 
     public class DbKarmaRequest : TableEntity
@@ -608,11 +634,11 @@ namespace KarmaWebApp
 
         public string MoreInfo {get;set;}
 
-        public string SendTo { get; set; }
+        public string DelieveredTo { get; set; }
 
         public string SeenBy { get; set; }
 
-        public string ShowTo { get; set; }
+        public string FriendsNearBy { get; set; }
 
         public string OfferedBy { get; set; }
 

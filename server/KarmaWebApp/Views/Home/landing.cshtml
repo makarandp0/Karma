@@ -103,7 +103,7 @@
                 console.log("will call fb.login!");
                 FB.login(function (response) {
                     console.log("got response from fb.login!");
-                }, { scope: 'email' });
+                }, { scope: 'email,user_groups' });
                 console.log("done with fb.login call");
             });
 

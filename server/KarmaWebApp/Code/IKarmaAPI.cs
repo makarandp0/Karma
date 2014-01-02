@@ -22,26 +22,21 @@ namespace KarmaWebApp.Code
     }
 
     /// <summary>
-    /// represents a facebook user.
+    ///  reprensets a karma user. A specialized version KaramActiveUser is derived from this.
     /// </summary>
-    public interface IFbPerson
+    public interface IKarmaUser
     {
         string FacebookId { get; }
 
         string Name { get; }
 
-        string FirstName { get; } // TODO: dont store this.
+        string FirstName { get; }
 
         string PictureUrl { get; }
 
         string Location { get; }
-    }
 
-    /// <summary>
-    ///  reprensets a karma user. A specialized version KaramActiveUser is derived from this.
-    /// </summary>
-    public interface IKarmaUser : IFbPerson
-    {
+        Gender Gender { get; }
 
         int karmaPoints { get; }
     }

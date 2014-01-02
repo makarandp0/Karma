@@ -43,7 +43,7 @@ namespace KarmaWebApp.Code
         public KarmaBackgroundWorker(CloudStorageAccount storageAccount)
         {
             var queueClient = storageAccount.CreateCloudQueueClient();
-            _WorkerQueue = queueClient.GetQueueReference("workQueue");
+            _WorkerQueue = queueClient.GetQueueReference("workqueue");
             // _WorkerQueue.CreateIfNotExists();
 
             _Backgroundworker = new Thread(this.DoWork);

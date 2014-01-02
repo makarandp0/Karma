@@ -154,6 +154,7 @@
     <None Include="Properties\PublishProfiles\mirawebware.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="images\active_404.png" />
+    <Content Include="images\mainBg.png" />
     <Content Include="images\pressed_404.png" />
     <Content Include="Scripts\app\Channel.html" />
     <Content Include="Scripts\app\appscript.js" />
@@ -184,12 +185,11 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
-    <Compile Include="Code\FbUser.cs" />
     <Compile Include="Code\IKarmaAPI.cs" />
     <Compile Include="Code\KarmaBackgroundWorker.cs" />
     <Compile Include="Code\KarmaGraph.cs" />
+    <Compile Include="Code\KarmaTypes.cs" />
     <Compile Include="Code\Logger.cs" />
-    <Compile Include="Code\Utils.cs" />
     <Compile Include="Controllers\AndroidController.cs" />
     <Compile Include="Controllers\ApiController.cs" />
     <Compile Include="Controllers\HomeController.cs" />

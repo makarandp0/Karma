@@ -20,34 +20,18 @@ namespace KarmaBackEnd
             KarmaGraphNode<KarmaPerson> person = null;
 
             // verify the access token with facebook.
-            var client = new KaramFacebookClient(accessToken);
-            if (client.ReadBasicInfo())
+            var client = new KaramFacebookUser(accessToken);
+            if (client.ValidateUser())
             {
-                // see if we have the person's info in our cache.
-                if (!KarmaDatabase.GetPersonEntry(client.FacebookId, out person))
+                bool userExists = KarmaDatabase.GetPersonEntry(client.FacebookId, out person);
+                if (!userExists)
                 {
                     // we did not find the entry in cache.
                     // or the entry is stale. lets get more info from facebook
                     // and add new entry to our database.
                     if (client.ReadExtendedInformation())
                     {
-                        // store create comma seperated friends list
-                        var nonKarmaFriends = new List<string>();
-                        var karmaFriends = new List<string>();
-                        
-                        foreach (var friend in client.Friends)
-                        {
-                            if (friend.IsKarmaUser)
-                            {
-                                karmaFriends.Add(friend.FacebookId);
-                            }
-                            else
-                            {
-                                nonKarmaFriends.Add(friend.FacebookId);
-                            }
-                        }
-
-                        person = KarmaDatabase.CreatePersonEntry(client.FacebookId, client.FirstName, client.Name, client.PictureUrl, client.Location, client.Email, karmaFriends, nonKarmaFriends);
+                        person = KarmaDatabase.AddPersonEntry(new KarmaPerson(client));
                     }
                 }
             }
@@ -133,6 +117,15 @@ namespace KarmaBackEnd
                 return this._karmaFriend.GetValue().Location;
             }
         }
+
+        public Gender Gender
+        {
+            get
+            {
+                return this._karmaFriend.GetValue().Gender;
+            }
+
+        }
     }
 
     public class KarmaRequest : IKarmaRequest
@@ -177,6 +170,7 @@ namespace KarmaBackEnd
 
     public class KarmaActiveUser : IKaramActiveUser
     {
+
         private KarmaGraphNode<KarmaPerson> _person;
 
         public string FacebookId 
@@ -202,6 +196,11 @@ namespace KarmaBackEnd
         public string Location
         {
             get { return _person.GetValue().Location; }
+        }
+
+        public Gender Gender
+        {
+            get { return _person.GetValue().Gender; }
         }
 
         public int karmaPoints
