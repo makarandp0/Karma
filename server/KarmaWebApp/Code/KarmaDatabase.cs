@@ -16,12 +16,11 @@ using KarmaGraph.Types;
 namespace KarmaWebApp
 {
   
-    public class KarmaDatabase
+    public class KarmaBackEnd
     {
         private static Graph PeopleGraph = new Graph();
-        private static KarmaDb.KarmaDb TheDb = new KarmaDb.KarmaDb();
-        private static KarmaDatabase TheDatabase = new KarmaDatabase();
-        // private static KarmaGraph<KarmaPerson> PeopleGraph = new KarmaGraph<KarmaPerson>();
+        private static KarmaDb.KarmaDb Database = new KarmaDb.KarmaDb();
+        private static KarmaBackEnd BackEnd = new KarmaBackEnd();
         private static KarmaBackgroundWorker KarmaBackgroundWorker;
         
         // private static CloudTable PeopleTable;
@@ -48,12 +47,13 @@ namespace KarmaWebApp
 
             KarmaBackgroundWorker = new KarmaBackgroundWorker(storageAccount);
 
-            TheDb.SetTable(peopleTable);
+            Database.SetTable(peopleTable);
+            PeopleGraph.SetDatabase(Database);
             PeopleGraph.Generate();
 
-            KarmaBackgroundWorker.RegisterWorkItem("DelayedTask_UpdateFriends", new KarmaBackgroundWorker.WorkItemDelegate(TheDatabase.DelayedTask_UpdateFriends));
-            KarmaBackgroundWorker.RegisterWorkItem("DelayedTask_ProcessRequest", new KarmaBackgroundWorker.WorkItemDelegate(TheDatabase.DelayedTask_ProcessRequest));
-            KarmaBackgroundWorker.RegisterWorkItem("BroadCast_AddToGraph", new KarmaBackgroundWorker.WorkItemDelegate(TheDatabase.BroadCast_AddToGraph));
+            KarmaBackgroundWorker.RegisterWorkItem("DelayedTask_UpdateFriends", new KarmaBackgroundWorker.WorkItemDelegate(BackEnd.DelayedTask_UpdateFriends));
+            KarmaBackgroundWorker.RegisterWorkItem("DelayedTask_ProcessRequest", new KarmaBackgroundWorker.WorkItemDelegate(BackEnd.DelayedTask_ProcessRequest));
+            KarmaBackgroundWorker.RegisterWorkItem("BroadCast_AddToGraph", new KarmaBackgroundWorker.WorkItemDelegate(BackEnd.BroadCast_AddToGraph));
         }
 
         private void DelayedTask_ProcessRequest(string workId)
@@ -297,7 +297,7 @@ namespace KarmaWebApp
             var client = new KaramFacebookUser(accessToken);
             if (client.ValidateUser())
             {
-                var person = KarmaDatabase.GetUser(client.FacebookId);
+                var person = KarmaBackEnd.GetUser(client.FacebookId);
                 if (person == null)
                 {
                     // we did not find the entry in cache.
@@ -305,7 +305,7 @@ namespace KarmaWebApp
                     // and add new entry to our database.
                     if (client.ReadExtendedInformation())
                     {
-                        person = KarmaDatabase.CreateUser(client);
+                        person = KarmaBackEnd.CreateUser(client);
                     }
                 }
 

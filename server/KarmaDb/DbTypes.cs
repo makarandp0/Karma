@@ -78,6 +78,13 @@ namespace KarmaDb.Types
             string etag)
         {
             DbEntry resolvedEntity = null;
+            if (!props.ContainsKey("EntityType"))
+            {
+                // TODO: we do not understand this entity.
+                // create a special list to take care of such.
+                return null;
+            }
+
             string entityType = props["EntityType"].StringValue;
 
             switch (entityType)

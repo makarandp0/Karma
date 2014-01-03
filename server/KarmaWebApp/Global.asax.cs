@@ -26,7 +26,7 @@ namespace KarmaWebApp
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
             ReadAppConfiguration();
-            KarmaDatabase.LoadDatabase();
+            KarmaBackEnd.LoadDatabase();
         }
 
         public void Session_OnStart()

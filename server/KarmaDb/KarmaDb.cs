@@ -37,11 +37,12 @@ namespace KarmaDb
             // TO: we are doing very inefficient reading here.
             // but its very extendable. so for some time as long as we have
             // lots of flux, and small users this would work.
-
             TableQuery query = (new TableQuery());
             var everything = this._peopleTable.ExecuteQuery(query, new EntityResolver<DbEntry>(DbEntry.Resolver), null, null);
             foreach(var thing in everything)
             {
+                if (thing == null) continue; // for the entries that we do not understand.
+
                 switch(thing.EntityType)
                 {
                     case "DbUserBasic":
@@ -56,7 +57,8 @@ namespace KarmaDb
 
                      case "DbUserExtended":
                         // we dont care for this right now.
-                        break;
+                        break;;
+
                     default:
                         break;
                 }

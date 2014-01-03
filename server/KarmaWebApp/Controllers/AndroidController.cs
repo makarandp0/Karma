@@ -37,7 +37,7 @@ namespace KarmaWebApp.Controllers
 
             try 
             {
-                var logonUser = KarmaDatabase.LogonUserUsingFB(accessToken);
+                var logonUser = KarmaBackEnd.LogonUserUsingFB(accessToken);
 
                 // save user context for subsequent calls.
                 // this will be used by all api calls.
