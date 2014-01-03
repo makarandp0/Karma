@@ -8,7 +8,6 @@ using Microsoft.WindowsAzure;
 using System.Data.Services.Client;
 using KarmaWeb.Utilities;
 using System.Configuration;
-using KarmaWeb.Azure;
 using Sepialabs.Azure.Test;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;

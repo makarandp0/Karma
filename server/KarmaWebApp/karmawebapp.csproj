@@ -186,6 +186,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Code\IKarmaAPI.cs" />
+    <Compile Include="Code\KarmaActiveUser.cs" />
     <Compile Include="Code\KarmaBackgroundWorker.cs" />
     <Compile Include="Code\KarmaGraph.cs" />
     <Compile Include="Code\KarmaTypes.cs" />
@@ -227,6 +228,16 @@
     <TypeScriptCompile Include="Scripts\typings\bootstrap\bootstrap.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\knockout\knockout.d.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\KarmaDb\KarmaDb.csproj">
+      <Project>{bf97fea1-2731-490a-b625-91a3411da61f}</Project>
+      <Name>KarmaDb</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Utilities\Utilities.csproj">
+      <Project>{60b50ddc-14a6-4313-9c43-b15fcdc20b8a}</Project>
+      <Name>Utilities</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

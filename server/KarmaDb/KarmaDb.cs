@@ -13,8 +13,8 @@ namespace KarmaDb
     {
         private CloudTable _peopleTable;
         private ILogger _logger = new NullLogger();
-        
-        public void SetDatabase(CloudTable peopleTable)
+
+        public void SetTable(CloudTable peopleTable)
         {
             this._peopleTable = peopleTable;
         }
@@ -26,14 +26,47 @@ namespace KarmaDb
 
         public bool ReadAll(
             out List<DbUserBasic> userBasic,
-            out List<DbUserExtended> userExtended,
             out List<DbGroup> groups,
             out List<DbRequest> requests
-            );
+            )
+        {
+            userBasic = new List<DbUserBasic>();
+            groups = new List<DbGroup>();
+            requests = new List<DbRequest>();
 
-        public List<DbUserBasic> ReadAllPeopleBasic();
-        public List<DbUserExtended> ReadAllPeopleExtended();
-        public List<DbGroup> ReadAllGroups();
-        public List<DbRequest> ReadAllRequests();
+            // TO: we are doing very inefficient reading here.
+            // but its very extendable. so for some time as long as we have
+            // lots of flux, and small users this would work.
+
+            TableQuery query = (new TableQuery());
+            var everything = this._peopleTable.ExecuteQuery(query, new EntityResolver<DbEntry>(DbEntry.Resolver), null, null);
+            foreach(var thing in everything)
+            {
+                switch(thing.EntityType)
+                {
+                    case "DbUserBasic":
+                        userBasic.Add((DbUserBasic)thing);
+                        break;
+                    case "DbRequest":
+                        requests.Add((DbRequest)thing);
+                        break;
+                    case "DbGroup":
+                        groups.Add((DbGroup) thing);
+                        break;
+
+                     case "DbUserExtended":
+                        // we dont care for this right now.
+                        break;
+                    default:
+                        break;
+                }
+            }
+            return true;
+        }
+
+        public TableResult InsertOrMerge(DbEntry userBasic)
+        {
+            return userBasic.InsertOrMerge(this._peopleTable);
+        }
     }
 }

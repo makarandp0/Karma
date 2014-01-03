@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
+using System.Globalization;
 
 namespace KarmaDb.Types
 {
@@ -30,6 +31,11 @@ namespace KarmaDb.Types
 
     [Flags]
     public enum EDBRequestFlags
+    {
+    }
+
+
+    public enum EDBGroupFlags
     {
     }
 
@@ -77,20 +83,21 @@ namespace KarmaDb.Types
             switch (entityType)
             {
                 case "DbUserBasic":
-                    resolvedEntity = new DbUserBasic();
+                    resolvedEntity = new DbUserBasic(pk);
                     break;
 
                 case "DbUserExtended":
-                    resolvedEntity = new DbUserExtended();
+                    resolvedEntity = new DbUserExtended(pk);
                     break;
 
                 case "DbGroup":
-                    resolvedEntity = new DbGroup();
+                    resolvedEntity = new DbGroup(pk);
                     break;
 
                 case "DbRequest": 
-                    resolvedEntity = new DbRequest();
+                    resolvedEntity = new DbRequest(pk, rk);
                     break;
+
                 default:
                     Debug.Assert(false, "Unknown entityType:" + entityType);
                     return null;
@@ -103,6 +110,27 @@ namespace KarmaDb.Types
             resolvedEntity.ReadEntity(props, null);
             return resolvedEntity;
         }
+
+
+        public TableResult InsertOrMerge(CloudTable table)
+        {
+            this.ETag = "*"; // this tells azure that overwrite the entry even if its modified before us.
+            var insertOp = TableOperation.InsertOrMerge(this);
+            return table.Execute(insertOp);
+        }
+
+
+        public static DbRequest Read(CloudTable table, string pk, string rk)
+        {
+            var retrieveOperation = TableOperation.Retrieve<DbRequest>(pk, rk);
+            var retrievedResult = table.Execute(retrieveOperation);
+            if (retrievedResult.Result != null)
+            {
+                return (DbRequest)retrievedResult.Result;
+            }
+            return null;
+        }
+
     }
 
     /// <summary>
@@ -111,8 +139,17 @@ namespace KarmaDb.Types
     /// </summary>
     public class DbUserBasic : DbEntry
     {
+        public const string ROW_ID = "user_basic";
+        public DbUserBasic(string facebookId)
+        {
+            this.PartitionKey = facebookId;
+            this.RowKey = ROW_ID;
+        }
         [IgnoreProperty]
-        public string fbId { get; set; }                // facebookid.
+        public string fbId 
+        { 
+            get { return this.PartitionKey; }
+        }                
         public string firstname { get; set; }           // first name
         public string name { get; set; }                // name
         public string gender { get; set; }              // gender
@@ -131,17 +168,76 @@ namespace KarmaDb.Types
 
     public class DbUserExtended : DbEntry
     {
+        public const string ROW_ID = "user_extended";
+        public DbUserExtended(string facebookId)
+        {
+            this.PartitionKey = facebookId;
+            this.RowKey = ROW_ID;
+        }
+
         [IgnoreProperty]
-        public string fbId { get; set; }              // userid (primary key)
+        public string fbId
+        {
+            get { return this.PartitionKey; }
+        }                
         public string accessToken { get; set; }         // user access token
         public string nonkarmaFriends { get; set; }     // karma friends
     }
 
     public class DbRequest: DbEntry
     {
+        const char SEPERATOR = '!';
+        public DbRequest(string owner)
+        {
+            this.PartitionKey = owner;
+
+            // generate a unique request id.
+            this.RowKey = DateTime.UtcNow.ToString("s", CultureInfo.InvariantCulture); // someting like  2008-04-10T06:30:00
+
+        }
+
+        public static DbRequest ReadFromDatabase(CloudTable table, string requestId)
+        {
+            try
+            {
+                var keys = requestId.Split(SEPERATOR);
+                if (keys.Length != 2) 
+                {
+                    Debug.Assert(false); // convert to dbgmsg.
+                    return null;
+                }
+
+                var dbEntry = DbEntry.Read(table, keys[0], keys[1]);
+                if (dbEntry != null && dbEntry.EntityType == typeof(DbRequest).ToString())
+                {
+                    return (DbRequest)dbEntry;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception retriving request:{0} from database:{1}", requestId, ex);
+            }
+            return null;
+        }
+
+
+        public DbRequest(string pk, string rk)
+        {
+            this.PartitionKey = pk;
+            this.RowKey = rk;
+        }
         [IgnoreProperty]
-        public string requestId { get; set; }           // requestId
-        public string createdBy { get; set; }           // id of the person who created it.
+        public string requestId 
+        {
+            get { return this.PartitionKey + SEPERATOR + this.RowKey; }
+        }
+
+
+        [IgnoreProperty]
+        public string createdBy
+        {
+            get { return this.PartitionKey; }
+        }
         public string title { get; set; }               // title
         public string moreinfo { get; set; }            // more info
         public double lat { get; set; }                 // latitude
@@ -158,10 +254,21 @@ namespace KarmaDb.Types
 
     public class DbGroup : DbEntry
     {
+        public const string ROW_ID = "group_basic";
+        public DbGroup(string facebookId)
+        {
+            this.PartitionKey = facebookId;
+            this.RowKey = ROW_ID;
+        }
+
+
         [IgnoreProperty]
-        public string fbId { get; set; }
+        public string fbId
+        {
+            get { return this.PartitionKey; }
+        }
         public string name { get; set; }
-        public string members { get; set; }
-        public Int64 flags { get; set; }                // group flags.
+
+        public EDBGroupFlags flags { get; set; }                // group flags.
     }
 }

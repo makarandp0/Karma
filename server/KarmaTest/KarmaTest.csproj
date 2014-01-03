@@ -36,7 +36,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Microsoft.WindowsAzure.Storage, Version=2.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.WindowsAzure.Storage, Version=2.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\WindowsAzure.Storage.2.1.0.3\lib\net40\Microsoft.WindowsAzure.Storage.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data.Services" />
     <Reference Include="System.Data.Services.Client" />
@@ -60,10 +63,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AzureLibrary\AzureLibrary.csproj">
-      <Project>{2ef323b1-2427-4d67-8a0d-bf522e3d49e6}</Project>
-      <Name>AzureLibrary</Name>
-    </ProjectReference>
     <ProjectReference Include="..\KarmaDb\KarmaDb.csproj">
       <Project>{bf97fea1-2731-490a-b625-91a3411da61f}</Project>
       <Name>KarmaDb</Name>

@@ -1,4 +1,5 @@
 ﻿using Facebook;
+using KarmaGraph.Types;
 using KarmaWebApp.Code;
 using System;
 using System.Collections.Generic;
@@ -39,50 +40,43 @@ namespace KarmaWebApp
     public class KaramFacebookUser 
     {
         private FacebookClient _facebookClient;
+        
         public KaramFacebookUser(string accessToken)
         {
+            this.AccessToken = accessToken;
             this._facebookClient = new FacebookClient(accessToken);
             this.FbFriends = new List<FacebookFriend>();
             this.FbGroups = new List<FacebookGroup>();
+            this.location = new Location();
+            this.Gender = EGender.Unknown;
         }
-        
+
+        public string AccessToken { get; private set; }
         public string  FacebookId {get; private set;}
         public string Name { get; private set; }
         public string FirstName { get; private set; }
         public string PictureUrl { get; private set; }
         public List<FacebookFriend> FbFriends { get; private set; }
         public List<FacebookGroup>  FbGroups {get;private set;}
-        public string Location { get; private set; }
+        public string LocationFbId { get; private set; }
         public string Email { get; private set; }
-        public Gender Gender { get; private set; }
-
+        public EGender Gender { get; private set; }
+        public Location location;
         public bool ValidateUser()
         {
             try
             {
                 if (String.IsNullOrEmpty(FacebookId))
                 {
-                    this.Gender = Code.Gender.Unknown;
-                    //dynamic meResults = _facebookClient.Get("me", new { fields = "name,first_name,id,picture,location,email,gender" });
-                    dynamic meResults = _facebookClient.Get("me", new { fields = "name,first_name,id,picture,location,email,gender" });
+                    dynamic meResults = _facebookClient.Get("me", new { fields = "id,name,location" });
                     this.FacebookId = meResults.id;
-                    this.FirstName = meResults.first_name;
                     this.Name = meResults.ContainsKey("name") ? meResults.name : "Unknown";
-                    this.PictureUrl = meResults.ContainsKey("picture") ? meResults.picture.data.url : null;
-                    this.Location = meResults.ContainsKey("location") ? meResults.location.name : "unknown";
-                    this.Email = meResults.ContainsKey("email") ? meResults.email : "unknown";
-                    if (meResults.ContainsKey("gender"))
+                    if (meResults.ContainsKey("location"))
                     {
-                        if (String.Compare(meResults.gender, "female", true) == 0)
-                        {
-                            this.Gender = Code.Gender.Female;
-                        }
-                        else if (String.Compare(meResults.gender, "male", true) == 0)
-                        {
-                            this.Gender = Code.Gender.Male;
-                        }
+                        this.location.name = meResults.location.name;
+                        this.LocationFbId = meResults.location.id;
+                        this.location.nameIsValid = true;
                     }
-                        
                 }
                 Logger.WriteLine("Facebook: Read Basic Information for:" + this.FacebookId);
                 return true;
@@ -98,12 +92,23 @@ namespace KarmaWebApp
         {
             try
             {
-                dynamic result = _facebookClient.Batch(
-                    new FacebookBatchParameter("me", new { fields = "name,first_name,id,picture,location,email,gender" }),
-                    new FacebookBatchParameter("me/friends", new { fields = "id,name,installed" }),
-                    new FacebookBatchParameter("me/groups", new { fields = "id,name" })
-                    );
+                FacebookBatchParameter[] fbBatchparams;
+                if (string.IsNullOrEmpty(this.LocationFbId))
+                    fbBatchparams = new FacebookBatchParameter[3];
+                else
+                    fbBatchparams = new FacebookBatchParameter[4];
 
+                fbBatchparams[0] = new FacebookBatchParameter("me", new { fields = "name,first_name,id,picture,location,email,gender" });
+                fbBatchparams[1] = new FacebookBatchParameter("me/friends", new { fields = "id,name,installed" });
+                fbBatchparams[2] = new FacebookBatchParameter("me/groups", new { fields = "id,name" });
+
+                if (this.location.nameIsValid)
+                {
+                    // "/109738839051539?fields=location"
+                    fbBatchparams[3] = new FacebookBatchParameter(this.LocationFbId, new { fields = "location" });
+                }
+
+                dynamic result = _facebookClient.Batch(fbBatchparams);
                 if (result[0] is Exception)
                 {
                     var ex = (Exception)result[0];
@@ -123,7 +128,6 @@ namespace KarmaWebApp
                     this.FirstName = result[0].ContainsKey("first_name") ? result[0].first_name : "Unknown";
                     this.Name = result[0].ContainsKey("name") ? result[0].name : "Unknown";
                     this.PictureUrl = result[0].ContainsKey("picture") ? result[0].picture.data.url : null;
-                    this.Location = result[0].ContainsKey("location") ? result[0].location.name : "unknown";
                     this.Email = result[0].ContainsKey("email") ? result[0].email : "unknown";
                     this.Gender = result[0].ContainsKey("gender") ? result[0].gender : "female"; 
 
@@ -147,9 +151,35 @@ namespace KarmaWebApp
                             }
                         }
                     }
-
-                    Logger.WriteLine("Facebook: Read ReadExtendedInformation for:" + this.FacebookId);
-                    return true;
+                    if (this.location.nameIsValid)
+                    {
+                        if (result[3] is Exception)
+                        {
+                            var ex = (Exception)result[3];
+                            // handle exception
+                            Logger.WriteLine("result[3] is Exception in ReadExtendedInformation:" + ex);
+                        }
+                        else
+                        {
+                            /*
+                             {
+                                  "location": {
+                                    "street": "", 
+                                    "zip": "", 
+                                    "latitude": 47.6742, 
+                                    "longitude": -122.12
+                                  }, 
+                                  "id": "109738839051539"
+                                }* 
+                             */
+                            if (result[3].ContainsKey("location"))
+                            {
+                                this.location.lat = result[3].location.latitude;
+                                this.location.lan = result[3].location.longitude;
+                                this.location.latlanIsValid = true;
+                            }
+                        }
+                    }
                 }
             }
             catch (FacebookApiException ex)

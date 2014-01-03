@@ -37,19 +37,21 @@ namespace KarmaWebApp.Controllers
 
             try 
             {
-                var backEnd = new KarmaBackend();
-                var logonUser = backEnd.LogonUserUsingFB(accessToken);
+                var logonUser = KarmaDatabase.LogonUserUsingFB(accessToken);
 
                 // save user context for subsequent calls.
                 // this will be used by all api calls.
                 var karmaSessionContext = GetKarmaSessionContext();
                 karmaSessionContext.ActiveUser = logonUser;
 
+
                 var model = new MobileSessionModel();
+                /*
                 model.name = logonUser.FirstName;
                 model.pictureUrl = logonUser.PictureUrl;
                 model.facebookId = logonUser.FacebookId;
                 model.location = logonUser.Location;
+                */
 
                 return View(model);
             }

@@ -63,25 +63,6 @@ namespace KarmaWebApp.Controllers
             public string id;
         }
 
-        public class JsonFriend
-        {
-            public string name;
-            public string id;
-            public int karmapoints;
-            public JsonFriend(IKarmaFriend karmaFriend)
-            {
-                this.name = karmaFriend.Name;
-                this.id = karmaFriend.FacebookId;
-                this.karmapoints = karmaFriend.karmaPoints;
-            }
-
-        }
-
-        public class JsonFriendsData : JsonData
-        {
-            public List<JsonFriend> friends = new List<JsonFriend>();
-        }
-
         public class JsonUser
         {
             public string id;
@@ -127,29 +108,6 @@ namespace KarmaWebApp.Controllers
             public List<JsonInboxEntry> inbox;
             public JsonOutboxEntry outbox;
         }
-        //
-        // GET: /Api/getFriends
-        public JsonResult getFriends(string client)
-        {
-            var data = new JsonFriendsData();
-
-            var sessionContext = GetKarmaSessionContext();
-            if (sessionContext.ActiveUser != null)
-            {
-                var dbFriends =  sessionContext.ActiveUser.Friends();
-                foreach(var friend in dbFriends)
-                {
-                    data.friends.Add(new JsonFriend(friend));
-                }
-            }
-            else
-            {
-                data.seterror("usersession inactive");
-            }
-
-            return Json(data, JsonRequestBehavior.AllowGet);
-        }
-
 
         // creates a new request and returns its id.
         public JsonResult createRequest(string Title)
@@ -167,8 +125,7 @@ namespace KarmaWebApp.Controllers
                 data.seterror("usersession inactive");
                 return Json(data, JsonRequestBehavior.AllowGet);
             }
-            var karmaRequest = sessionContext.ActiveUser.CreateRequest(Title, "no message", DateTime.MaxValue);
-            data.id = karmaRequest.Id;
+            data.id = sessionContext.ActiveUser.CreateRequest(Title, "no message", DateTime.MaxValue);
             return Json(data, JsonRequestBehavior.AllowGet);
         }
 
