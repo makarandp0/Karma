@@ -1,15 +1,9 @@
-﻿@model KarmaWebApp.Models.MobileSessionModel
-
-@{
-    Layout = null;
-}
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <meta charset="utf-8">
-    <title>Karma Mobile!</title>
+    <title>Welcome to Karma!</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css" rel="stylesheet">
     <script type='text/javascript' src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.9.1.min.js"></script>
@@ -19,14 +13,12 @@
     <!-- ticker -->
     <script type='text/javascript' src='../../Scripts/app/textticker.js'></script>
 
-
-    <!--
-    @if (Model.useMock)
+    @if (Model.useMock) 
     {
         <script type='text/javascript' src='../../Scripts/jquery.mockjax.js'></script>
         <script type='text/javascript' src='../../Scripts/app/mockdata.js'></script>
     }
-    -->
+    
     <link rel="stylesheet" type="text/css" href="../../Content/app/appstyle.css">
     <script type='text/javascript' src='../../Scripts/app/apptypes.js'></script>
 
@@ -42,16 +34,67 @@
                 "help moving my stuff tommorrow.    "
             ]);
 
-            $('[data-toggle=offcanvas]').click(function () {
-                $('.row-offcanvas').toggleClass('active');
-            });
-
-            $('.btn-toggle').click(function () {
-                $(this).find('.btn').toggleClass('active').toggleClass('btn-default').toggleClass('btn-primary');
-            });
-
             KarmaTypes.KarmaViewModel.SetupKnockOut();
         });
+
+        // A $( document ).ready() block.
+        $(document).ready(function () {
+
+            // hide details areas
+            $('.friends-details, .inbox-details, .outbox-details').hide();
+
+            // friend list item click
+            $(document.body).on('click', '.friendinListContainer', function () {
+                expandDetails('.friends-details', $(this));
+            });
+
+            // friend list item click
+            $(document.body).on('click', '.inboxListContainer', function () {
+                expandDetails('.inbox-details', $(this));
+            });
+
+            // friend list item click
+            $(document.body).on('click', '.outboxListContainer', function () {
+                expandDetails('.outbox-details', $(this));
+            });
+
+            /*
+            $(document.body).on('click', '.details-close', function () {
+                var closeElem = $(this).attr('data-close-elem');
+                $(closeElem).slideUp();
+            });
+            */
+
+        });
+
+        function expandDetails(detailsElementSelector, clickedElement) {
+            if ($(detailsElementSelector).is(":visible")) {
+                if ($(clickedElement).next(detailsElementSelector).length !== 0) {
+                    console.log("details element is visible after clicked");
+                    $(detailsElementSelector).slideUp();
+                }
+                else {
+                    console.log("details element is visible but NOT after clicked");
+                    $(detailsElementSelector).slideUp('fast', function () {
+                        $(detailsElementSelector).insertAfter(clickedElement);
+                        $(detailsElementSelector).slideDown();
+                    });
+                }
+            }
+            else {
+                console.log("details element is NOT visible");
+                $(detailsElementSelector).insertAfter(clickedElement);
+                $(detailsElementSelector).slideDown();
+            }
+        }
+
+        function expandDetails_orig(detailsElementSelector, clickedElement) {
+            console.log(detailsElementSelector, clickedElement);
+            $(detailsElementSelector).slideUp('fast', function () {
+                $(detailsElementSelector).insertAfter(clickedElement);
+                $(detailsElementSelector).slideDown();
+            });
+        }
     </script>
 </head>
 
@@ -59,35 +102,41 @@
 
     <!--page-container-->
     <div class="page-container">
+
         <!-- top navbar -->
-        <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="offcanvas" data-target=".sidebar-nav">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href=" #">KarmaWeb</a>
+                <a class="navbar-brand" href="#">KarmaWeb</a>
             </div>
-        </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li> <a href="#you" class="">you</a> </li>
+                    <li> <a href="#friends" class=""><span class="badge pull-right header-data-badge" data-bind="text: MyFriends.Items().length">0</span>friends</a> </li>
+                    <li> <a href="#inbox" class=""><span class="badge pull-right header-data-badge" data-bind="text: MyInbox.Items().length">0</span>inbox</a> </li>
+                    <li> <a href="#outbox" class=""><span class="badge pull-right header-data-badge" data-bind="text: MyOutbox.Items().length">0</span>outbox</a> </li>
+                </ul>
+
+
+            </div><!-- /.navbar-collapse -->
+        </nav>
+
         <!-- /top navbar -->
         <!--.container-->
         <div class="col-sm-12">
             <div class="row row-offcanvas row-offcanvas-left">
-                <!-- sidebar -->
-                <div class="col-xs-4 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
-                    <div data-spy="affix" data-offset-top="45" data-offset-bottom="90" class="">
-                        <ul class="nav" id="sidebar-nav">
-                            <li> <a href="#you" class="">you</a> </li>
-                            <li> <a href="#friends" class=""><span class="badge pull-right" data-bind="text: MyFriends.Items().length">0</span>friends</a> </li>
-                            <li> <a href="#inbox" class=""><span class="badge pull-right" data-bind="text: MyInbox.Items().length">0</span>inbox</a> </li>
-                            <li> <a href="#outbox" class=""><span class="badge pull-right" data-bind="text: MyOutbox.Items().length">0</span>outbox</a> </li>
-                        </ul>
-                    </div>
-                </div>
-                <!-- /sidebar -->
+
                 <!-- main area -->
-                <div class="col-xs-12 col-sm-9" data-spy="scroll" data-target="#sidebar-nav">
+                <div class="col-xs-12 col-sm-12" data-spy="scroll" data-target="#sidebar-nav">
 
                     <!-- ask your friends for help pannel-->
                     <h1 id="you" class="">you</h1>
@@ -115,7 +164,7 @@
                                 <hr class="">
 
                                 <div data-bind="if: showRequestError()">
-                                    <span class="label label-warning"> Are you kidding me...at least type sometime ?</span>
+                                    <span class="label label-warning"> Are you kidding me...at least type something?</span>
                                 </div>
                                 <button class="btn btn-lg btn-primary pull-right" data-bind="click: GotoNextRequestPage" type="button">
                                     Next <span class="glyphicon glyphicon-chevron-right"></span>
@@ -153,9 +202,9 @@
 
                     <h1 id="friends" class="">friends</h1>
                     <div class="row" data-bind="with: MyFriends">
-                        <div class="col-sm-6">
+                        <div class="col-sm-12">
                             <!-- Friends List -->
-                            <div class="panel panel-default">
+                            <div class="panel panel-default friends-list-panel">
                                 <div class="panel-heading">
                                     <a href="#" class="pull-right">refresh</a>
                                     <h4 class="" data-bind="text: PanelHeader">Friends List:</h4>
@@ -169,6 +218,7 @@
                                             <h4 class="list-group-item-heading" data-bind="text: Name"></h4>
                                             <p class="list-group-item-text">...</p>
                                         </a>
+
                                     </div>
                                 </div>
                                 <div class="panel-body" data-bind="if: Items().length  == 0">
@@ -186,31 +236,21 @@
                             </div>
 
                         </div>
-                        <div class="col-sm-6">
+                        <div class="friends-details">
                             <!-- Friends Details -->
                             <div class="panel panel-default" data-bind="with: SelectedItem()">
-                                <div class="panel-heading">
-                                    <a href="#" class="pull-right">View all</a>
-                                    <h4 class="" data-bind="text: Name">Friends Details</h4>
-                                </div>
                                 <div class="panel-body">
-                                    <p class=" ">
-                                        <img class=" img-polaroid pull-left" data-bind="attr:{src: Pic}">
-                                    </p>
-                                    <div class="clearfix"></div>
                                     <div class="realFriend" data-bind="ifnot: IsBlocked">
-                                        <hr class="">
                                         if <span data-bind="text: FirstName()"></span> is not really a "friend", you can block <span data-bind="text: hehimhis('him')"></span>.
                                         Once blocked <span data-bind="text: hehimhis('he')"></span> will not see any help requests from you and you will not
                                         see any requests from <span data-bind="text: hehimhis('him')"></span>. And don't worry we won't tell on you.
                                         <span data-bind="text: hehimhis('He')"></span> won't know  that you blocked <span data-bind="text: hehimhis('him')"></span>.
                                         <hr class="">
                                         <div class="btn-group pull-right">
-                                            <button class="btn btn-warning" data-bind="click: BlockFriend">Block <span data-bind="text: FirstName()"></span></button>
+                                            <button class="btn btn-danger" data-bind="click: BlockFriend">Block <span data-bind="text: FirstName()"></span></button>
                                         </div>
                                     </div>
                                     <div class="blockedFriend" data-bind="if: IsBlocked">
-                                        <hr class="">
                                         You have blocked <span data-bind="text: FirstName()"></span>. that means you will not see any help
                                         requests from <span data-bind="text: hehimhis('him')"></span> nor will
                                         <span data-bind="text: hehimhis('he')"></span> see any of your help requests. if you change your mind
@@ -228,7 +268,7 @@
                     <h1 id="inbox" class="">inbox</h1>
                     <div class="row" data-bind="with: MyInbox">
                         <!--Inbox-->
-                        <div class="col-sm-6">
+                        <div class="col-sm-12">
                             <div class="panel panel-default">
                                 <div class="panel-heading">
                                     <a href="#" class="pull-right">Refresh</a>
@@ -248,22 +288,12 @@
                             </div>
                         </div> <!--/Inbox-->
 
-                        <div class="col-sm-6">
+                        <div class="inbox-details">
                             <!-- InboxDetails -->
                             <div class="panel panel-default" data-bind="with: SelectedItem()">
-                                <div class="panel-heading">
-                                    <a href="#" class="pull-right">View all</a>
-                                    <h4 class="" data-bind="text: From.Name">Inbox Details</h4>
-                                </div>
                                 <div class="panel-body">
-                                    <div style="float:left;padding-right:10px">
-                                        <img class="img-polaroid pull-left" data-bind="attr:{src: From.Pic}">
-
-                                    </div>
-                                    <h4 class="list-group-item-heading" data-bind="text: Name"></h4>
-                                    <div class="clearfix"></div>
                                     <div class="pendingrequest" data-bind="if: Response() == 'noresponse'">
-                                        <hr class="">This is your chance to help <span data-bind="text: $data.From.FirstName()"></span>. if you choose to help, we will notify
+                                        This is your chance to help <span data-bind="text: $data.From.FirstName()"></span>. if you choose to help, we will notify
                                         <span data-bind="text: $data.From.hehimhis('him')"></span> about it. if <span data-bind="text: $data.From.hehimhis('he')"></span>
                                         hasn't gotten help already,  <span data-bind="text: $data.From.hehimhis('he')"></span> will accept your request and get back to you.
                                         if you choose to not help. its okay! We won't tell <span data-bind="text: $data.From.hehimhis('him')"></span> that you saw the request.
@@ -275,14 +305,14 @@
                                         </div>
                                     </div>
                                     <div class="request_helpoffered" data-bind="if: Response() == 'yes'">
-                                        <hr class="">You offered help to <span data-bind="text: $data.From.FirstName()"></span>. <strong>Thank you!</strong> we will notify
+                                        You offered help to <span data-bind="text: $data.From.FirstName()"></span>. <strong>Thank you!</strong> we will notify
                                         <span data-bind="text: $data.From.hehimhis('him')"></span> about it. if <span data-bind="text: $data.From.hehimhis('he')"></span>
                                         hasn't gotten help already,  <span data-bind="text: $data.From.hehimhis('he')"></span> will accept your request and get back to you.
                                         <div class="clearfix"></div>
                                         <hr class="">
                                     </div>
                                     <div class="request_helpdenied" data-bind="if: Response() == 'no'">
-                                        <hr class="">You said you couldnt help <span data-bind="text: $data.From.FirstName()"></span>. <strong>Don't worry!</strong>
+                                        You said you couldnt help <span data-bind="text: $data.From.FirstName()"></span>. <strong>Don't worry!</strong>
                                         We won't tell <span data-bind="text: $data.From.hehimhis('him')"></span> that you saw the request.
                                         <div class="clearfix"></div>
                                         <hr class="">
@@ -296,7 +326,7 @@
                     <h1 id="outbox" class="">outbox</h1>
                     <div class="row" data-bind="with: MyOutbox">
                         <!--Outbox-->
-                        <div class="col-sm-6">
+                        <div class="col-sm-12">
                             <div class="panel panel-default">
                                 <div class="panel-heading">
                                     <a href="#" class="pull-right">Refresh</a>
@@ -304,7 +334,7 @@
                                 </div>
                                 <div class="panel-body">
                                     <div class="list-group" data-bind="foreach: Items">
-                                        <a href="#" class="inboxListContainer list-group-item" data-bind="css: { active: $parent.SelectedItem() == $data}, click: $parent.SelectItem.bind($parent)">
+                                        <a href="#" class="outboxListContainer list-group-item" data-bind="css: { active: $parent.SelectedItem() == $data}, click: $parent.SelectItem.bind($parent)">
                                             <h4 class="list-group-item-heading" data-bind="text: Name"></h4>
                                         </a>
                                     </div>
@@ -312,26 +342,18 @@
                             </div>
                         </div> <!--/outbox-->
 
-                        <div class="col-sm-6">
+                        <div class="outbox-details">
                             <!-- OutboxDetails -->
                             <div class="panel panel-default" data-bind="with: SelectedItem()">
-                                <div class="panel-heading">
-                                    <a href="#" class="pull-right">Refresh</a>
-                                    <h4 class="" data-bind="text: Name">Need a Ride</h4>
-                                </div>
                                 <div class="panel-body">
-                                    <div style="float:left;padding-right:10px">
-                                        <img class="img-polaroid pull-left" data-bind="attr:{src: $root.Me().Pic}">
-                                    </div>
-                                    <h4 class="list-group-item-heading" data-bind="text: 'You Need:' + Name"></h4>
-                                    <div class="clearfix"></div>
-
                                     <!-- people who offered help -->
                                     <div data-bind="if: helpOffered.length > 0">
                                         <div data-bind="foreach: helpOffered">
+                                            <div data-bind="if: $index() !== 0">
+                                                <hr class=""> <!-- divider after each element except 1st -->
+                                            </div>
                                             <div data-bind="if: Response() == 'noresponse'">
                                                 <div class="clearfix"></div>
-                                                <hr class="">
                                                 <img data-bind="attr:{src: From.Pic}">
                                                 <span data-bind="text: From.Name"> </span> has offered Help!
                                                 <div class="btn-group pull-right">
@@ -340,14 +362,11 @@
                                                 </div>
                                             </div>
                                             <div data-bind="if: Response() == 'yes'">
-                                                <div class="clearfix"></div>
-                                                <hr class="">
                                                 <img data-bind="attr:{src: From.Pic}">
                                                 You accepted help offer from <span data-bind="text: From.Name"> </span>!
                                             </div>
                                             <div data-bind="if: Response() == 'no'">
                                                 <div class="clearfix"></div>
-                                                <hr class="">
                                                 <img data-bind="attr:{src: From.Pic}">
                                                 You ignored help offer from <span data-bind="text: From.Name"> </span>!
                                             </div>

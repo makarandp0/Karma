@@ -13,7 +13,13 @@
     <!-- ticker -->
     <script type='text/javascript' src='../../Scripts/app/textticker.js'></script>
 
-    <!-- these lines are commented out in real cshtml and the block above is enabled.-->
+    <!--
+    @if (Model.useMock)
+    {
+        <script type='text/javascript' src='../../Scripts/jquery.mockjax.js'></script>
+        <script type='text/javascript' src='../../Scripts/app/mockdata.js'></script>
+    }
+    -->
     <script type='text/javascript' src='../../Scripts/jquery.mockjax.js'></script>
     <script type='text/javascript' src='../../Scripts/app/mockdata.js'></script>
     <link rel="stylesheet" type="text/css" href="../../Content/app/appstyle.css">
@@ -67,15 +73,17 @@
         function expandDetails(detailsElementSelector, clickedElement) {
             if ($(detailsElementSelector).is(":visible")) {
                 if ($(clickedElement).next(detailsElementSelector).length !== 0) {
+                    // remove from current position
                     console.log("details element is visible after clicked");
                     $(detailsElementSelector).slideUp();
                 }
                 else {
                     console.log("details element is visible but NOT after clicked");
+                    // remove from old position (slideup) and after done move to new position (insertafter/slidedown)
                     $(detailsElementSelector).slideUp('fast', function () {
                         $(detailsElementSelector).insertAfter(clickedElement);
                         $(detailsElementSelector).slideDown();
-                    });
+                    })
                 }
             }
             else {

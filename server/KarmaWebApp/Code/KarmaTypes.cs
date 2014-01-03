@@ -154,19 +154,22 @@ namespace KarmaGraph.Types
 
     public class KarmaUser
     {
-        public string id;
-        public string name;             // name
-        public EGender gender;           // gender
-        public string pic;       // picture url
-        public Location location;       // user location.
-        public KarmaPoints points;      // karma points.
-        public string email;            // email
+        public string id {get;set;}
+        public string name {get;set;}             // name
+        public EGender gender {get;set;}           // gender
+        public string pic {get;set;}       // picture url
 
-        public List<KarmaUser> friends;
-        public List<KarmaUser> blockedFriends;
-        public List<KarmaRequest> inbox;
-        public List<KarmaRequest> outbox;
-        public List<KarmaGroup> memberofGroups;
+        public string email { get; set; }            // email
+
+        public Location location = new Location();
+        public KarmaPoints points = new KarmaPoints();
+        
+
+        public List<KarmaUser> friends = new List<KarmaUser>();
+        public List<KarmaUser> blockedFriends = new List<KarmaUser>();
+        public List<KarmaRequest> inbox = new List<KarmaRequest>();
+        public List<KarmaRequest> outbox = new List<KarmaRequest>();
+        public List<KarmaGroup> memberofGroups = new List<KarmaGroup> ();
 
         public KarmaUser(string id)
         {

@@ -67,7 +67,7 @@
                         // setup image, name, enter link.
                         $("#karma_user_img").attr("src", fb_me_response.picture.data.url);
                         $("#karma_user_name").html("Hello " + fb_me_response.name + "!")
-                        $("#karma_enter_button").attr('href', '/Android/?accessToken=' + response.authResponse.accessToken);
+                        $("#karma_enter_button").attr('href', '/Home/me?accessToken=' + response.authResponse.accessToken);
                         // save stuff in localstorage.
                         localStorage.setItem("karma_accesstoken", response.authResponse.accessToken);
                         localStorage.setItem("karma_username", fb_me_response.name);
@@ -126,7 +126,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="/">About</a>
+                <a class="navbar-brand" href="/home/mock">About</a>
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav navbar-right userisloggedOn">

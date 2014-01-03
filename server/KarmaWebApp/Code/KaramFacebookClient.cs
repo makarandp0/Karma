@@ -129,7 +129,10 @@ namespace KarmaWebApp
                     this.Name = result[0].ContainsKey("name") ? result[0].name : "Unknown";
                     this.PictureUrl = result[0].ContainsKey("picture") ? result[0].picture.data.url : null;
                     this.Email = result[0].ContainsKey("email") ? result[0].email : "unknown";
-                    this.Gender = result[0].ContainsKey("gender") ? result[0].gender : "female"; 
+                    if (result[0].ContainsKey("gender"))
+                    {
+                        this.Gender = (result[0].gender == "male") ? EGender.Male : EGender.Female;
+                    }
 
                     foreach (var frienddata in result[1].data)
                     {
@@ -185,12 +188,14 @@ namespace KarmaWebApp
             catch (FacebookApiException ex)
             {
                 Logger.WriteLine("FacebookApiException in ReadExtendedInformation:" + ex);
+                return false;
             }
             catch (Exception ex)
             {
                 Logger.WriteLine("Exception in ReadExtendedInformation:" + ex);
+                return false;
             }
-            return false;
+            return true;
         }
     }
 }
