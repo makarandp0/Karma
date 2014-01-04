@@ -292,7 +292,7 @@
                             <!-- InboxDetails -->
                             <div class="panel panel-default" data-bind="with: SelectedItem()">
                                 <div class="panel-body">
-                                    <div class="pendingrequest" data-bind="if: Response() == 'noresponse'">
+                                    <div class="pendingrequest" data-bind="if: Response() == 'none'">
                                         This is your chance to help <span data-bind="text: $data.From.FirstName()"></span>. if you choose to help, we will notify
                                         <span data-bind="text: $data.From.hehimhis('him')"></span> about it. if <span data-bind="text: $data.From.hehimhis('he')"></span>
                                         hasn't gotten help already,  <span data-bind="text: $data.From.hehimhis('he')"></span> will accept your request and get back to you.
@@ -352,7 +352,7 @@
                                             <div data-bind="if: $index() !== 0">
                                                 <hr class=""> <!-- divider after each element except 1st -->
                                             </div>
-                                            <div data-bind="if: Response() == 'noresponse'">
+                                            <div data-bind="if: Response() == 'none'">
                                                 <div class="clearfix"></div>
                                                 <img data-bind="attr:{src: From.Pic}">
                                                 <span data-bind="text: From.Name"> </span> has offered Help!

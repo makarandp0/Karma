@@ -1,4 +1,5 @@
 ﻿using KarmaDb.Types;
+using KarmaWeb.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,6 +37,13 @@ namespace KarmaGraph.Types
         }
     }
 
+    public class RequestStateUtil
+    {
+        public static string FromDBToJson(RequestState state)
+        {
+            throw new NotImplementedException();
+        }
+    }
     public class LocationUtil
     {
         internal static Location FromDbLocation(double lat, double lan, string location, EDBLocationFlags flags)
@@ -75,7 +83,27 @@ namespace KarmaGraph.Types
         }
     }
 
+    public class KarmaDate
+    {
+        public string ToDBDate()
+        {
+            throw new NotImplementedException();
+        }
+        public static KarmaDate FromDBDate(string dbDate)
+        {
+            throw new NotImplementedException();
+        }
 
+        public string ToJsonDate()
+        {
+            throw new NotImplementedException();
+        }
+        public static KarmaDate FromJsonDate(string jsonDate)
+        {
+            throw new NotImplementedException();
+        }
+    }
+    
     public class KarmaPoints
     {
         public int Requested;
@@ -119,29 +147,53 @@ namespace KarmaGraph.Types
 
     public class KarmaRequest
     {
-        public string requestId;
-        public string title;
-        public Location location;
-        public RequestState state;
+        public string requestId {get;private set;}
+        public string title { get; private set; }
+        public Location location { get; private set; }
 
-        public KarmaUser from;
-        public List<KarmaUser> delieverTo;
-        public List<KarmaUser> delieveredTo;
-        public List<KarmaUser> offeredBy;
-        public List<KarmaUser> acecptedFrom;
-        public List<KarmaUser> ignoredFrom;
+        public KarmaDate dueDate { get; private set; }
+        public RequestState state { get; private set; }
+
+        public KarmaUser from { get; private set; }
+        public List<KarmaUser> delieverTo { get; private set; }
+        public List<KarmaUser> delieveredTo { get; private set; }
+        public List<KarmaUser> offeredBy { get; private set; }
+        public List<KarmaUser> ignoredBy { get; private set; }
+        public List<KarmaUser> acecptedFrom { get; private set; }
+        public List<KarmaUser> ignoredFrom { get; private set; }
 
         public KarmaRequest(string requestId)
         {
             this.requestId = requestId;
+            this.delieverTo = new List<KarmaUser>();
+            this.delieveredTo = new List<KarmaUser>();
+            this.offeredBy = new List<KarmaUser>();
+            this.ignoredBy = new List<KarmaUser>();
+            this.acecptedFrom = new List<KarmaUser>();
+            this.ignoredFrom = new List<KarmaUser>();
+            this.location = new Location();
         }
 
-        internal static KarmaRequest FromDB(DbRequest request)
+        internal static KarmaRequest FromDB(DbRequest request, Graph graph)
         {
             var graphRequest = new KarmaRequest(request.requestId);
             graphRequest.title = request.title;
+            graphRequest.dueDate = KarmaDate.FromDBDate(request.dueDate);
             graphRequest.location = LocationUtil.FromDbLocation(request.lat, request.lang, request.location, request.locFlags);
             graphRequest.state = RequestFlagsToStatus(request.flags);
+
+            KarmaUser graphUser;
+            if (graph.Users.TryGetValue(request.createdBy, out graphUser))
+            {
+                graphRequest.from = graphUser;
+            }
+
+            graph.FillListWithUsers(graphRequest.delieverTo, ListUtils.ListFromCSV(request.delieverTo));
+            graph.FillListWithUsers(graphRequest.delieveredTo, ListUtils.ListFromCSV(request.delieveredTo));
+            graph.FillListWithUsers(graphRequest.acecptedFrom, ListUtils.ListFromCSV(request.offerAccepted));
+            graph.FillListWithUsers(graphRequest.ignoredFrom, ListUtils.ListFromCSV(request.offersIgnored));
+            graph.FillListWithUsers(graphRequest.ignoredBy, ListUtils.ListFromCSV(request.ignoredBy));
+
             return graphRequest;
         }
 
@@ -149,31 +201,37 @@ namespace KarmaGraph.Types
         {
             throw new NotImplementedException();
         }
+
     }
 
 
     public class KarmaUser
     {
-        public string id {get;set;}
-        public string name {get;set;}             // name
-        public EGender gender {get;set;}           // gender
-        public string pic {get;set;}       // picture url
+        public string id { get; private set; }
+        public string name { get; private set; }             // name
+        public EGender gender { get; private set; }           // gender
+        public string pic { get; private set; }       // picture url
 
-        public string email { get; set; }            // email
+        public string email { get; private set; }            // email
 
         public Location location = new Location();
         public KarmaPoints points = new KarmaPoints();
         
 
-        public List<KarmaUser> friends = new List<KarmaUser>();
-        public List<KarmaUser> blockedFriends = new List<KarmaUser>();
-        public List<KarmaRequest> inbox = new List<KarmaRequest>();
-        public List<KarmaRequest> outbox = new List<KarmaRequest>();
-        public List<KarmaGroup> memberofGroups = new List<KarmaGroup> ();
+        public List<KarmaUser> friends { get; private set; }
+        public List<KarmaUser> blockedFriends { get; private set; }
+        public List<KarmaRequest> inbox { get; private set; }
+        public List<KarmaRequest> outbox { get; private set; }
+        public List<KarmaGroup> memberofGroups { get; private set; }
 
         public KarmaUser(string id)
         {
             this.id = id;
+            this.friends = new List<KarmaUser>();
+            this.blockedFriends = new List<KarmaUser>();
+            this.inbox = new List<KarmaRequest>();
+            this.outbox = new List<KarmaRequest>();
+            this.memberofGroups = new List<KarmaGroup>();
         }
 
         public static KarmaUser FromDbUser(DbUserBasic userBasic)
@@ -186,6 +244,11 @@ namespace KarmaGraph.Types
             user.email = userBasic.email;
             user.points = KarmaPoints.FromDbPoints(userBasic.karmapoints);
             return user;
+        }
+
+        internal bool HasBlocked(KarmaUser user)
+        {
+            return this.blockedFriends.Contains(user);
         }
     }
 

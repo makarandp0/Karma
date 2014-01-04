@@ -11,6 +11,7 @@ namespace KarmaWeb.Utilities
     /// </summary>
     public class KarmaObject
     {
+        private ILogger _staticlogger = new NullLogger();
         private ILogger _logger = new NullLogger();
         public ILogger Logger
         { 

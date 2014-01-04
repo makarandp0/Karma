@@ -12,6 +12,7 @@ using KarmaWebApp.Code;
 using Microsoft.WindowsAzure.Storage.Queue;
 using KarmaGraph;
 using KarmaGraph.Types;
+using KarmaWebApp.Code.API;
 
 namespace KarmaWebApp
 {
@@ -61,9 +62,9 @@ namespace KarmaWebApp
             throw new NotImplementedException();
         }
 
-        internal static string CreateRequest(string userid, decimal lat, decimal lang, string strLocation, string subject, string message, string closedateUTC)
+        public KarmaRequest CreateRequest(string userid, Location location, string message, KarmaDate date)
         {
-            return PeopleGraph.CreateRequest(userid, lat, lang, strLocation, subject, message, closedateUTC);
+            return PeopleGraph.CreateRequest(userid, location, message, date);
         }
         /*
         #region request stuff
@@ -291,7 +292,7 @@ namespace KarmaWebApp
         {
             return PeopleGraph.GetUser(fbId);
         }
-        public static IKaramActiveUser LogonUserUsingFB(string accessToken)
+        public static IActiveUser LogonUserUsingFB(string accessToken)
         {
             // verify the access token with facebook.
             var client = new KaramFacebookUser(accessToken);
@@ -311,7 +312,7 @@ namespace KarmaWebApp
 
                 if (person != null)
                 {
-                    return new KarmaActiveUser(person);
+                    return new KarmaActiveUser(person, KarmaBackEnd.BackEnd);
                 }
             }
             return null;

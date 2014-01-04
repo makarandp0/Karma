@@ -100,10 +100,10 @@ module KarmaTypes {
     export class HelpOffer {
         public Id: string;
         public From: Friend;
-        public Response = ko.observable<string>("noresponse");
+        public Response = ko.observable<string>("none");
 
         constructor(jsonOffer: any) {
-            // { id: "628825055_201412312020_575635813", response: "noresponse", from: "575635813" },
+            // { id: "628825055_201412312020_575635813", response: "none", from: "575635813" },
             this.Id = jsonOffer.id;
             this.Response(jsonOffer.response);
             this.From = KarmaViewModel.staticFriendsDictionary.GetByKey(jsonOffer.from);
@@ -148,8 +148,8 @@ module KarmaTypes {
             {
                 ...
                 helpOffers: [
-                    { id: "628825055_201412312020_648352020", response: "noresponse", from: "648352020" },
-                    { id: "628825055_201412312020_631784108", response: "noresponse", from: "631784108" },
+                    { id: "628825055_201412312020_648352020", response: "none", from: "648352020" },
+                    { id: "628825055_201412312020_631784108", response: "none", from: "631784108" },
                 ]
             },
             */
@@ -176,7 +176,7 @@ module KarmaTypes {
                 location: "seattle, WA",
                 title: "a job",
 
-                response: "noresponse",
+                response: "none",
                 from: "615700133"
 
             },

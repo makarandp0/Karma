@@ -12,6 +12,23 @@ namespace KarmaGraph
 {
     public class Graph : KarmaObject
     {
+        private KarmaDb.KarmaDb _Database;
+        public Dictionary<string, KarmaUser> Users {get;private set;}
+        public Dictionary<string, KarmaGroup> Groups { get; private set; }
+        public Dictionary<string, KarmaRequest> Requests { get; private set; }
+
+        public void SetDatabase(KarmaDb.KarmaDb database)
+        {
+            this._Database = database;
+        }
+
+        public Graph()
+        {
+            this.Users = new Dictionary<string, KarmaUser>();
+            this.Groups = new Dictionary<string, KarmaGroup>();
+            this.Requests = new Dictionary<string, KarmaRequest>();
+        }
+
         #region Private Methods
         private void UpdateGroupMembers(KarmaUser graphUser, IEnumerable<string> groupIds)
         {
@@ -32,7 +49,7 @@ namespace KarmaGraph
             }
         }
 
-        private int FillListWithUsers(List<KarmaUser> list, IEnumerable<string> userIds)
+        public int FillListWithUsers(List<KarmaUser> list, IEnumerable<string> userIds)
         {
             int error = 0;
             foreach (var userid in userIds)
@@ -52,15 +69,6 @@ namespace KarmaGraph
         }
         #endregion
 
-        private KarmaDb.KarmaDb _Database;
-        private Dictionary<string, KarmaUser> Users = new Dictionary<string, KarmaUser>();
-        private Dictionary<string, KarmaGroup> Groups = new Dictionary<string, KarmaGroup>();
-        private Dictionary<string, KarmaRequest> Requests = new Dictionary<string, KarmaRequest>();
-
-        public void SetDatabase(KarmaDb.KarmaDb database)
-        {
-            this._Database = database;
-        }
 
         /// <summary>
         /// generates graph from database.
@@ -113,24 +121,27 @@ namespace KarmaGraph
             // add all requests, and setup inbox/outboxes
             foreach (var request in requests)
             {
-                var graphRequest = KarmaRequest.FromDB(request);
+                var graphRequest = KarmaRequest.FromDB(request, this);
                 this.Requests.Add(request.requestId, graphRequest);
 
-                KarmaUser graphUser;
-                if (this.Users.TryGetValue(request.createdBy, out graphUser))
+                // update appropriate inboxes and outboxes for this request.
+                graphRequest.from.outbox.Add(graphRequest);
+                foreach (var to in graphRequest.delieverTo)
                 {
-                    graphRequest.from = graphUser;
+                    if (graphRequest.from.HasBlocked(to) || to.HasBlocked(graphRequest.from))
+                    {
+                        Logger.Info("request was not added to inbox, because users dont trust each other.");
+                    }
+                    else
+                    {
+                        to.inbox.Add(graphRequest);
+                    }
                 }
-
-                FillListWithUsers(graphRequest.delieverTo, ListUtils.ListFromCSV(request.delieverTo));
-                FillListWithUsers(graphRequest.delieveredTo, ListUtils.ListFromCSV(request.delieveredTo));
-                FillListWithUsers(graphRequest.acecptedFrom, ListUtils.ListFromCSV(request.offerAccepted));
-                FillListWithUsers(graphRequest.ignoredFrom, ListUtils.ListFromCSV(request.offersIgnored));
+                
             }
 
             this.Logger.Info("GenerateGraph:Created Nodes:" + this.Users.Count);
         }
-
 
 
         public KarmaUser GetUser(string fbId)
@@ -250,7 +261,7 @@ namespace KarmaGraph
             return graphUser;
         }
 
-        internal string  CreateRequest(string userid, decimal lat, decimal lang, string strLocation, string subject, string message, string closedateUTC)
+        internal KarmaRequest CreateRequest(string userid, Location location, string message, KarmaDate date)
         {
             throw new NotImplementedException();
         }

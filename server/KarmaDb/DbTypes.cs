@@ -247,6 +247,7 @@ namespace KarmaDb.Types
         }
         public string title { get; set; }               // title
         public string moreinfo { get; set; }            // more info
+        public string dueDate { get; set; }             // due date
         public double lat { get; set; }                 // latitude
         public double lang { get; set; }                // langitude
         public string location { get; set; }            // location
@@ -255,8 +256,10 @@ namespace KarmaDb.Types
         public string delieverTo { get; set; }          // whom should the request be delievered to
         public string delieveredTo { get; set; }          // whom should the request be delievered to
         public string offeredBy { get; set; }           // who has offered.
+        public string ignoredBy { get; set; }           // people who responded "no" to request.
         public string offerAccepted { get; set; }       // whos offers have been accepted
         public string offersIgnored { get; set; }       // whos offers have been ignored.
+        
     }
 
     public class DbGroup : DbEntry

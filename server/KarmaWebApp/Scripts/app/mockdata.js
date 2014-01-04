@@ -28,7 +28,7 @@
                  location: "seattle, WA",
                  title: "Need some hardware",
 
-                 response: "noresponse",
+                 response: "none",
                  from: "676783107",
                  
             },
@@ -39,7 +39,7 @@
                 location: "seattle, WA",
                 title: "a job",
 
-                response: "noresponse",
+                response: "none",
                 from: "615700133"
 
             },
@@ -50,7 +50,7 @@
                 location: "seattle, WA",
                 title: "some english friends",
 
-                response: "noresponse",
+                response: "none",
                 from: "100003142340770",
             }
         ],
@@ -63,8 +63,8 @@
                 location: "seattle, WA",
 
                 helpOffers: [
-                    { id: "628825055_201412312020_648352020", response: "noresponse", from: "648352020" },
-                    { id: "628825055_201412312020_631784108", response: "noresponse", from: "631784108" },
+                    { id: "628825055_201412312020_648352020", response: "none", from: "648352020" },
+                    { id: "628825055_201412312020_631784108", response: "none", from: "631784108" },
                 ]
             },
             {
@@ -74,8 +74,8 @@
                 status: "open",
                 location: "seattle, WA",
                 helpOffers: [
-                    { id: "628825055_201412312020_575635813", response: "noresponse", from: "575635813" },
-                    { id: "628825055_201412312020_622449773", response: "noresponse", from: "622449773" },
+                    { id: "628825055_201412312020_575635813", response: "none", from: "575635813" },
+                    { id: "628825055_201412312020_622449773", response: "none", from: "622449773" },
                 ]
             },
             {
@@ -85,8 +85,8 @@
                 status: "open",
                 location: "seattle, WA",
                 helpOffers: [
-                    { id: "628825055_201412312020_100000475566141", response: "noresponse", from: "100000475566141" },
-                    { id: "628825055_201412312020_648352020", response: "noresponse", from: "648352020" },
+                    { id: "628825055_201412312020_100000475566141", response: "none", from: "100000475566141" },
+                    { id: "628825055_201412312020_648352020", response: "none", from: "648352020" },
                 ]
             },
         ]
@@ -229,8 +229,8 @@
                 location: "seattle, WA",
 
                 helpOffers: [
-                    { id: "628825055_201412312020_648352020", response: "noresponse", from: "648352020" },
-                    { id: "628825055_201412312020_631784108", response: "noresponse", from: "631784108" },
+                    { id: "628825055_201412312020_648352020", response: "none", from: "648352020" },
+                    { id: "628825055_201412312020_631784108", response: "none", from: "631784108" },
                 ]
             },
            */
