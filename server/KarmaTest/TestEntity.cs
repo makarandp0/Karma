@@ -258,4 +258,81 @@ namespace Sepialabs.Azure.Test
             Assert.AreEqual(expected.do_not_updatefield, actual.do_not_updatefield, "do_not_updatefield is not equal");
         }
     }
+
+    public enum EFlag
+    {
+        EZero = 0,
+        EOne = 1,
+        ETwo = 2,
+        EThree = 3,
+        EFour = 4,
+        EFive = 5,
+        ESix = 6,
+        ESeven = 7,
+        EMax = 8
+    }
+
+    public struct InsideStruct
+    {
+        public  InsideStruct(int value)
+        {
+            this.intField = value;
+        }
+
+
+        public int intvalue {
+            get
+            {
+                return intField;
+            }
+            set
+            {
+                intField = value;
+            }
+        }
+
+        public int intField;
+    }
+    public class InsideClass
+    {
+        public InsideClass(int i)
+        {
+            this.intvalue = i;
+            this.stringvalue = i.ToString();
+        }
+
+        public int intvalue {get;set;}
+        public string stringvalue {get;set;}
+    }
+    public class NestedEntity : TableEntity
+    {
+        public NestedEntity()
+        {
+            // setup default values.
+            this.inStruct = new InsideStruct((int)EFlag.EMax);
+            this.inClass = new InsideClass((int)EFlag.EMax);
+            this.flagValue = EFlag.EMax;
+            this.int64Value = (Int64)EFlag.EMax;
+        }
+
+        public NestedEntity(string pk, string rk, int Value)
+        {
+            this.PartitionKey = pk;
+            this.RowKey = rk;
+
+            // use seeding value to populate the members.
+            Assert.IsTrue(EFlag.EMax > (EFlag)Value);
+            this.inStruct = new InsideStruct(Value);
+            this.inClass = new InsideClass(Value);
+            this.flagValue = (EFlag)Value;
+            this.int64Value = Value;
+
+            Assert.IsTrue((int) this.flagValue == Value);
+        }
+
+        public InsideStruct inStruct { get; set; }
+        public InsideClass inClass { get; set; }
+        public EFlag flagValue { get; set; }
+        public Int64 int64Value { get; set; }
+    }
 }

@@ -1,5 +1,4 @@
-﻿using KarmaBackEnd;
-using KarmaGraph.Types;
+﻿using KarmaGraph.Types;
 using KarmaWebApp.Code;
 using KarmaWebApp.Code.API;
 using System;
@@ -14,7 +13,7 @@ namespace KarmaWebApp.Controllers
     public class ApiController : KarmaBaseController
     {
         // creates a new request and returns its id.
-        public JsonResult createRequest(string title, string strDate, string location, double? lat, double? lan)
+        public JsonResult createRequest(string title, string date, string location, double? lat, double? lan)
         {
             try
             {
@@ -30,7 +29,7 @@ namespace KarmaWebApp.Controllers
                     return JsonError("bad title");
                 }
 
-                var dateTime = KarmaDate.FromJsonDate(strDate);
+                var dateTime = KarmaDate.FromJsonDate(date);
                 if (dateTime == null)
                 {
                     return JsonError("invlid date");

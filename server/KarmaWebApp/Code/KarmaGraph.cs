@@ -30,6 +30,26 @@ namespace KarmaGraph
         }
 
         #region Private Methods
+        private void AddRequestToGraph(DbRequest request)
+        {
+            var graphRequest = KarmaRequest.FromDB(request, this);
+            this.Requests.Add(request.requestId, graphRequest);
+
+            // update appropriate inboxes and outboxes for this request.
+            graphRequest.from.outbox.Add(graphRequest);
+            foreach (var to in graphRequest.delieverTo)
+            {
+                if (graphRequest.from.HasBlocked(to) || to.HasBlocked(graphRequest.from))
+                {
+                    Logger.Info("request was not added to inbox, because users dont trust each other.");
+                }
+                else
+                {
+                    to.inbox.Add(graphRequest);
+                }
+            }
+        }
+
         private void UpdateGroupMembers(KarmaUser graphUser, IEnumerable<string> groupIds)
         {
             int error = 0;
@@ -121,27 +141,12 @@ namespace KarmaGraph
             // add all requests, and setup inbox/outboxes
             foreach (var request in requests)
             {
-                var graphRequest = KarmaRequest.FromDB(request, this);
-                this.Requests.Add(request.requestId, graphRequest);
-
-                // update appropriate inboxes and outboxes for this request.
-                graphRequest.from.outbox.Add(graphRequest);
-                foreach (var to in graphRequest.delieverTo)
-                {
-                    if (graphRequest.from.HasBlocked(to) || to.HasBlocked(graphRequest.from))
-                    {
-                        Logger.Info("request was not added to inbox, because users dont trust each other.");
-                    }
-                    else
-                    {
-                        to.inbox.Add(graphRequest);
-                    }
-                }
-                
+                AddRequestToGraph(request);
             }
 
             this.Logger.Info("GenerateGraph:Created Nodes:" + this.Users.Count);
         }
+
 
 
         public KarmaUser GetUser(string fbId)
@@ -203,8 +208,16 @@ namespace KarmaGraph
             // now look at the groups.
             List<DbGroup> newGroups = new List<DbGroup>();
             List<KarmaGroup> existingGraphGroups = new List<KarmaGroup>();
+            bFirst = true;
             foreach (var group in client.FbGroups)
             {
+                if (!bFirst)
+                {
+                    userBasic.groups += ",";
+                }
+                bFirst = false;
+                userBasic.groups += group.Id;
+
                 KarmaGroup graphGroup = null;
                 if (this.Groups.TryGetValue(group.Id, out graphGroup))
                 {
@@ -223,15 +236,13 @@ namespace KarmaGraph
             // now create the bunch of objects that we have created.
             // need to check for error values.
             // TODO: check for return values.
-            _Database.InsertOrMerge(userBasic);
-
-
-            _Database.InsertOrMerge(userExtended);
             foreach (var dbGroup in newGroups)
             {
                 _Database.InsertOrMerge(dbGroup);
-
             }
+
+            _Database.InsertOrMerge(userBasic);
+            _Database.InsertOrMerge(userExtended);
 
             // once done with database additions
             // udpate the graph.
@@ -261,9 +272,17 @@ namespace KarmaGraph
             return graphUser;
         }
 
-        internal KarmaRequest CreateRequest(string userid, Location location, string message, KarmaDate date)
+        internal KarmaRequest CreateRequest(KarmaUser user, Location location, string subject, KarmaDate dateTime)
         {
-            throw new NotImplementedException();
+            var dbRequest = new DbRequest(user.id);
+            dbRequest.title = subject;
+            dbRequest.dueDate = dateTime.ToDBDate();
+            LocationUtil.ToDbLocation(location, dbRequest);
+
+            var result = _Database.InsertOrMerge(dbRequest);
+            AddRequestToGraph(dbRequest);
+
+            return KarmaRequest.FromDB(dbRequest,this);
         }
     }
 }

@@ -15,27 +15,45 @@ namespace KarmaDb.Types
         public const string DBGENDER_MALE = "male";
         public const string DBGENER_FEMALE = "female";
         public const string DBGENDER_UNKNOWN = "unknown";
+        public const string DATEFORMAT = "yyyyMMddHHmmss";
     }
 
-    [Flags]
-    public enum EDBLocationFlags
+    public class EDBLocationFlags
     {
-        Location_LatLanIsValid = 0x1,
-        Location_NameIsValid = 0x2
+        public const int Location_LatLanIsValid = 0x1;
+        public const int Location_NameIsValid = 0x2;
     }
 
-    [Flags]
-    public enum EDBUserFlags
-    {
-    }
-
-    [Flags]
-    public enum EDBRequestFlags
+    public class EDBUserFlags
     {
     }
 
+    public class EDBRequestState
+    {
+        public const int created = 0x1;
+        public const int opening = 0x2;
+        public const int opened = 0x4;
+        public const int intransitPatial = 0x8;    // has been send to some friends, some friends remains
+        public const int intransitFull = 0x10;      // has been sent to all friends. no friends remaining.
+        public const int offered = 0x20;
+        public const int accepted = 0x40;
+        public const int failed = 0x80;
+        public const int closed = 0x100;
 
-    public enum EDBGroupFlags
+        static public bool isOpen(int state)
+        {
+            return (state & EDBRequestState.closed) == 0;
+        }
+        // for output, we are mostly interested in "open" "closed"
+        public static string FromDBToJson(int state)
+        {
+            return isOpen(state) ? "open" : "closed";
+        }
+
+    }
+
+
+    public class EDBGroupFlags
     {
     }
 
@@ -121,6 +139,10 @@ namespace KarmaDb.Types
 
         public TableResult InsertOrMerge(CloudTable table)
         {
+            if (!ArekeysValid())
+            {
+                throw new ArgumentException("row key or partition key contains invalid chars");
+            }
             this.ETag = "*"; // this tells azure that overwrite the entry even if its modified before us.
             var insertOp = TableOperation.InsertOrMerge(this);
             return table.Execute(insertOp);
@@ -138,6 +160,35 @@ namespace KarmaDb.Types
             return null;
         }
 
+        // checks if row key and partition key are valid.
+        bool ArekeysValid()
+        {
+            /*
+             * following are illegal characters.
+                The forward slash (/) character
+                The backslash (\) character
+                The number sign (#) character
+                The question mark (?) character
+                Control characters from U+0000 to U+001F, including:
+                The horizontal tab (\t) character
+                The linefeed (\n) character
+                The carriage return (\r) character
+                Control characters from U+007F to U+009F             * 
+             */
+            char[] illegalChars = {
+                '/', '\\', '#', '?', '\t', '\n', '\r'
+            };
+
+            if (this.RowKey.IndexOfAny(illegalChars) != -1)
+                return false;
+
+            if (this.PartitionKey.IndexOfAny(illegalChars) != -1)
+                return false;
+
+            // there are other characters to consider, but for now dont worry.
+            return true;
+        }
+
     }
 
     /// <summary>
@@ -151,6 +202,7 @@ namespace KarmaDb.Types
         {
             this.PartitionKey = facebookId;
             this.RowKey = ROW_ID;
+            this.locFlags = 0;
         }
         [IgnoreProperty]
         public string fbId 
@@ -167,10 +219,10 @@ namespace KarmaDb.Types
         public double lat { get; set; }                 // latitude
         public double lang { get; set; }                // langitude
         public string location { get; set; }            // location
-        public EDBLocationFlags locFlags { get; set; }            
+        public int locFlags { get; set; }            
         public string email { get; set; }               // email
         public string groups { get; set; }              // groups user belongs to
-        public EDBUserFlags userflags { get; set; }         // various flag values.
+        public int userflags { get; set; }         // various flag values.
     }
 
     public class DbUserExtended : DbEntry
@@ -199,8 +251,8 @@ namespace KarmaDb.Types
             this.PartitionKey = owner;
 
             // generate a unique request id.
-            this.RowKey = DateTime.UtcNow.ToString("s", CultureInfo.InvariantCulture); // someting like  2008-04-10T06:30:00
-
+            this.RowKey = DateTime.UtcNow.ToString(DbConstants.DATEFORMAT, CultureInfo.InvariantCulture); // someting like  2013/1/20
+            this.state = EDBRequestState.created;
         }
 
         public static DbRequest ReadFromDatabase(CloudTable table, string requestId)
@@ -251,15 +303,14 @@ namespace KarmaDb.Types
         public double lat { get; set; }                 // latitude
         public double lang { get; set; }                // langitude
         public string location { get; set; }            // location
-        public EDBLocationFlags locFlags { get; set; }    // location flags        
-        public EDBRequestFlags flags { get; set; }      // request flags (contains status)
+        public int locFlags { get; set; }    // location flags        
+        public int state { get; set; }      // request flags (contains status)
         public string delieverTo { get; set; }          // whom should the request be delievered to
         public string delieveredTo { get; set; }          // whom should the request be delievered to
         public string offeredBy { get; set; }           // who has offered.
         public string ignoredBy { get; set; }           // people who responded "no" to request.
         public string offerAccepted { get; set; }       // whos offers have been accepted
         public string offersIgnored { get; set; }       // whos offers have been ignored.
-        
     }
 
     public class DbGroup : DbEntry
@@ -279,6 +330,6 @@ namespace KarmaDb.Types
         }
         public string name { get; set; }
 
-        public EDBGroupFlags flags { get; set; }                // group flags.
+        public int flags { get; set; }                // group flags.
     }
 }

@@ -66,9 +66,9 @@ namespace KarmaDb
             return true;
         }
 
-        public TableResult InsertOrMerge(DbEntry userBasic)
+        public TableResult InsertOrMerge(DbEntry dbEntry)
         {
-            return userBasic.InsertOrMerge(this._peopleTable);
+            return dbEntry.InsertOrMerge(this._peopleTable);
         }
     }
 }

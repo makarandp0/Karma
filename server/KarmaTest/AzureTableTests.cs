@@ -387,6 +387,47 @@ namespace UnitTestProject1
     }
 
     [TestClass]
+    public class NestedAndEnumTypes
+    {
+        private TestTable PeopleTable = new TestTable();
+        [TestInitialize()]
+        public void CreateEntities()
+        {
+            PeopleTable.CreateFresh();
+        }
+        [TestMethod]
+        public void CreateNestedEntryAndRetrive()
+        {
+            var entry = new NestedEntity("pk1", "rk1", 2);
+
+            var insertOperation = TableOperation.Insert(entry);
+            var insertResult = PeopleTable.Table.Execute(insertOperation);
+
+            var retrieveOperation = TableOperation.Retrieve<NestedEntity>(entry.PartitionKey, entry.RowKey);
+            var queryResult = PeopleTable.Table.Execute(retrieveOperation);
+
+            // types comes equal
+            Assert.AreEqual(entry.GetType(), queryResult.Result.GetType());
+
+            var result = (NestedEntity)queryResult.Result;
+
+            // int64 values gets stored fine.
+            Assert.IsTrue(entry.int64Value == result.int64Value);
+
+            // but nested classes DO NOT get saved!
+            Assert.IsFalse(entry.inClass.intvalue == result.inClass.intvalue);
+
+            // nested structures do not get saved either.
+            Assert.IsFalse(entry.inStruct.intvalue == result.inStruct.intvalue);
+
+            // enum values do not get stored either.
+            Assert.IsFalse(entry.flagValue == result.flagValue);
+
+        }
+
+    }
+
+    [TestClass]
     public class TableUpdateTests
     {
         private TestTable PeopleTable = new TestTable();
@@ -414,6 +455,7 @@ namespace UnitTestProject1
             EntityTypeTwo.AssertEqual(entry, (EntityTypeTwo)queryResult.Result);
 
         }
+
 
         [TestMethod]
         public void CreateSingleEntry_AndUpdateSingleField()

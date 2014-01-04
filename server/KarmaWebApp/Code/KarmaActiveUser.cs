@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using KarmaGraph.Types;
+using KarmaDb.Types;
 
 namespace KarmaWebApp.Code.API
 {
     public class KarmaActiveUser : IActiveUser
     {
-        private KarmaUser person { get; set; }
         private KarmaBackEnd karmaBackEnd {get;set;}
 
-        private KarmaUser _activeUser {get;set;}
+        private KarmaUser me {get;set;}
 
         public KarmaActiveUser(KarmaUser person, KarmaBackEnd karmaBackEnd)
         {
-            this.person = person;
+            this.me = person;
             this.karmaBackEnd = karmaBackEnd;
         }
 
@@ -23,7 +23,7 @@ namespace KarmaWebApp.Code.API
         public JsonCreateRequestResponse CreateRequest(string subject, KarmaDate dateTime, Location location)
         {
             var response = new JsonCreateRequestResponse();
-            var request = this.karmaBackEnd.CreateRequest(this._activeUser.id, location, subject, dateTime);
+            var request = this.karmaBackEnd.CreateRequest(this.me, location, subject, dateTime);
             if (request == null)
             {
                 response.seterror("karmaBackEnd.CreateRequest failed");
@@ -33,7 +33,7 @@ namespace KarmaWebApp.Code.API
             response.request.date = request.dueDate.ToJsonDate();
             response.request.id = request.requestId;
             response.request.location = request.location.name;
-            response.request.status = RequestStateUtil.FromDBToJson(request.state);
+            response.request.status = EDBRequestState.isOpen(request.state) ? "open" : "closed";
             response.request.title = request.title;
             return response;
         }
@@ -42,16 +42,16 @@ namespace KarmaWebApp.Code.API
         public JsonGetAllResponse GetAll()
         {
             var response = new JsonGetAllResponse();
-            response.me = JsonUserFromKarmaUser(this._activeUser);
+            response.me = JsonUserFromKarmaUser(this.me);
             
             response.friends = new List<JsonFriend>();
-            foreach (var friend in this._activeUser.friends)
+            foreach (var friend in this.me.friends)
             {
-                response.friends.Add(JsonFriendFromKarmaUser(this._activeUser, friend));
+                response.friends.Add(JsonFriendFromKarmaUser(this.me, friend));
             }
             
             response.inbox = new List<JsonInboxEntry>();
-            foreach (var inboxItem in this._activeUser.inbox)
+            foreach (var inboxItem in this.me.inbox)
             {
                 var jsonInboxItem = new JsonInboxEntry();
                 jsonInboxItem.from = inboxItem.from.id;
@@ -60,16 +60,18 @@ namespace KarmaWebApp.Code.API
                 jsonInboxItem.date = "dummy date"; // TODO: fix this
                 jsonInboxItem.location = inboxItem.location.name;
 
-                if (inboxItem.offeredBy.Contains(this._activeUser))
+                if (inboxItem.offeredBy.Contains(this.me))
                     jsonInboxItem.response = "yes";
-                else if (inboxItem.ignoredBy.Contains(this._activeUser))
+                else if (inboxItem.ignoredBy.Contains(this.me))
                     jsonInboxItem.response = "no";
                 else
                     jsonInboxItem.response = "none";
+
+                response.inbox.Add(jsonInboxItem);
             }
             // TODO finish outbox.
             response.outbox = new List<JsonOutboxEntry>();
-            foreach (var outboxItem in this._activeUser.outbox)
+            foreach (var outboxItem in this.me.outbox)
             {
                 var jsonOutboxItem = new JsonOutboxEntry();
                 jsonOutboxItem.title = outboxItem.title;
@@ -91,6 +93,8 @@ namespace KarmaWebApp.Code.API
 
                     jsonOutboxItem.helpOffers.Add(offerEntry);
                 }
+
+                response.outbox.Add(jsonOutboxItem);
             }
             return response;
         }

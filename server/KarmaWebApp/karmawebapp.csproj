@@ -198,7 +198,6 @@
     </Compile>
     <Compile Include="Code\KaramFacebookClient.cs" />
     <Compile Include="Controllers\KarmaBaseController.cs" />
-    <Compile Include="Code\KarmaDatabase.cs" />
     <Compile Include="Code\KarmaWebBackEnd.cs" />
     <Compile Include="Models\MainModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

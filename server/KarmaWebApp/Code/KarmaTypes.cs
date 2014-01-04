@@ -2,6 +2,7 @@
 using KarmaWeb.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Web;
 
@@ -37,16 +38,9 @@ namespace KarmaGraph.Types
         }
     }
 
-    public class RequestStateUtil
-    {
-        public static string FromDBToJson(RequestState state)
-        {
-            throw new NotImplementedException();
-        }
-    }
     public class LocationUtil
     {
-        internal static Location FromDbLocation(double lat, double lan, string location, EDBLocationFlags flags)
+        internal static Location FromDbLocation(double lat, double lan, string location, int flags)
         {
             var loc = new Location();
             loc.lat = lat;
@@ -81,26 +75,73 @@ namespace KarmaGraph.Types
                 userBasic.locFlags &= ~EDBLocationFlags.Location_LatLanIsValid;
             }
         }
+        internal static void ToDbLocation(Location location, DbRequest request)
+        {
+            if (location.nameIsValid)
+            {
+                request.location = location.name;
+                request.locFlags |= EDBLocationFlags.Location_NameIsValid;
+            }
+            else
+            {
+                request.location = "";
+                request.locFlags &= ~EDBLocationFlags.Location_NameIsValid;
+            }
+
+            if (location.latlanIsValid)
+            {
+                request.lat = location.lat;
+                request.lang = location.lan;
+                request.locFlags |= EDBLocationFlags.Location_LatLanIsValid;
+            }
+            else
+            {
+                request.locFlags &= ~EDBLocationFlags.Location_LatLanIsValid;
+            }
+        }
+
     }
 
+    /// <summary>
+    /// json date: 2013/1/20
+    /// DbDate: 2013/1/20
+    /// </summary>
     public class KarmaDate
     {
+        public const string JASON_DATEFORMAT = "yy/M/d";
+        KarmaDate(DateTime date)
+        {
+            this.datetime = date;
+        }
+
+        private DateTime datetime { get; set; } 
+
         public string ToDBDate()
         {
-            throw new NotImplementedException();
+            return datetime.ToString(DbConstants.DATEFORMAT, CultureInfo.InvariantCulture);
         }
         public static KarmaDate FromDBDate(string dbDate)
         {
-            throw new NotImplementedException();
+            DateTime date;
+            if (DateTime.TryParseExact(dbDate, DbConstants.DATEFORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None, out date))
+            {
+                return new KarmaDate(date);
+            }
+            return null;
         }
 
         public string ToJsonDate()
         {
-            throw new NotImplementedException();
+            return datetime.ToString(JASON_DATEFORMAT, CultureInfo.InvariantCulture);
         }
         public static KarmaDate FromJsonDate(string jsonDate)
         {
-            throw new NotImplementedException();
+            DateTime date;
+            if (DateTime.TryParseExact(jsonDate, JASON_DATEFORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None, out date))
+            {
+                return new KarmaDate(date);
+            }
+            return null;
         }
     }
     
@@ -132,18 +173,6 @@ namespace KarmaGraph.Types
         public double lan;
     }
 
-    public enum RequestState
-    {
-        created,
-        opening,
-        opened,
-        intransitPatial,    // has been send to some friends, some friends remains
-        intransitFull,       // has been sent to all friends. no friends remaining.
-        offered,
-        accepted,
-        failed,
-        closed
-    }
 
     public class KarmaRequest
     {
@@ -152,7 +181,7 @@ namespace KarmaGraph.Types
         public Location location { get; private set; }
 
         public KarmaDate dueDate { get; private set; }
-        public RequestState state { get; private set; }
+        public int state { get; private set; }
 
         public KarmaUser from { get; private set; }
         public List<KarmaUser> delieverTo { get; private set; }
@@ -180,7 +209,7 @@ namespace KarmaGraph.Types
             graphRequest.title = request.title;
             graphRequest.dueDate = KarmaDate.FromDBDate(request.dueDate);
             graphRequest.location = LocationUtil.FromDbLocation(request.lat, request.lang, request.location, request.locFlags);
-            graphRequest.state = RequestFlagsToStatus(request.flags);
+            graphRequest.state = request.state;
 
             KarmaUser graphUser;
             if (graph.Users.TryGetValue(request.createdBy, out graphUser))
@@ -196,12 +225,6 @@ namespace KarmaGraph.Types
 
             return graphRequest;
         }
-
-        private static RequestState RequestFlagsToStatus(EDBRequestFlags eDBRequestFlags)
-        {
-            throw new NotImplementedException();
-        }
-
     }
 
 
@@ -254,13 +277,14 @@ namespace KarmaGraph.Types
 
     public class KarmaGroup
     {
-        public string fbId;
-        public string name;
-        public List<KarmaUser> members;
+        public string fbId {get;set;}
+        public string name {get;set;}
+        public List<KarmaUser> members {get;set;}
 
         public KarmaGroup(string fbId)
         {
             this.fbId = fbId;
+            this.members = new List<KarmaUser>();
         }
 
         internal static KarmaGroup FromDbGroup(DbGroup dbGroup)
