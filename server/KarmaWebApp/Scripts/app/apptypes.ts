@@ -292,11 +292,12 @@ module KarmaTypes {
         public MyOutbox = new SelectableList<MyRequest>(); 
 
         // new request
-        public requestText = ko.observable<string>("");         // request header text value.
-        public requestDateTime = ko.observable<string>("");     // request date/time.
-        public request_location = ko.observable<string>("");    // request location.
-        public requestOnPage = ko.observable<number>(1);        // which page are we on.
+        public requestText = ko.observable<string>("");          // request header text value.
+        public requestDateTime = ko.observable<string>("");      // request date/time.
+        public request_location = ko.observable<string>("");     // request location.
+        public requestOnPage = ko.observable<number>(1);         // which page are we on.
         public showRequestError = ko.observable<boolean>(false); // need to show error message about next button?
+        public activePannel = ko.observable<string>("you");   // currently active pannel.
 
         // invite friends
         public inviteText = ko.observable<string>("Hello friends, Please join karmaweb!");
@@ -306,6 +307,31 @@ module KarmaTypes {
 
         public GotoPrevRequestPage() {
             this.requestOnPage(this.requestOnPage() - 1);
+        }
+
+        public SelectPanel(pannelName: string) {
+            var self = this;
+            var oldPanel = self.activePannel();
+            $("#" + oldPanel).slideUp("fast", function () {
+                $('.friends-details, .inbox-details, .outbox-details').hide();
+                self.activePannel(pannelName);
+                $("#" + pannelName).slideDown();
+                $('.friends-details, .inbox-details, .outbox-details').hide();
+            });
+        }
+        public SelectYou() {
+            this.SelectPanel("you");
+        }
+        
+        public SelectFriends() {
+            
+            this.SelectPanel('friends');
+        }
+        public SelectInbox() {
+            this.SelectPanel('inbox');
+        }
+        public SelectOutbox() {
+            this.SelectPanel('outbox');
         }
 
         public GotoNextRequestPage () {

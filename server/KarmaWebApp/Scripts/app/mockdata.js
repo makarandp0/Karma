@@ -12,10 +12,10 @@
         me: { id: "628825055", ismale: true, name: "Makarand Patwardhan", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/274191_628825055_1428018580_q.jpg"},
         friends: [
             { blocked: false, id: "676783107", ismale: true, name: "Lloyd Bond", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn2/1117691_676783107_853903468_q.jpg" },
-            { blocked: false, id: "631784108", ismale: true, name: "Daniel Dinu", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash3/260677_631784108_1701214824_q.jpg" },
+            { blocked: false, id: "100004008272532", ismale: false, name: "Vrushali Shrotri", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn2/203272_100004008272532_1822936541_q.jpg" },
             { blocked: false, id: "615700133", ismale: false, name: "LiChean Ng", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn2/186460_615700133_437735881_q.jpg" },
             { blocked: false, id: "575635813", ismale: false, name: "Swapna Medi", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-frc1/372584_575635813_1343373760_q.jpg" },
-            { blocked: false, id: "100003142340770", ismale: true, name: "Steve Palmer", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/1118633_100003142340770_1866995702_q.jpg" },
+            { blocked: false, id: "1483222744", ismale: false, name: "Trish Alexander", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn2/274579_1483222744_1091189260_q.jpg" },
             { blocked: false, id: "622449773", ismale: true, name: "Vladimir Stoyanov", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash1/211449_622449773_1448160153_q.jpg" },
             { blocked: false, id: "648352020", ismale: false, name: "Imelda Kirby", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn1/573007_648352020_1317477714_q.jpg" },
             { blocked: false, id: "100000475566141", ismale: true, name: "Piotr Slatala", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn1/50106_100000475566141_4909_q.jpg" },
@@ -44,14 +44,14 @@
 
             },
             {
-                id: "100003142340770_201412312020",
+                id: "648352020_201412312020",
                 date: "12/13",
                 status: "open",
                 location: "seattle, WA",
                 title: "some english friends",
 
                 response: "none",
-                from: "100003142340770",
+                from: "648352020",
             }
         ],
         outbox: [
@@ -64,7 +64,6 @@
 
                 helpOffers: [
                     { id: "628825055_201412312020_648352020", response: "none", from: "648352020" },
-                    { id: "628825055_201412312020_631784108", response: "none", from: "631784108" },
                 ]
             },
             {

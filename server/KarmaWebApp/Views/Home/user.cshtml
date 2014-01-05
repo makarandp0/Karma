@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <meta charset="utf-8">
-    <title>Welcome to Karma!</title>
+    <title>Karma Mobile!</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css" rel="stylesheet">
     <script type='text/javascript' src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.9.1.min.js"></script>
@@ -13,7 +13,7 @@
     <!-- ticker -->
     <script type='text/javascript' src='../../Scripts/app/textticker.js'></script>
 
-    @if (Model.useMock) 
+    @if (Model.useMock)
     {
         <script type='text/javascript' src='../../Scripts/jquery.mockjax.js'></script>
         <script type='text/javascript' src='../../Scripts/app/mockdata.js'></script>
@@ -70,15 +70,16 @@
         function expandDetails(detailsElementSelector, clickedElement) {
             if ($(detailsElementSelector).is(":visible")) {
                 if ($(clickedElement).next(detailsElementSelector).length !== 0) {
+                    // remove from current position
                     console.log("details element is visible after clicked");
                     $(detailsElementSelector).slideUp();
                 }
                 else {
                     console.log("details element is visible but NOT after clicked");
-                    $(detailsElementSelector).slideUp('fast', function () {
-                        $(detailsElementSelector).insertAfter(clickedElement);
-                        $(detailsElementSelector).slideDown();
-                    });
+                    // remove from old position (slideup) and after done move to new position (insertafter/slidedown)
+                    $(detailsElementSelector).slideUp("fast", function () {
+                        $(detailsElementSelector).insertAfter(clickedElement).slideDown();
+                    })
                 }
             }
             else {
@@ -118,15 +119,13 @@
             </div>
 
             <!-- Collect the nav links, forms, and other content for toggling -->
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <div class="collapse navbar-collapse navbar-right" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
-                    <li> <a href="#you" class="">you</a> </li>
-                    <li> <a href="#friends" class=""><span class="badge pull-right header-data-badge" data-bind="text: MyFriends.Items().length">0</span>friends</a> </li>
-                    <li> <a href="#inbox" class=""><span class="badge pull-right header-data-badge" data-bind="text: MyInbox.Items().length">0</span>inbox</a> </li>
-                    <li> <a href="#outbox" class=""><span class="badge pull-right header-data-badge" data-bind="text: MyOutbox.Items().length">0</span>outbox</a> </li>
+                    <li data-bind="css: { active: activePannel() === 'you' }"> <a href="#you" class="" data-bind="click: SelectYou">you</a> </li>
+                    <li data-bind="css: { active: activePannel() === 'friends' }"> <a href="#friends" class="" data-bind="click: SelectFriends"><span class="badge pull-right header-data-badge" data-bind="text: MyFriends.Items().length">0</span>friends</a> </li>
+                    <li data-bind="css: { active: activePannel() === 'inbox' }"> <a href="#inbox" class="" data-bind="click: SelectInbox"><span class="badge pull-right header-data-badge" data-bind="text: MyInbox.Items().length">0</span>inbox</a> </li>
+                    <li data-bind="css: { active: activePannel() === 'outbox' }"> <a href="#outbox" class="" data-bind="click: SelectOutbox"><span class="badge pull-right header-data-badge" data-bind="text: MyOutbox.Items().length">0</span>outbox</a> </li>
                 </ul>
-
-
             </div><!-- /.navbar-collapse -->
         </nav>
 
@@ -139,258 +138,266 @@
                 <div class="col-xs-12 col-sm-12" data-spy="scroll" data-target="#sidebar-nav">
 
                     <!-- ask your friends for help pannel-->
-                    <h1 id="you" class="">you</h1>
-                    <div class="panel panel-default">
-                        <div class=" panel-heading" data-bind="with: Me">
-                            <img data-bind="attr:{src: Pic}">
-                            <div data-bind="if: $root.requestOnPage() == 1">
-                                <h4 class="">You got Friends <span data-bind="text: FirstName() + '!'">!</span></h4>
-                            </div>
-                            <div data-bind="if: $root.requestOnPage() == 2">
-                                <h4 class="">You need <span data-bind="text: $root.requestText()">!</span></h4>
-                            </div>
-                        </div>
-                        <div data-bind="if: requestOnPage() == 1">
-                            <div class="panel-body">
-                                Everybody needs help and friends love to help each other. Karmaweb makes exchanging favors easy! It will contact
-                                your local <strong>karma friends</strong> and find somebody who can help. Don't worry we hate spam too. We won't
-                                post on facebook or send emails to your friends. Just type in what you need...
-                                <!--<form class="form">-->
-                                <div class="input-group text-center">
-                                    <span class="input-group-addon">I Need</span>
-                                    <input id="textticker" type="text" class="form-control input-lg" title="Don't worry. We hate spam, we wont post on facebook."
-                                           placeholder="enter what you need..." data-bind="value: requestText">
+                    <div id="you" class="karmapannel" data-bind="if: activePannel() === 'you'">
+                        <h1 class="">you</h1>
+                        <div class="panel panel-default">
+                            <div class=" panel-heading" data-bind="with: Me">
+                                <img data-bind="attr:{src: Pic}">
+                                <div data-bind="if: $root.requestOnPage() == 1">
+                                    <h4 class="">You got Friends <span data-bind="text: FirstName() + '!'">!</span></h4>
                                 </div>
-                                <hr class="">
-
-                                <div data-bind="if: showRequestError()">
-                                    <span class="label label-warning"> Are you kidding me...at least type something?</span>
-                                </div>
-                                <button class="btn btn-lg btn-primary pull-right" data-bind="click: GotoNextRequestPage" type="button">
-                                    Next <span class="glyphicon glyphicon-chevron-right"></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div data-bind="if: requestOnPage() == 2">
-                            <div class="panel-body">
-                                <div class="form-group">
-                                    <label for="request_datetime">When do you need this help:</label>
-                                    <input id="request_datetime" type="text" class="form-control input-lg" title="Your friends would like know about date/time"
-                                           placeholder="Enter date like: 14/2/2" data-bind="value: requestDateTime">
-                                </div>
-                                <div class="form-group">
-                                    <label for="request_location">Where do you need this help:</label>
-                                    <input id="request_location" type="text" class="form-control input-lg" title="we will notify only friends closer to this location"
-                                           placeholder="enter city,state. we will notify only friends living closer to this location" data-bind="value: request_location">
-                                </div>
-                                <hr class="">
-                                <button class="btn btn-default pull-left" data-bind="click: UseCurrentLocation" type="button">
-                                    User current location
-                                </button>
-
-                                <div class="btn-group pull-right">
-                                    <button class="btn btn-lg btn-default" data-bind="click: GotoPrevRequestPage" type="button">
-                                        <span class="glyphicon glyphicon-chevron-left"></span> Previous
-                                    </button>
-                                    <button class="btn btn-lg btn-primary" data-bind="click: CreateRequest" type="button">
-                                        Submit
-                                    </button>
+                                <div data-bind="if: $root.requestOnPage() == 2">
+                                    <h4 class="">You need <span data-bind="text: $root.requestText()">!</span></h4>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-
-                    <h1 id="friends" class="">friends</h1>
-                    <div class="row" data-bind="with: MyFriends">
-                        <div class="col-sm-12">
-                            <!-- Friends List -->
-                            <div class="panel panel-default friends-list-panel">
-                                <div class="panel-heading">
-                                    <a href="#" class="pull-right">refresh</a>
-                                    <h4 class="" data-bind="text: PanelHeader">Friends List:</h4>
-                                </div>
-                                <div class="panel-body" data-bind="if: Items().length > 0">
-                                    <div class="list-group" data-bind="foreach: Items">
-                                        <a href="#" class="friendinListContainer list-group-item" data-bind="css: { active: $parent.SelectedItem() == $data}, click: $parent.SelectItem.bind($parent)">
-                                            <div style="float:left;padding-right:10px">
-                                                <img style="float:left" class="img-polaroid" data-bind="attr:{src: Pic}">
-                                            </div>
-                                            <h4 class="list-group-item-heading" data-bind="text: Name"></h4>
-                                            <p class="list-group-item-text">...</p>
-                                        </a>
-
-                                    </div>
-                                </div>
-                                <div class="panel-body" data-bind="if: Items().length  == 0">
-                                    Sorry, none of your friends have joined KarmaWeb. KarmaWeb is a network of friends for helping each other.
-                                    You can help yourself and your friends by inviting them to KarmaWeb. They will be glad you did!
+                            <div data-bind="if: requestOnPage() == 1">
+                                <div class="panel-body">
+                                    Everybody needs help and friends love to help each other. Karmaweb makes exchanging favors easy! It will contact
+                                    your local <strong>karma friends</strong> and find somebody who can help. Don't worry we hate spam too. We won't
+                                    post on facebook or send emails to your friends. Just type in what you need...
+                                    <!--<form class="form">-->
                                     <div class="input-group text-center">
                                         <span class="input-group-addon">I Need</span>
-                                        <textarea id="inviteFriends" class="form-control input-lg" title="Don't worry. We hate spam, we wont post on facebook."
-                                                  placeholder="Hello friends, Please join karmaweb.!" data-bind="value: $root.inviteText"></textarea>
+                                        <input id="textticker" type="text" class="form-control input-lg" title="Don't worry. We hate spam, we wont post on facebook."
+                                               placeholder="enter what you need..." data-bind="value: requestText">
                                     </div>
                                     <hr class="">
-                                    <button class="btn btn-lg btn-success pull-right" data-bind="click: $root.InviteFriends" type="button">Invite</button>
-                                </div>
 
-                            </div>
-
-                        </div>
-                        <div class="friends-details">
-                            <!-- Friends Details -->
-                            <div class="panel panel-default" data-bind="with: SelectedItem()">
-                                <div class="panel-body">
-                                    <div class="realFriend" data-bind="ifnot: IsBlocked">
-                                        if <span data-bind="text: FirstName()"></span> is not really a "friend", you can block <span data-bind="text: hehimhis('him')"></span>.
-                                        Once blocked <span data-bind="text: hehimhis('he')"></span> will not see any help requests from you and you will not
-                                        see any requests from <span data-bind="text: hehimhis('him')"></span>. And don't worry we won't tell on you.
-                                        <span data-bind="text: hehimhis('He')"></span> won't know  that you blocked <span data-bind="text: hehimhis('him')"></span>.
-                                        <hr class="">
-                                        <div class="btn-group pull-right">
-                                            <button class="btn btn-danger" data-bind="click: BlockFriend">Block <span data-bind="text: FirstName()"></span></button>
-                                        </div>
+                                    <div data-bind="if: showRequestError()">
+                                        <span class="label label-warning"> Are you kidding me...at least type something?</span>
                                     </div>
-                                    <div class="blockedFriend" data-bind="if: IsBlocked">
-                                        You have blocked <span data-bind="text: FirstName()"></span>. that means you will not see any help
-                                        requests from <span data-bind="text: hehimhis('him')"></span> nor will
-                                        <span data-bind="text: hehimhis('he')"></span> see any of your help requests. if you change your mind
-                                        you can unblock <span data-bind="text: hehimhis('him')"></span> anytime!
-                                        <hr class="">
-                                        <div class="btn-group pull-right">
-                                            <button class="btn btn-success" data-bind="click: UnBlockFriend">UnBlock <span data-bind="text: FirstName()"></span></button>
-                                        </div>
+                                    <button class="btn btn-lg btn-primary pull-right" data-bind="click: GotoNextRequestPage" type="button">
+                                        Next <span class="glyphicon glyphicon-chevron-right"></span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div data-bind="if: requestOnPage() == 2">
+                                <div class="panel-body">
+                                    <div class="form-group">
+                                        <label for="request_datetime">When do you need this help:</label>
+                                        <input id="request_datetime" type="text" class="form-control input-lg" title="Your friends would like know about date/time"
+                                               placeholder="Enter date like: 14/2/2" data-bind="value: requestDateTime">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="request_location">Where do you need this help:</label>
+                                        <input id="request_location" type="text" class="form-control input-lg" title="we will notify only friends closer to this location"
+                                               placeholder="enter city,state. we will notify only friends living closer to this location" data-bind="value: request_location">
+                                    </div>
+                                    <hr class="">
+                                    <button class="btn btn-default pull-left" data-bind="click: UseCurrentLocation" type="button">
+                                        User current location
+                                    </button>
+
+                                    <div class="btn-group pull-right">
+                                        <button class="btn btn-lg btn-default" data-bind="click: GotoPrevRequestPage" type="button">
+                                            <span class="glyphicon glyphicon-chevron-left"></span> Previous
+                                        </button>
+                                        <button class="btn btn-lg btn-primary" data-bind="click: CreateRequest" type="button">
+                                            Submit
+                                        </button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <h1 id="inbox" class="">inbox</h1>
-                    <div class="row" data-bind="with: MyInbox">
-                        <!--Inbox-->
-                        <div class="col-sm-12">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <a href="#" class="pull-right">Refresh</a>
-                                    <h4 class="" data-bind="text: PanelHeader">Inbox:</h4>
-                                </div>
-                                <div class="panel-body">
-                                    <div class="list-group" data-bind="foreach: Items">
-                                        <a href="#" class="inboxListContainer list-group-item" data-bind="css: { active: $parent.SelectedItem() == $data}, click: $parent.SelectItem.bind($parent)">
-                                            <div style="float:left;padding-right:10px">
-                                                <img class="img-polaroid" data-bind="attr:{src: From.Pic}">
-                                            </div>
-                                            <p class="list-group-item-text" data-bind="text: From.Name">...</p>
-                                            <h4 class="list-group-item-heading" data-bind="text: Name"></h4>
-                                        </a>
+                    <div id="friends" class="karmapannel" data-bind="if: activePannel() === 'friends'">
+                        <h1 class="">friends</h1>
+                        <div class="row" data-bind="with: MyFriends">
+                            <div class="col-sm-12">
+                                <!-- Friends List -->
+                                <div class="panel panel-default friends-list-panel">
+                                    <div class="panel-heading">
+                                        <a href="#" class="pull-right">refresh</a>
+                                        <h4 class="" data-bind="text: PanelHeader">Friends List:</h4>
                                     </div>
-                                </div>
-                            </div>
-                        </div> <!--/Inbox-->
-
-                        <div class="inbox-details">
-                            <!-- InboxDetails -->
-                            <div class="panel panel-default" data-bind="with: SelectedItem()">
-                                <div class="panel-body">
-                                    <div class="pendingrequest" data-bind="if: Response() == 'none'">
-                                        This is your chance to help <span data-bind="text: $data.From.FirstName()"></span>. if you choose to help, we will notify
-                                        <span data-bind="text: $data.From.hehimhis('him')"></span> about it. if <span data-bind="text: $data.From.hehimhis('he')"></span>
-                                        hasn't gotten help already,  <span data-bind="text: $data.From.hehimhis('he')"></span> will accept your request and get back to you.
-                                        if you choose to not help. its okay! We won't tell <span data-bind="text: $data.From.hehimhis('him')"></span> that you saw the request.
-                                        <div class="clearfix"></div>
-                                        <hr class="">
-                                        <div class="btn-group pull-right">
-                                            <button type="button" class="btn btn-success" data-bind="click: OfferHelp">Sure, I Can Help!</button>
-                                            <button type="button" class="btn btn-default" data-bind="click: DenyHelp">Sorry, I Can't</button>
-                                        </div>
-                                    </div>
-                                    <div class="request_helpoffered" data-bind="if: Response() == 'yes'">
-                                        You offered help to <span data-bind="text: $data.From.FirstName()"></span>. <strong>Thank you!</strong> we will notify
-                                        <span data-bind="text: $data.From.hehimhis('him')"></span> about it. if <span data-bind="text: $data.From.hehimhis('he')"></span>
-                                        hasn't gotten help already,  <span data-bind="text: $data.From.hehimhis('he')"></span> will accept your request and get back to you.
-                                        <div class="clearfix"></div>
-                                        <hr class="">
-                                    </div>
-                                    <div class="request_helpdenied" data-bind="if: Response() == 'no'">
-                                        You said you couldnt help <span data-bind="text: $data.From.FirstName()"></span>. <strong>Don't worry!</strong>
-                                        We won't tell <span data-bind="text: $data.From.hehimhis('him')"></span> that you saw the request.
-                                        <div class="clearfix"></div>
-                                        <hr class="">
-                                    </div>
-                                </div>
-                            </div>
-                        </div><!-- /InboxDetails -->
-
-                    </div>
-
-                    <h1 id="outbox" class="">outbox</h1>
-                    <div class="row" data-bind="with: MyOutbox">
-                        <!--Outbox-->
-                        <div class="col-sm-12">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <a href="#" class="pull-right">Refresh</a>
-                                    <h4 class="" data-bind="text: PanelHeader">Inbox:</h4>
-                                </div>
-                                <div class="panel-body">
-                                    <div class="list-group" data-bind="foreach: Items">
-                                        <a href="#" class="outboxListContainer list-group-item" data-bind="css: { active: $parent.SelectedItem() == $data}, click: $parent.SelectItem.bind($parent)">
-                                            <h4 class="list-group-item-heading" data-bind="text: Name"></h4>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div> <!--/outbox-->
-
-                        <div class="outbox-details">
-                            <!-- OutboxDetails -->
-                            <div class="panel panel-default" data-bind="with: SelectedItem()">
-                                <div class="panel-body">
-                                    <!-- people who offered help -->
-                                    <div data-bind="if: helpOffered.length > 0">
-                                        <div data-bind="foreach: helpOffered">
-                                            <div data-bind="if: $index() !== 0">
-                                                <hr class=""> <!-- divider after each element except 1st -->
-                                            </div>
-                                            <div data-bind="if: Response() == 'none'">
-                                                <div class="clearfix"></div>
-                                                <img data-bind="attr:{src: From.Pic}">
-                                                <span data-bind="text: From.Name"> </span> has offered Help!
-                                                <div class="btn-group pull-right">
-                                                    <button type="button" class="btn btn-success" data-bind="click: AcceptHelp">Accept Help!</button>
-                                                    <button type="button" class="btn btn-default" data-bind="click: IgnoreHelp">Ignore</button>
+                                    <div class="panel-body" data-bind="if: Items().length > 0">
+                                        <div class="list-group" data-bind="foreach: Items">
+                                            <div class="friendinListContainer list-group-item" data-bind="css: { active: $parent.SelectedItem() == $data}, click: $parent.SelectItem.bind($parent)">
+                                                <div style="float:left;padding-right:10px">
+                                                    <img style="float:left" class="img-polaroid" data-bind="attr:{src: Pic}">
                                                 </div>
+                                                <h4 class="list-group-item-heading" data-bind="text: Name"></h4>
+                                                <p class="list-group-item-text"><span class="glyphicon glyphicon-chevron-down pull-right"></span>...</p>
                                             </div>
-                                            <div data-bind="if: Response() == 'yes'">
-                                                <img data-bind="attr:{src: From.Pic}">
-                                                You accepted help offer from <span data-bind="text: From.Name"> </span>!
+                                        </div>
+                                        <div>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body" data-bind="if: Items().length  == 0">
+                                        Sorry, none of your friends have joined KarmaWeb. KarmaWeb is a network of friends for helping each other.
+                                        You can help yourself and your friends by inviting them to KarmaWeb. They will be glad you did!
+                                        <div class="input-group text-center">
+                                            <span class="input-group-addon">I Need</span>
+                                            <textarea id="inviteFriends" class="form-control input-lg" title="Don't worry. We hate spam, we wont post on facebook."
+                                                      placeholder="Hello friends, Please join karmaweb.!" data-bind="value: $root.inviteText"></textarea>
+                                        </div>
+                                        <hr class="">
+                                        <button class="btn btn-lg btn-success pull-right" data-bind="click: $root.InviteFriends" type="button">Invite</button>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                            <div class="friends-details">
+                                <!-- Friends Details -->
+                                <div class="panel panel-default" data-bind="with: SelectedItem()">
+                                    <div class="panel-body">
+                                        <div class="realFriend" data-bind="ifnot: IsBlocked">
+                                            if <span data-bind="text: FirstName()"></span> is not really a "friend", you can block <span data-bind="text: hehimhis('him')"></span>.
+                                            Once blocked <span data-bind="text: hehimhis('he')"></span> will not see any help requests from you and you will not
+                                            see any requests from <span data-bind="text: hehimhis('him')"></span>. And don't worry we won't tell on you.
+                                            <span data-bind="text: hehimhis('He')"></span> won't know  that you blocked <span data-bind="text: hehimhis('him')"></span>.
+                                            <hr class="">
+                                            <div class="btn-group pull-right">
+                                                <button class="btn btn-danger" data-bind="click: BlockFriend">Block <span data-bind="text: FirstName()"></span></button>
                                             </div>
-                                            <div data-bind="if: Response() == 'no'">
-                                                <div class="clearfix"></div>
-                                                <img data-bind="attr:{src: From.Pic}">
-                                                You ignored help offer from <span data-bind="text: From.Name"> </span>!
+                                        </div>
+                                        <div class="blockedFriend" data-bind="if: IsBlocked">
+                                            You have blocked <span data-bind="text: FirstName()"></span>. that means you will not see any help
+                                            requests from <span data-bind="text: hehimhis('him')"></span> nor will
+                                            <span data-bind="text: hehimhis('he')"></span> see any of your help requests. if you change your mind
+                                            you can unblock <span data-bind="text: hehimhis('him')"></span> anytime!
+                                            <hr class="">
+                                            <div class="btn-group pull-right">
+                                                <button class="btn btn-success" data-bind="click: UnBlockFriend">UnBlock <span data-bind="text: FirstName()"></span></button>
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                                    <!-- nobody offered help-->
-                                    <div data-bind="if: helpOffered.length == 0">
+                    <div id="inbox" class="karmapannel" data-bind="if: activePannel() === 'inbox'">
+                        <h1 class="">inbox</h1>
+                        <div class="row" data-bind="with: MyInbox">
+                            <!--Inbox-->
+                            <div class="col-sm-12">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <a href="#" class="pull-right">Refresh</a>
+                                        <h4 class="" data-bind="text: PanelHeader">Inbox:</h4>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="list-group" data-bind="foreach: Items">
+                                            <a href="#" class="inboxListContainer list-group-item" data-bind="css: { active: $parent.SelectedItem() == $data}, click: $parent.SelectItem.bind($parent)">
+                                                <div style="float:left;padding-right:10px">
+                                                    <img class="img-polaroid" data-bind="attr:{src: From.Pic}">
+                                                </div>
+                                                <p class="list-group-item-text" data-bind="text: From.Name">...</p>
+                                                <p class="list-group-item-text"><span class="glyphicon glyphicon-chevron-down pull-right"></span></p>
+                                                <h4 class="list-group-item-heading" data-bind="text: Name"></h4>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div> <!--/Inbox-->
 
-                                        <hr class="">
-                                        Your request is in transit. Please be patient, and check back later. We will send
-                                        your request to your friends one by one. When somebody offers help we will notify
-                                        you.
-                                        <hr class="">
-
+                            <div class="inbox-details">
+                                <!-- InboxDetails -->
+                                <div class="panel panel-default" data-bind="with: SelectedItem()">
+                                    <div class="panel-body">
+                                        <div class="pendingrequest" data-bind="if: Response() == 'none'">
+                                            This is your chance to help <span data-bind="text: $data.From.FirstName()"></span>. if you choose to help, we will notify
+                                            <span data-bind="text: $data.From.hehimhis('him')"></span> about it. if <span data-bind="text: $data.From.hehimhis('he')"></span>
+                                            hasn't gotten help already,  <span data-bind="text: $data.From.hehimhis('he')"></span> will accept your request and get back to you.
+                                            if you choose to not help. its okay! We won't tell <span data-bind="text: $data.From.hehimhis('him')"></span> that you saw the request.
+                                            <div class="clearfix"></div>
+                                            <hr class="">
+                                            <div class="btn-group pull-right">
+                                                <button type="button" class="btn btn-success" data-bind="click: OfferHelp">Sure, I Can Help!</button>
+                                                <button type="button" class="btn btn-default" data-bind="click: DenyHelp">Sorry, I Can't</button>
+                                            </div>
+                                        </div>
+                                        <div class="request_helpoffered" data-bind="if: Response() == 'yes'">
+                                            You offered help to <span data-bind="text: $data.From.FirstName()"></span>. <strong>Thank you!</strong> we will notify
+                                            <span data-bind="text: $data.From.hehimhis('him')"></span> about it. if <span data-bind="text: $data.From.hehimhis('he')"></span>
+                                            hasn't gotten help already,  <span data-bind="text: $data.From.hehimhis('he')"></span> will accept your request and get back to you.
+                                            <div class="clearfix"></div>
+                                            <hr class="">
+                                        </div>
+                                        <div class="request_helpdenied" data-bind="if: Response() == 'no'">
+                                            You said you couldnt help <span data-bind="text: $data.From.FirstName()"></span>. <strong>Don't worry!</strong>
+                                            We won't tell <span data-bind="text: $data.From.hehimhis('him')"></span> that you saw the request.
+                                            <div class="clearfix"></div>
+                                            <hr class="">
+                                        </div>
                                     </div>
                                 </div>
                             </div><!-- /InboxDetails -->
-
                         </div>
-                    </div> <!-- outbox row-->
+                    </div>
+
+                    <div id="outbox" class="karmapannel" data-bind="if: activePannel() === 'outbox'">
+                        <h1 class="">outbox</h1>
+                        <div class="row" data-bind="with: MyOutbox">
+                            <!--Outbox-->
+                            <div class="col-sm-12">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <a href="#" class="pull-right">Refresh</a>
+                                        <h4 class="" data-bind="text: PanelHeader">Inbox:</h4>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="list-group" data-bind="foreach: Items">
+                                            <a href="#" class="outboxListContainer list-group-item" data-bind="css: { active: $parent.SelectedItem() == $data}, click: $parent.SelectItem.bind($parent)">
+                                                <p class="list-group-item-text"><span class="glyphicon glyphicon-chevron-down pull-right"></span></p>
+                                                <h4 class="list-group-item-heading" data-bind="text: Name"></h4>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div> <!--/outbox-->
+
+                            <div class="outbox-details">
+                                <!-- OutboxDetails -->
+                                <div class="panel panel-default" data-bind="with: SelectedItem()">
+                                    <div class="panel-body">
+                                        <!-- people who offered help -->
+                                        <div data-bind="if: helpOffered.length > 0">
+                                            <div data-bind="foreach: helpOffered">
+                                                <div data-bind="if: $index() !== 0">
+                                                    <hr class=""> <!-- divider after each element except 1st -->
+                                                </div>
+                                                <div data-bind="if: Response() == 'none'">
+                                                    <div class="clearfix"></div>
+                                                    <img data-bind="attr:{src: From.Pic}">
+                                                    <span data-bind="text: From.Name"> </span> has offered Help!
+                                                    <div class="btn-group pull-right">
+                                                        <button type="button" class="btn btn-success" data-bind="click: AcceptHelp">Accept Help!</button>
+                                                        <button type="button" class="btn btn-default" data-bind="click: IgnoreHelp">Ignore</button>
+                                                    </div>
+                                                </div>
+                                                <div data-bind="if: Response() == 'yes'">
+                                                    <img data-bind="attr:{src: From.Pic}">
+                                                    You accepted help offer from <span data-bind="text: From.Name"> </span>!
+                                                </div>
+                                                <div data-bind="if: Response() == 'no'">
+                                                    <div class="clearfix"></div>
+                                                    <img data-bind="attr:{src: From.Pic}">
+                                                    You ignored help offer from <span data-bind="text: From.Name"> </span>!
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- nobody offered help-->
+                                        <div data-bind="if: helpOffered.length == 0">
+
+                                            <hr class="">
+                                            Your request is in transit. Please be patient, and check back later. We will send
+                                            your request to your friends one by one. When somebody offers help we will notify
+                                            you.
+                                            <hr class="">
+
+                                        </div>
+                                    </div>
+                                </div><!-- /InboxDetails -->
+                            </div>
+                        </div> <!-- outbox row-->
+                    </div>
                 </div>
                 <!-- /main area-->
-
             </div>
         </div>
         <!--/.container-->
