@@ -121,6 +121,10 @@ namespace KarmaWebApp.Code.API
         JsonGetAllResponse GetAll();
 
         JsonCreateRequestResponse CreateRequest(string title, KarmaDate dateTime, Location loc);
+
+        JsonData OfferHelp(string requestId, bool offered);
+
+        JsonData AcceptHelp(string requestId, bool accpeted);
     }
 
 }

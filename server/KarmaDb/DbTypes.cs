@@ -137,6 +137,21 @@ namespace KarmaDb.Types
         }
 
 
+        public TableResult InsertOrReplace(CloudTable table)
+        {
+            if (!ArekeysValid())
+            {
+                throw new ArgumentException("row key or partition key contains invalid chars");
+            }
+            var insertOp = TableOperation.InsertOrReplace(this);
+            return table.Execute(insertOp);
+        }
+
+        /// <summary>
+        /// this adds any new propperties, but does not delete any existing properties.
+        /// </summary>
+        /// <param name="table"></param>
+        /// <returns></returns>
         public TableResult InsertOrMerge(CloudTable table)
         {
             if (!ArekeysValid())
@@ -149,13 +164,17 @@ namespace KarmaDb.Types
         }
 
 
-        public static DbRequest Read(CloudTable table, string pk, string rk)
+        public static T Read<T>(CloudTable table, string pk, string rk) where T:DbEntry
         {
             var retrieveOperation = TableOperation.Retrieve<DbRequest>(pk, rk);
             var retrievedResult = table.Execute(retrieveOperation);
             if (retrievedResult.Result != null)
             {
-                return (DbRequest)retrievedResult.Result;
+                var dbEntry = (DbEntry)retrievedResult.Result;
+                if (dbEntry != null && dbEntry.EntityType == typeof(T).Name)
+                {
+                    return (T)dbEntry;
+                }
             }
             return null;
         }
@@ -198,6 +217,9 @@ namespace KarmaDb.Types
     public class DbUserBasic : DbEntry
     {
         public const string ROW_ID = "user_basic";
+
+        // parameterless constructor only for use by Queries.
+        public DbUserBasic() {}
         public DbUserBasic(string facebookId)
         {
             this.PartitionKey = facebookId;
@@ -223,11 +245,20 @@ namespace KarmaDb.Types
         public string email { get; set; }               // email
         public string groups { get; set; }              // groups user belongs to
         public int userflags { get; set; }         // various flag values.
+
+        public static DbUserBasic ReadFromDatabase(CloudTable table, string fbId)
+        {
+            return DbEntry.Read<DbUserBasic>(table, fbId, ROW_ID);
+        }
     }
 
     public class DbUserExtended : DbEntry
     {
         public const string ROW_ID = "user_extended";
+
+        // parameterless constructor only for use by Queries.
+        public DbUserExtended() {}
+
         public DbUserExtended(string facebookId)
         {
             this.PartitionKey = facebookId;
@@ -255,6 +286,9 @@ namespace KarmaDb.Types
             this.state = EDBRequestState.created;
         }
 
+        // parameterless constructor only for use by Queries.
+        public DbRequest() {}
+
         public static DbRequest ReadFromDatabase(CloudTable table, string requestId)
         {
             try
@@ -266,11 +300,7 @@ namespace KarmaDb.Types
                     return null;
                 }
 
-                var dbEntry = DbEntry.Read(table, keys[0], keys[1]);
-                if (dbEntry != null && dbEntry.EntityType == typeof(DbRequest).ToString())
-                {
-                    return (DbRequest)dbEntry;
-                }
+                return DbEntry.Read<DbRequest>(table, keys[0], keys[1]);
             }
             catch (Exception ex)
             {

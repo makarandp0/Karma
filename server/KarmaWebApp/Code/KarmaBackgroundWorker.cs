@@ -20,7 +20,7 @@ namespace KarmaWebApp.Code
         private static readonly TimeSpan ONE_MINUTE = new TimeSpan(0, 1, 0);
         private static readonly TimeSpan FIVE_MINUTES = new TimeSpan(0, 5, 0);
         private static readonly TimeSpan TIME_FOR_MESSAGE_TO_LIVE = ONE_DAY;
-        private static readonly TimeSpan INITIAL_INVISIBILITY_TIME = FIVE_MINUTES;
+        private static readonly TimeSpan INITIAL_INVISIBILITY_TIME = ONE_MINUTE;
         private static readonly TimeSpan TIME_TO_PROCESS_MESSAGE = ONE_MINUTE;
 
         private static AutoResetEvent _workAvailableEvent = new AutoResetEvent(false);

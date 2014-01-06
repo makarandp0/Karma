@@ -95,6 +95,90 @@ namespace KarmaWebApp.Controllers
             }
         }
 
+        // get /Api/offerHelp/?requestid=xyz&offer=yes[no]
+        public JsonResult offerhelp(string requestId, string offer)
+        {
+            try
+            {
+                bool offered = false; // is offer yes= true, no = false;
+                var sessionContext = GetKarmaSessionContext();
+                if (sessionContext.ActiveUser == null)
+                {
+                    return JsonError("usersession inactive");
+                }
+
+                // validate parameters
+                if (string.IsNullOrWhiteSpace(requestId))
+                {
+                    return JsonError("bad requestId");
+                }
+
+                if (string.Compare(offer, "yes", true) == 0)
+                {
+                    offered = true;
+                }
+                else if (string.Compare(offer, "no", true) == 0)
+                {
+                    offered = false;
+                }
+                else
+                {
+                    return JsonError("bad offer:" + offer);
+                }
+
+                var result = sessionContext.ActiveUser.OfferHelp(requestId, offered);
+                return Json(result, JsonRequestBehavior.AllowGet);
+
+            }
+            catch (Exception ex)
+            {
+                return JsonError("Exception in offerhelp:" + ex);
+            }
+
+        }
+
+        // get /Api/accepthelp/?offerid=xyz&accept=yes[no]
+        public JsonResult accepthelp(string offerId, string accept)
+        {
+            try
+            {
+                bool accpeted = false; // is yes=true, no=false;
+                var sessionContext = GetKarmaSessionContext();
+                if (sessionContext.ActiveUser == null)
+                {
+                    return JsonError("usersession inactive");
+                }
+
+                // validate parameters
+                if (string.IsNullOrWhiteSpace(offerId))
+                {
+                    return JsonError("bad requestId");
+                }
+
+                if (string.Compare(accept, "yes", true) == 0)
+                {
+                    accpeted = true;
+                }
+                else if (string.Compare(accept, "no", true) == 0)
+                {
+                    accpeted = false;
+                }
+                else
+                {
+                    return JsonError("bad accept:" + accept);
+                }
+
+                var result = sessionContext.ActiveUser.AcceptHelp(offerId, accpeted);
+                return Json(result, JsonRequestBehavior.AllowGet);
+
+            }
+            catch (Exception ex)
+            {
+                return JsonError("Exception in accepthelp:" + ex);
+            }
+
+        }
+
         private JsonResult JsonError(string error)
         {
             return Json(new JsonData(error), JsonRequestBehavior.AllowGet);

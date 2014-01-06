@@ -120,13 +120,14 @@ module KarmaTypes {
         // accept=yes|no
         public AcceptIgnoreOffer(accept: string) {
             this.Response(accept);
-            var createOfferURL = '/Api/accepthelp/?requestId=' + this.Id + '&accept=' + accept;
+            // offer id contains '#' need to encode. it.
+            var createOfferURL = '/Api/accepthelp/?offerId=' + encodeURIComponent(this.Id) + '&accept=' + accept;
             var acceptIgnore = $.getJSON(createOfferURL, function () {
                 console.log(createOfferURL + ":success");
             })
                 .done(function (data) {
                     if (!data || data.error) {
-                        console.log(createOfferURL + ":returned error:" + data.error + ", errorcode:" + data.errorcode);
+                        console.log(createOfferURL + ": returned error:" + data.error + ", errorcode:" + data.errorcode);
                     }
                 })
                 .fail(function () {

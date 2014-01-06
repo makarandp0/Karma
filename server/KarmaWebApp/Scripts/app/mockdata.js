@@ -1,7 +1,7 @@
 ﻿$(document).ready(function () {
 
-    // requestid = userid_requestdatetime 
-    // offerid = requestid_helperId_datetimeoffered
+    // requestid = userid!requestdatetime 
+    // offerid = requestid#helperId
     // 
 
     // this global variable contains all our data!
@@ -22,7 +22,7 @@
         ],
         inbox: [
             {
-                 id: "676783107_201312302020",
+                 id: "676783107!201312302020",
                  date: "12/13",
                  status: "open",
                  location: "seattle, WA",
@@ -33,7 +33,7 @@
                  
             },
             {
-                id: "615700133_201312312020",
+                id: "615700133!201312312020",
                 date: "12/23",
                 status: "open",
                 location: "seattle, WA",
@@ -44,7 +44,7 @@
 
             },
             {
-                id: "648352020_201412312020",
+                id: "648352020!201412312020",
                 date: "12/13",
                 status: "open",
                 location: "seattle, WA",
@@ -56,141 +56,46 @@
         ],
         outbox: [
             {
-                id: "628825055_201412312020",
+                id: "628825055!201412312020",
                 date: "12/13", // TODO: think more about date format
                 title: "Need a Ride to Airport",
                 status: "open",
                 location: "seattle, WA",
 
                 helpOffers: [
-                    { id: "628825055_201412312020_648352020", response: "none", from: "648352020" },
+                    { id: "628825055!201412312020#648352020", response: "none", from: "648352020" },
                 ]
             },
             {
-                id: "628825055_201412312020",
+                id: "628825055!201412312020",
                 date: "12/15", // TODO: think more about date format
                 title: "need some peanuts",
                 status: "open",
                 location: "seattle, WA",
                 helpOffers: [
-                    { id: "628825055_201412312020_575635813", response: "none", from: "575635813" },
-                    { id: "628825055_201412312020_622449773", response: "none", from: "622449773" },
+                    { id: "628825055!201412312020#575635813", response: "none", from: "575635813" },
+                    { id: "628825055!201412312020#622449773", response: "none", from: "622449773" },
                 ]
             },
             {
-                id: "628825055_201412312020",
+                id: "628825055!201412312020",
                 date: "12/13", // TODO: think more about date format
                 title: "a break",
                 status: "open",
                 location: "seattle, WA",
                 helpOffers: [
-                    { id: "628825055_201412312020_100000475566141", response: "none", from: "100000475566141" },
-                    { id: "628825055_201412312020_648352020", response: "none", from: "648352020" },
+                    { id: "628825055!201412312020#100000475566141", response: "none", from: "100000475566141" },
+                    { id: "628825055!201412312020#648352020", response: "none", from: "648352020" },
                 ]
             },
         ]
     }
-    var mockdata = {
-            friends: [
-                { blocked: false, id: "100003794306037", gender: "female", name: "Sucheta Desai", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash1/211272_100003794306037_59011785_q.jpg" },
-                { blocked: false, id: "100004008272532", gender: "female", name: "Vrushali Shrotri", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn2/203272_100004008272532_1822936541_q.jpg" },
-                { blocked: false, id: "100004066370422", gender: "male", name: "Anish Patwardhan", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/1086622_100004066370422_1811447981_q.jpg" },
-                { blocked: true, id: "100004081128591", gender: "female", name: "Sandhya Prasade", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash3/157780_100004081128591_2133113783_q.jpg" },
-                { blocked: false, id: "100004890999167", gender: "female", name: "Anila Puranik Halbe", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn2/1118410_100004890999167_2007089240_q.jpg" },
-                { blocked: false, id: "100005435892032", gender: "male", name: "Appa Patwardhan", pic: "https://fbcdn-profile-a.akamaihd.net/static-ak/rsrc.php/v2/yo/r/UlIqmHJn-SK.gif" },
-                { blocked: false, id: "100005516403683", gender: "male", name: "Suhas Vaidya", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash1/623591_100005516403683_1681623943_q.jpg" },
-            ],
-            inbox: [
-                {
-                    from: { id: "100004890999167", gender: "female", name: "Anila Puranik Halbe", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn2/1118410_100004890999167_2007089240_q.jpg" },
-                    request: { name: "Needs some more time", id: "100004890999167_201312302020", requestStatus: 0, yourStatus: 0 }
-                },
-                {
-                    from: { id: "100004066370422", gender: "male", name: "Anish Patwardhan", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/1086622_100004066370422_1811447981_q.jpg" },
-                    request: { name: "Needs some money management lessons", id: "100004066370422_201312312020", requestStatus: 0, yourStatus: 0 }
-                },
-                {
-                    from: { id: "100003794306037", gender: "female", name: "Sucheta Desai", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash1/211272_100003794306037_59011785_q.jpg" },
-                    request: { name: "Needs a break", id: "100003794306037_201412312020", requestStatus: 0, yourStatus: 0 }
-                }
-            ],
-            outbox: [
-                {
-                    name: "Need a Ride to Airport",
-                    id: "628825055_201412312020",
-                    date: "12/13", // TODO: think more about date format
-                    helpOffered: [
-                        { offerid: "628825055_201412312020_100004081128591", yourStatus: 0, friendid: "100004081128591", gender: "female", name: "Sandhya Prasade", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash3/157780_100004081128591_2133113783_q.jpg" },
-                        { offerid: "628825055_201412312020_100004890999167", yourStatus: 0, friendid: "100004890999167", gender: "female", name: "Anila Puranik Halbe", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn2/1118410_100004890999167_2007089240_q.jpg" },
-                    ]
-                },
-                {
-                    name: "Help feeding my cat",
-                    date: "12/12", // TODO: think more about date format
-                    id: "628825055_201312312020",
-                    helpOffered: [
-                        { offerid: "628825055_201312312020_100004008272532", yourStatus: 0, friendid: "100004008272532", gender: "female", name: "Vrushali Shrotri", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn2/203272_100004008272532_1822936541_q.jpg" },
-                    ],
-                },
-                {
-                    name: "No Help offers on this one",
-                    date: "12/14", // TODO: think more about date format
-                    id: "628825055_201401312020",
-                    helpOffered: [
-                    ],
-                }
-            ]
-    };
 
     $.mockjax({
         url: '/Api/getAll/*',
         responseTime: 750,
         response: function (settings) {
             this.responseText = mockdata2;
-        }
-    });
-
-    $.mockjax({
-        url: '/Api/getFriends',
-        responseTime: 750,
-        response: function ()
-        {
-            this.responseText =  {
-                errorcode: '',
-                error: false,
-            }
-            this.responseText.friends = mockdata.friends;
-        }
-    });
-
-    // inbox
-    // requestStatus = opened = 1, closed = 0
-    // yourStatus = nostatus = 0, ignored = 1, offered = 2
-    $.mockjax({
-        url: '/Api/getInbox',
-        responseTime: 750,
-        response: function () {
-            this.responseText =  {
-                errorcode: '',
-                error: false,
-            }
-            this.responseText.inbox = mockdata.inbox;
-        }
-    });
-
-    // outbox
-    // helpOffered :
-    // helpIgnored :
-    // helpAccepted :
-    $.mockjax({
-        url: '/Api/getOutbox',
-        responseTime: 750,
-        response: function () {
-            this.responseText =  {
-                errorcode: '',
-                error: false,
-            }
-            this.responseText.outbox = mockdata.outbox;
         }
     });
 
@@ -221,7 +126,7 @@
             console.log('location:' + locationEntered);
             /*
             {
-                id: "628825055_201412312020",
+                id: "628825055!201412312020",
                 date: "12/13", // TODO: think more about date format
                 title: "Need a Ride to Airport",
                 status: "open",
@@ -254,7 +159,7 @@
         responseTime: 750,
         response: function (settings) {
             console.log("url:" + settings.url);
-            console.log("requestId:" + getURLParameter('requestId', settings.url));
+            console.log("offerId:" + getURLParameter('offerId', settings.url));
             console.log("offer:" + getURLParameter('offer', settings.url));
             this.responseText = {
                 errorcode: '',

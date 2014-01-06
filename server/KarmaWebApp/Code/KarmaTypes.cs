@@ -216,14 +216,28 @@ namespace KarmaGraph.Types
             {
                 graphRequest.from = graphUser;
             }
-
+            
             graph.FillListWithUsers(graphRequest.delieverTo, ListUtils.ListFromCSV(request.delieverTo));
             graph.FillListWithUsers(graphRequest.delieveredTo, ListUtils.ListFromCSV(request.delieveredTo));
+            graph.FillListWithUsers(graphRequest.offeredBy, ListUtils.ListFromCSV(request.offeredBy));
             graph.FillListWithUsers(graphRequest.acecptedFrom, ListUtils.ListFromCSV(request.offerAccepted));
             graph.FillListWithUsers(graphRequest.ignoredFrom, ListUtils.ListFromCSV(request.offersIgnored));
             graph.FillListWithUsers(graphRequest.ignoredBy, ListUtils.ListFromCSV(request.ignoredBy));
 
             return graphRequest;
+        }
+
+        // update the DbRequest objects with modifications from the graph request object.
+        public void UpdateDbRequest(DbRequest request)
+        {
+            request.delieverTo = Graph.FillStringWithUsers(this.delieverTo);
+            request.delieveredTo = Graph.FillStringWithUsers(this.delieveredTo);
+            request.offeredBy = Graph.FillStringWithUsers(this.offeredBy);
+            request.offerAccepted = Graph.FillStringWithUsers(this.acecptedFrom);
+            request.offersIgnored = Graph.FillStringWithUsers(this.ignoredFrom);
+            request.ignoredBy = Graph.FillStringWithUsers(this.ignoredBy);
+
+            // TODO:update status as needed.
         }
     }
 

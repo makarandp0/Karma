@@ -81,7 +81,8 @@ namespace KarmaWebApp.Code.API
                 foreach(var offer in outboxItem.offeredBy)
                 {
                     var offerEntry = new JsonhelpOfferEntry();
-                    offerEntry.id = outboxItem.requestId + "_" + offer.id; // requestid_responderid
+                    offerEntry.id = MakeOfferId(outboxItem.requestId, offer.id);
+                    
                     offerEntry.from = offer.id;
                     
                     if (outboxItem.ignoredFrom.Contains(offer))
@@ -96,6 +97,51 @@ namespace KarmaWebApp.Code.API
 
                 response.outbox.Add(jsonOutboxItem);
             }
+            return response;
+        }
+
+        public const char OFFER_SEPERATOR = '#';
+        private string MakeOfferId(string requestId, string offeredBy)
+        {
+            if (requestId.Contains(OFFER_SEPERATOR) || offeredBy.Contains(OFFER_SEPERATOR))
+                throw new ArgumentException("request id or offeredBy contains \""+ OFFER_SEPERATOR + "\"");
+            return requestId + OFFER_SEPERATOR + offeredBy; // requestid_responderid
+        }
+
+        private string ExtractRequestId(string offerid)
+        {
+            var items = offerid.Split(OFFER_SEPERATOR);
+            if (items.Length != 2) throw new ArgumentException("offerid must contain only one \""+ OFFER_SEPERATOR + "\"");
+            return items[0];
+        }
+        private string ExtractOfferedBy(string offerid)
+        {
+            var items = offerid.Split(OFFER_SEPERATOR);
+            if (items.Length != 2) throw new ArgumentException("offerid must contain only one \"" + OFFER_SEPERATOR + "\"");
+            return items[1];
+        }
+
+        public JsonData OfferHelp(string requestId, bool offered)
+        {
+            var response = new JsonData();
+            if (!this.karmaBackEnd.OfferHelp(this.me, requestId, offered))
+            {
+                response.seterror("karmaBackEnd.OfferHelp failed");
+            }
+
+            return response;
+        }
+
+        public JsonData AcceptHelp(string offerId, bool accpeted)
+        {
+            var response = new JsonData();
+            var requestId = ExtractRequestId(offerId);
+            var offeredBy = ExtractOfferedBy(offerId);
+            if (!this.karmaBackEnd.AcceptHelp(this.me, requestId, offeredBy, accpeted))
+            {
+                response.seterror("karmaBackEnd.AcceptHelp failed");
+            }
+
             return response;
         }
 
@@ -122,6 +168,8 @@ namespace KarmaWebApp.Code.API
             return jsonFriend;
         }
         #endregion
+
+
     }
 
 }

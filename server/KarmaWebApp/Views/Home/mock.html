@@ -4,7 +4,8 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <meta charset="utf-8">
     <title>Karma Mobile!</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1,user-scalable=no">
+    <meta name="MobileOptimized" content="640">
     <link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css" rel="stylesheet">
     <script type='text/javascript' src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.9.1.min.js"></script>
     <script type='text/javascript' src="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
@@ -61,6 +62,12 @@
                 expandDetails('.outbox-details', $(this));
             });
 
+            // when a navbar link is clicked - collapse the menu.
+            $(document).on('click', '.navbar-collapse.in', function (e) {
+                if ($(e.target).is('a')) {
+                    $(this).collapse('hide');
+                }
+            });
             /*
             $(document.body).on('click', '.details-close', function () {
                 var closeElem = $(this).attr('data-close-elem');
@@ -109,10 +116,10 @@
 
         <!-- top navbar -->
 
-        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
             <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#collapsethis">
                     <span class="sr-only">Toggle navigation</span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
@@ -122,7 +129,7 @@
             </div>
 
             <!-- Collect the nav links, forms, and other content for toggling -->
-            <div class="collapse navbar-collapse navbar-right" id="bs-example-navbar-collapse-1">
+            <div class="collapse navbar-collapse navbar-right" id="collapsethis">
                 <ul class="nav navbar-nav">
                     <li data-bind="css: { active: activePannel() === 'you' }"> <a href="#you" class="" data-bind="click: SelectYou">you</a> </li>
                     <li data-bind="css: { active: activePannel() === 'friends' }"> <a href="#friends" class="" data-bind="click: SelectFriends"><span class="badge pull-right header-data-badge" data-bind="text: MyFriends.Items().length">0</span>friends</a> </li>

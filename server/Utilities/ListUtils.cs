@@ -38,6 +38,16 @@ namespace KarmaWeb.Utilities
                 return new List<string>();
         }
 
-
+        public static string CSVFromList(IEnumerable<string> list)
+        {
+            string result = string.Empty;
+            foreach(var item in list)
+            {
+                if (!string.IsNullOrEmpty(result))
+                    result += ",";
+                result += item;
+            }
+            return result;
+        }
     }
 }

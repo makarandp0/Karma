@@ -48,12 +48,7 @@ namespace KarmaWebApp
             KarmaBackgroundWorker = new KarmaBackgroundWorker(storageAccount);
 
             Database.SetTable(peopleTable);
-            PeopleGraph.SetDatabase(Database);
-            PeopleGraph.Generate();
-
-            KarmaBackgroundWorker.RegisterWorkItem("DelayedTask_UpdateFriends", new KarmaBackgroundWorker.WorkItemDelegate(BackEnd.DelayedTask_UpdateFriends));
-            KarmaBackgroundWorker.RegisterWorkItem("DelayedTask_ProcessRequest", new KarmaBackgroundWorker.WorkItemDelegate(BackEnd.DelayedTask_ProcessRequest));
-            KarmaBackgroundWorker.RegisterWorkItem("BroadCast_AddToGraph", new KarmaBackgroundWorker.WorkItemDelegate(BackEnd.BroadCast_AddToGraph));
+            PeopleGraph.Generate(Database, KarmaBackgroundWorker);
         }
 
         private void DelayedTask_ProcessRequest(string workId)
@@ -239,18 +234,6 @@ namespace KarmaWebApp
         }
         */
         #endregion request stuff
-        /// <summary>
-        /// Delayed_UpdateFriends
-        /// this task is queued to update friends for a newly added user
-        /// when a user is added to database, his friends are not updated to link to him yet
-        /// Function loads the user from database, and going thru his friends fixes the graph 
-        /// links  and saves all friends into the database.
-        /// </summary>
-        /// <param name="personId"></param>
-        private void DelayedTask_UpdateFriends(string personId)
-        {
-            // read the persons entry from database.
-        }
 
 
 
@@ -272,11 +255,7 @@ namespace KarmaWebApp
 
         internal static KarmaUser CreateUser(KaramFacebookUser client)
         {
-            if (KarmaBackgroundWorker.QueueWorkItem("DelayedTask_UpdateFriends", client.FacebookId))
-            {
-                return PeopleGraph.CreateUser(client);
-            }
-            return null;
+           return PeopleGraph.CreateUser(client);
         }
 
         internal static KarmaUser GetUser(string fbId)
@@ -314,5 +293,15 @@ namespace KarmaWebApp
             return PeopleGraph.CreateRequest(user, location, subject, dateTime);
         }
 
+
+        internal bool OfferHelp(KarmaUser karmaUser, string requestId, bool offered)
+        {
+            return PeopleGraph.OfferHelp(karmaUser, requestId, offered);
+        }
+
+        internal bool AcceptHelp(KarmaUser karmaUser, string requestId, string offerFrom, bool accpeted)
+        {
+            return PeopleGraph.AcceptHelp(karmaUser, requestId, offerFrom, accpeted);
+        }
     }
 } //KarmaWebApp

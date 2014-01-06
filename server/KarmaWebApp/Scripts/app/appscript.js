@@ -172,7 +172,7 @@ var ViewModelClass = (function (name, pic) {
 
         // accept=yes|no
         this.AcceptIgnoreOffer = function (offerId, accept) {
-            var createOfferURL = '/Api/accepthelp/?requestId=' + offerId + '&accept=' + accept;
+            var createOfferURL = '/Api/accepthelp/?offerId=' + offerId + '&accept=' + accept;
             var acceptIgnore = $.getJSON(createOfferURL, function () {
                 console.log(createOfferURL + ":success");
             })

@@ -66,9 +66,24 @@ namespace KarmaDb
             return true;
         }
 
-        public TableResult InsertOrMerge(DbEntry dbEntry)
+        public DbUserBasic ReadUserBasic(string facebookId)
         {
-            return dbEntry.InsertOrMerge(this._peopleTable);
+            return DbUserBasic.ReadFromDatabase(this._peopleTable, facebookId);
         }
+
+        public DbRequest ReadRequest(string requestId)
+        {
+            return DbRequest.ReadFromDatabase(this._peopleTable, requestId);
+        }
+
+
+        //
+        // replaces existing entity with the new one.
+        //
+        public TableResult InsertOrReplace(DbEntry dbEntry)
+        {
+            return dbEntry.InsertOrReplace(this._peopleTable);
+        }
+
     }
 }

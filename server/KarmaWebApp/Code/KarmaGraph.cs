@@ -2,6 +2,7 @@
 using KarmaGraph.Types;
 using KarmaWeb.Utilities;
 using KarmaWebApp;
+using KarmaWebApp.Code;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,15 +13,31 @@ namespace KarmaGraph
 {
     public class Graph : KarmaObject
     {
-        private KarmaDb.KarmaDb _Database;
+        private KarmaDb.KarmaDb Database { get; set; }
         public Dictionary<string, KarmaUser> Users {get;private set;}
         public Dictionary<string, KarmaGroup> Groups { get; private set; }
         public Dictionary<string, KarmaRequest> Requests { get; private set; }
+        public KarmaBackgroundWorker Worker { get; set; }
 
-        public void SetDatabase(KarmaDb.KarmaDb database)
+        // once graph is ready to accept background work, it setups the worker.
+        private void SetBackgroundWorker(KarmaBackgroundWorker KarmaBackgroundWorker)
         {
-            this._Database = database;
+            this.Worker = KarmaBackgroundWorker;
+            this.Worker.RegisterWorkItem("DelayedTask_UpdateFriends", new KarmaBackgroundWorker.WorkItemDelegate(DelayedTask_UpdateFriends));
+            this.Worker.RegisterWorkItem("DelayedTask_ProcessRequest", new KarmaBackgroundWorker.WorkItemDelegate(DelayedTask_ProcessRequest));
+            this.Worker.RegisterWorkItem("BroadCast_AddToGraph", new KarmaBackgroundWorker.WorkItemDelegate(BroadCast_AddToGraph));
         }
+
+        private void BroadCast_AddToGraph(string workId)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void DelayedTask_ProcessRequest(string workId)
+        {
+            throw new NotImplementedException();
+        }
+
 
         public Graph()
         {
@@ -69,6 +86,20 @@ namespace KarmaGraph
             }
         }
 
+        public static string FillStringWithUsers(List<KarmaUser> users)
+        {
+            string result = string.Empty;
+            foreach (var u in users)
+            {
+                if (!string.IsNullOrEmpty(result))
+                {
+                    result += ",";
+                }
+                result += u.id;
+            }
+            return result;
+        }
+
         public int FillListWithUsers(List<KarmaUser> list, IEnumerable<string> userIds)
         {
             int error = 0;
@@ -93,11 +124,10 @@ namespace KarmaGraph
         /// <summary>
         /// generates graph from database.
         /// </summary>
-        public void Generate()
+        public void Generate(KarmaDb.KarmaDb database, KarmaBackgroundWorker worker)
         {
             this.Logger.Info("Generating Graph");
-            Debug.Assert(_Database != null);
-
+            this.Database = database;
             //
             // now ask database to read all the data async
             // and setup the delegates to update the graph as data comes in.
@@ -107,7 +137,7 @@ namespace KarmaGraph
             List<DbGroup> groups;
             List<DbRequest> requests;
 
-            if (!this._Database.ReadAll(out userBasic, out groups, out requests))
+            if (!this.Database.ReadAll(out userBasic, out groups, out requests))
             {
                 this.Logger.Error("_Database.ReadAll");
             }
@@ -144,6 +174,8 @@ namespace KarmaGraph
                 AddRequestToGraph(request);
             }
 
+            SetBackgroundWorker(worker);
+
             this.Logger.Info("GenerateGraph:Created Nodes:" + this.Users.Count);
         }
 
@@ -157,6 +189,15 @@ namespace KarmaGraph
             return null;
         }
 
+        /// <summary>
+        /// Creates a new user account using supplied facebook data.
+        /// 1. It creates entries in database for the user and any groups that user belongs to.
+        /// 2. It updates the user entry to the graph.
+        /// 3. It upddates links between friends and user.
+        /// 4. sets up a delayed task to update friends records.
+        /// </summary>
+        /// <param name="client"></param>
+        /// <returns></returns>
         internal KarmaUser CreateUser(KaramFacebookUser client)
         {
             var userBasic = new DbUserBasic(client.FacebookId);
@@ -207,7 +248,6 @@ namespace KarmaGraph
 
             // now look at the groups.
             List<DbGroup> newGroups = new List<DbGroup>();
-            List<KarmaGroup> existingGraphGroups = new List<KarmaGroup>();
             bFirst = true;
             foreach (var group in client.FbGroups)
             {
@@ -219,11 +259,7 @@ namespace KarmaGraph
                 userBasic.groups += group.Id;
 
                 KarmaGroup graphGroup = null;
-                if (this.Groups.TryGetValue(group.Id, out graphGroup))
-                {
-                    existingGraphGroups.Add(graphGroup);
-                }
-                else
+                if (!this.Groups.TryGetValue(group.Id, out graphGroup))
                 {
                     var newDBGroup = new DbGroup(group.Id);
                     newDBGroup.name = group.Name;
@@ -231,18 +267,23 @@ namespace KarmaGraph
                     newGroups.Add(newDBGroup);
                 }
             }
-
-            // write the new information to database.
-            // now create the bunch of objects that we have created.
-            // need to check for error values.
-            // TODO: check for return values.
-            foreach (var dbGroup in newGroups)
+            
+            // when we add user to database, we must also add his friends entries in database to link to the friend.
+            // however we dont want to do this async. Create a background task for this.
+            if (this.Worker.QueueWorkItem("DelayedTask_UpdateFriends", client.FacebookId))
             {
-                _Database.InsertOrMerge(dbGroup);
-            }
+                // write the new information to database.
+                // now create the bunch of objects that we have created.
+                // need to check for error values.
+                // TODO: check for return values.
+                foreach (var dbGroup in newGroups)
+                {
+                    Database.InsertOrReplace(dbGroup);
+                }
 
-            _Database.InsertOrMerge(userBasic);
-            _Database.InsertOrMerge(userExtended);
+                Database.InsertOrReplace(userBasic);
+                Database.InsertOrReplace(userExtended);
+            }
 
             // once done with database additions
             // udpate the graph.
@@ -259,7 +300,7 @@ namespace KarmaGraph
             FillListWithUsers(graphUser.friends, ListUtils.ListFromCSV(userBasic.karmaFriends));
             FillListWithUsers(graphUser.blockedFriends, ListUtils.ListFromCSV(userBasic.blockedFriends));
 
-            // TODO setup groups for this user.
+            // setup links in graph for the user's groups.
             UpdateGroupMembers(graphUser, ListUtils.ListFromCSV(userBasic.groups));
 
             // and finally update friends to link back to this new user.
@@ -272,6 +313,37 @@ namespace KarmaGraph
             return graphUser;
         }
 
+        // this task is setup to update the friends records when a user is created.
+        // graph must be already updated by other means.
+        private void DelayedTask_UpdateFriends(string userId)
+        {
+            var graphUser = GetUser(userId);
+            if (graphUser != null)
+            {
+                foreach (var friend in graphUser.friends)
+                {
+                    // read friend from database.
+                    // update the friend entry to add new friend.
+                    var dbFriend = this.Database.ReadUserBasic(friend.id);
+                    if (!string.IsNullOrEmpty(dbFriend.karmaFriends))
+                    {
+                        dbFriend.karmaFriends += ",";
+                    }
+                    dbFriend.karmaFriends += userId;
+                    this.Database.InsertOrReplace(dbFriend);
+                }
+            }
+        }
+
+        /// <summary>
+        /// creates a new request, and adds it to graph.
+        /// it also sets up delayed task to "process" this request.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="location"></param>
+        /// <param name="subject"></param>
+        /// <param name="dateTime"></param>
+        /// <returns></returns>
         internal KarmaRequest CreateRequest(KarmaUser user, Location location, string subject, KarmaDate dateTime)
         {
             var dbRequest = new DbRequest(user.id);
@@ -279,10 +351,115 @@ namespace KarmaGraph
             dbRequest.dueDate = dateTime.ToDBDate();
             LocationUtil.ToDbLocation(location, dbRequest);
 
-            var result = _Database.InsertOrMerge(dbRequest);
+            // setup delievery
+            var friendsNearBy = GetNearByFriends(user, location.lat, location.lan);
+            dbRequest.delieverTo = FillStringWithUsers(friendsNearBy);
+
+            var result = Database.InsertOrReplace(dbRequest);
             AddRequestToGraph(dbRequest);
 
             return KarmaRequest.FromDB(dbRequest,this);
+        }
+
+
+        /// <summary>
+        /// computes nearby friends
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="p1"></param>
+        /// <param name="p2"></param>
+        /// <returns></returns>
+        private List<KarmaUser> GetNearByFriends(KarmaUser user, double lat, double lan)
+        {
+            var nearbyFriends = new List<KarmaUser>();
+
+            // for now return all friends.
+            foreach (var friend in user.friends)
+            {
+                nearbyFriends.Add(friend);
+            }
+            return nearbyFriends;
+        }
+
+        /// <summary>
+        /// called when a users offers or denies help. 
+        /// </summary>
+        /// <param name="karmaUser"></param>
+        /// <param name="requestId"></param>
+        /// <param name="offered"></param>
+        /// <returns></returns>
+        internal bool OfferHelp(KarmaUser karmaUser, string requestId, bool offered)
+        {
+            // lookup the request id.
+            foreach (var request in karmaUser.inbox)
+            {
+                // check if such request exists.
+                if (string.Compare(request.requestId, requestId, true) == 0)
+                {
+                    if (offered)
+                    {
+                        request.offeredBy.Add(karmaUser);
+                        request.ignoredBy.Remove(karmaUser);
+                    }
+                    else
+                    {
+                        request.offeredBy.Remove(karmaUser);
+                        request.ignoredBy.Add(karmaUser);
+                    }
+
+                    SaveRequestToDatabase(request);
+                    return true;
+                }
+            }
+
+            // request was not found in inbox.
+            return false;
+        }
+
+        internal bool AcceptHelp(KarmaUser karmaUser, string requestId, string offerFrom, bool accepted)
+        {
+            foreach (var request in karmaUser.outbox)
+            {
+                if (string.Compare(request.requestId, requestId, true) == 0)
+                {
+                    foreach(var offerer in request.offeredBy)
+                    {
+                        if (string.Compare(offerer.id, offerFrom) == 0)
+                        {
+                            // this is the offer we are accepting.
+                            if (accepted)
+                            {
+                                request.acecptedFrom.Add(offerer);
+                                request.ignoredFrom.Remove(offerer);
+                            }
+                            else
+                            {
+                                request.acecptedFrom.Remove(offerer);
+                                request.ignoredFrom.Add(offerer);
+                            }
+
+                            // write the request to database.
+                            SaveRequestToDatabase(request);
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// this functions should saves the given request to database.
+        /// </summary>
+        /// <param name="request"></param>
+        private void SaveRequestToDatabase(KarmaRequest request)
+        {
+            // read DbRequst from database.
+            var dbRequest = this.Database.ReadRequest(request.requestId);
+            // update with the changes.
+            request.UpdateDbRequest(dbRequest);
+            // save to database
+            this.Database.InsertOrReplace(dbRequest);
         }
     }
 }
