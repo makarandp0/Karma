@@ -47,27 +47,13 @@
             // hide details areas
             $('.friends-details, .inbox-details, .outbox-details').hide();
 
-            // friend list item click
-            $(document.body).on('click', '.friendinListContainer', function () {
-                expandDetails('.friends-details', $(this));
-            });
-
-            // friend list item click
-            $(document.body).on('click', '.inboxListContainer', function () {
-                expandDetails('.inbox-details', $(this));
-            });
-
-            // friend list item click
-            $(document.body).on('click', '.outboxListContainer', function () {
-                expandDetails('.outbox-details', $(this));
-            });
-
             // when a navbar link is clicked - collapse the menu.
             $(document).on('click', '.navbar-collapse.in', function (e) {
                 if ($(e.target).is('a')) {
                     $(this).collapse('hide');
                 }
             });
+            
             /*
             $(document.body).on('click', '.details-close', function () {
                 var closeElem = $(this).attr('data-close-elem');
@@ -77,35 +63,6 @@
 
         });
 
-        function expandDetails(detailsElementSelector, clickedElement) {
-            if ($(detailsElementSelector).is(":visible")) {
-                if ($(clickedElement).next(detailsElementSelector).length !== 0) {
-                    // remove from current position
-                    console.log("details element is visible after clicked");
-                    $(detailsElementSelector).slideUp();
-                }
-                else {
-                    console.log("details element is visible but NOT after clicked");
-                    // remove from old position (slideup) and after done move to new position (insertafter/slidedown)
-                    $(detailsElementSelector).slideUp("fast", function () {
-                        $(detailsElementSelector).insertAfter(clickedElement).slideDown();
-                    })
-                }
-            }
-            else {
-                console.log("details element is NOT visible");
-                $(detailsElementSelector).insertAfter(clickedElement);
-                $(detailsElementSelector).slideDown();
-            }
-        }
-
-        function expandDetails_orig(detailsElementSelector, clickedElement) {
-            console.log(detailsElementSelector, clickedElement);
-            $(detailsElementSelector).slideUp('fast', function () {
-                $(detailsElementSelector).insertAfter(clickedElement);
-                $(detailsElementSelector).slideDown();
-            });
-        }
     </script>
 </head>
 
@@ -131,10 +88,10 @@
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse navbar-right" id="collapsethis">
                 <ul class="nav navbar-nav">
-                    <li data-bind="css: { active: activePannel() === 'you' }"> <a href="#you" class="" data-bind="click: SelectYou">you</a> </li>
-                    <li data-bind="css: { active: activePannel() === 'friends' }"> <a href="#friends" class="" data-bind="click: SelectFriends"><span class="badge pull-right header-data-badge" data-bind="text: MyFriends.Items().length">0</span>friends</a> </li>
-                    <li data-bind="css: { active: activePannel() === 'inbox' }"> <a href="#inbox" class="" data-bind="click: SelectInbox"><span class="badge pull-right header-data-badge" data-bind="text: MyInbox.Items().length">0</span>inbox</a> </li>
-                    <li data-bind="css: { active: activePannel() === 'outbox' }"> <a href="#outbox" class="" data-bind="click: SelectOutbox"><span class="badge pull-right header-data-badge" data-bind="text: MyOutbox.Items().length">0</span>outbox</a> </li>
+                    <li data-bind="css: { active: activePannel() === 'you' }"> <a href="#you" class="" data-bind="click:  function(data,event) { $root.SelectPanel('you')}">you</a> </li>
+                    <li data-bind="css: { active: activePannel() === 'friends' }"> <a href="#friends" class="" data-bind="click: function(data,event) { $root.SelectPanel('friends')}"><span class="badge pull-right header-data-badge" data-bind="text: MyFriends.Items().length">0</span>friends</a> </li>
+                    <li data-bind="css: { active: activePannel() === 'inbox' }"> <a href="#inbox" class="" data-bind="click: function(data,event) { $root.SelectPanel('inbox')}"><span class="badge pull-right header-data-badge" data-bind="text: MyInbox.Items().length">0</span>inbox</a> </li>
+                    <li data-bind="css: { active: activePannel() === 'outbox' }"> <a href="#outbox" class="" data-bind="click: function(data,event) { $root.SelectPanel('outbox')}"><span class="badge pull-right header-data-badge" data-bind="text: MyOutbox.Items().length">0</span>outbox</a> </li>
                 </ul>
             </div><!-- /.navbar-collapse -->
         </nav>
@@ -223,7 +180,7 @@
                                     </div>
                                     <div class="panel-body" data-bind="if: Items().length > 0">
                                         <div class="list-group" data-bind="foreach: Items">
-                                            <div class="friendinListContainer list-group-item" data-bind="css: { active: $parent.SelectedItem() == $data}, click: $parent.SelectItem.bind($parent)">
+                                            <div class="friendinListContainer list-group-item" data-bind="css: { active: $parent.SelectedItem() == $data}, click: function(data,event) { $parent.ExpandItem(data, $element, '.friends-details')} ">
                                                 <div style="float:left;padding-right:10px">
                                                     <img style="float:left" class="img-polaroid" data-bind="attr:{src: Pic}">
                                                 </div>
@@ -291,7 +248,7 @@
                                     </div>
                                     <div class="panel-body">
                                         <div class="list-group" data-bind="foreach: Items">
-                                            <a href="#" class="inboxListContainer list-group-item" data-bind="css: { active: $parent.SelectedItem() == $data}, click: $parent.SelectItem.bind($parent)">
+                                            <a href="#" class="inboxListContainer list-group-item" data-bind="css: { active: $parent.SelectedItem() == $data}, click: function(data,event) { $parent.ExpandItem(data, $element, '.inbox-details')}">
                                                 <div style="float:left;padding-right:10px">
                                                     <img class="img-polaroid" data-bind="attr:{src: From.Pic}">
                                                 </div>
@@ -351,7 +308,7 @@
                                     </div>
                                     <div class="panel-body">
                                         <div class="list-group" data-bind="foreach: Items">
-                                            <a href="#" class="outboxListContainer list-group-item" data-bind="css: { active: $parent.SelectedItem() == $data}, click: $parent.SelectItem.bind($parent)">
+                                            <a href="#" class="outboxListContainer list-group-item" data-bind="css: { active: $parent.SelectedItem() == $data}, click: function(data,event) { $parent.ExpandItem(data, $element, '.outbox-details')}">
                                                 <p class="list-group-item-text"><span class="glyphicon glyphicon-chevron-down pull-right"></span></p>
                                                 <h4 class="list-group-item-heading" data-bind="text: Name"></h4>
                                             </a>
@@ -381,12 +338,12 @@
                                                 </div>
                                                 <div data-bind="if: Response() == 'yes'">
                                                     <img data-bind="attr:{src: From.Pic}">
-                                                    You accepted help offer from <span data-bind="text: From.Name"> </span>!
+                                                    You <strong>accepted</strong> help offer from <span data-bind="text: From.FirstName()"> </span>!
                                                 </div>
                                                 <div data-bind="if: Response() == 'no'">
                                                     <div class="clearfix"></div>
                                                     <img data-bind="attr:{src: From.Pic}">
-                                                    You ignored help offer from <span data-bind="text: From.Name"> </span>!
+                                                    You <strong>ignored</strong> help offer from <span data-bind="text: From.FirstName()"> </span>!
                                                 </div>
                                             </div>
                                         </div>

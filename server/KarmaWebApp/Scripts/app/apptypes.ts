@@ -225,7 +225,36 @@ module KarmaTypes {
         public SelectedItem = ko.observable<T>(null);
         public PanelHeader = ko.observable<string>("Loading...");
 
+        // 2nd param is the event that gets passed to click (to access dom), third param is the selector.
+        public ExpandItem(item: T, clickedElement: any, detailsSelector: string) {
+            var self = this;
+            //
+            // 1st slide up the old item.if any
+            //
+            if ($(detailsSelector).is(":visible")) {
+                if ($(clickedElement).next(detailsSelector).length !== 0) {
+                    self.SelectedItem(item);                    
+                    $(detailsSelector).slideUp();
+                }
+                else {
+                    // remove from old position (slideup) and after done move to new position (insertafter/slidedown)
+                    $(detailsSelector).slideUp("fast", function () {
+                        $(detailsSelector).hide();
+                        self.SelectedItem(item);
+                        $(detailsSelector).insertAfter(clickedElement).slideDown();
+                    })
+                }
+            }
+            else {
+                $(detailsSelector).insertAfter(clickedElement);
+                $(detailsSelector).hide();
+                self.SelectedItem(item);
+                $(detailsSelector).slideDown();
+            }
+        }
+
         public SelectItem(item: T) {
+            console.log("Select Item:" + item);
             this.SelectedItem(item);
         }
 
@@ -319,20 +348,6 @@ module KarmaTypes {
                 $("#" + pannelName).slideDown();
                 $('.friends-details, .inbox-details, .outbox-details').hide();
             });
-        }
-        public SelectYou() {
-            this.SelectPanel("you");
-        }
-        
-        public SelectFriends() {
-            
-            this.SelectPanel('friends');
-        }
-        public SelectInbox() {
-            this.SelectPanel('inbox');
-        }
-        public SelectOutbox() {
-            this.SelectPanel('outbox');
         }
 
         public GotoNextRequestPage () {
