@@ -1,5 +1,8 @@
 ﻿@import url(http://fonts.googleapis.com/css?family=Droid+Sans+Mono);
 
+@-ms-viewport{
+	width: device-width;
+}
         html, body {
             height: 100%;
             font-family: 'Droid Sans Mono', sans-serif;
