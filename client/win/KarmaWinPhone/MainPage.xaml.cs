@@ -14,15 +14,6 @@
     /// </summary>
     public partial class MainPage : INotifyPropertyChanged
     {
-        #region Constants
-
-        /// <summary>
-        ///     The facebook app id (this is the ID given by facebook in the developer portal for your app)
-        /// </summary>
-        private const string AppId = "225642707613078";
-
-        #endregion
-
         #region Fields
 
         /// <summary>
@@ -159,17 +150,17 @@
         {
             SessionStorage.Remove();
 
-            FacebookSessionClient fb = new FacebookSessionClient(AppId);
+            FacebookSessionClient fb = new FacebookSessionClient(Constants.AppId);
 
             // TODO: to login with facebook app (frictionless) use this code
-            // fb.LoginWithApp("basic_info,publish_actions,read_stream", "custom_state_string");
+            fb.LoginWithApp(Constants.FbPermissions, Constants.FBCustomString);
             // for now I am getting an error about app's redirect URI not matching the registeration
             // I suspect because I dont yet have the "published" app id that facebook can verify.
             // make sure we use this method by publishing the app - and using manual flow for publishing.
 
             // to login with the browser use this code.
-            var session  = await fb.LoginAsync("user_about_me,read_stream");
-            UpdatePage(session);
+            // var session = await fb.LoginAsync(Constants.FbPermissions);
+            // UpdatePage(session);
         }
 
         /// <summary>

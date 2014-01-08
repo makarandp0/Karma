@@ -13,7 +13,7 @@ namespace KarmaWinPhone
     public partial class BrowserPage : PhoneApplicationPage
     {
         // Url of Home page
-        private string MainUri = "http://karmacloudservice.cloudapp.net/android";
+        private string MainUri = "http://karmacloudservice.cloudapp.net/home/me";
 
         // Constructor
         public BrowserPage()
@@ -28,7 +28,7 @@ namespace KarmaWinPhone
             var navigateTo = MainUri;
             if (!string.IsNullOrEmpty(App.AccessToken))
             {
-                navigateTo += "/?accessToken=" + App.AccessToken;
+                navigateTo += "?accessToken=" + App.AccessToken;
             }
             // Add your URL here
             Browser.Navigate(new Uri(navigateTo, UriKind.Absolute));
