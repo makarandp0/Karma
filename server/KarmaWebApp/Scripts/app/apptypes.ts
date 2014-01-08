@@ -278,6 +278,13 @@ module KarmaTypes {
         }
     }
 
+    export class AlertType {
+        public static SUCCESS: string = "alert-success";
+        public static INFO: string = "alert-info";
+        public static WARNING: string = "alert-warning";
+        public static DANGER: string = "alert-dange";
+    }
+
     export class KarmaViewModel {
 
         static staticFriendsDictionary = new Dictionary<Friend>();
@@ -332,7 +339,7 @@ module KarmaTypes {
         // invite friends
         public inviteText = ko.observable<string>("Hello friends, Please join karmaweb!");
         public InviteFriends() {
-            alert("implement this:" + this.inviteText());
+            this.addAlert("This is not implemented yet!", AlertType.SUCCESS);
         }
 
         public GotoPrevRequestPage() {
@@ -367,7 +374,8 @@ module KarmaTypes {
             }
         }
 
-        public CreateRequest() {
+        public CreateRequest(element: any) {
+            $(element).button('loading').attr('disabled', 'disabled');;
             var self = this;
             var createrequestURL = '/Api/createrequest/?title=' + encodeURIComponent(this.requestText()) + '&date=' + encodeURIComponent(this.requestDateTime()) + '&location=' + encodeURIComponent(this.request_location());
             var createRequest = $.getJSON(createrequestURL, function () {
@@ -377,26 +385,43 @@ module KarmaTypes {
                     if (!data.error) {
                         var newrequest = new MyRequest(data.request, self);
                         self.MyOutbox.Items.push(newrequest);
+                        self.addAlert("Request was sent successfully!", AlertType.SUCCESS);
                     }
                     else {
                         console.log(createrequestURL + ":returned error:" + data.error + ", errorcode:" + data.errorcode);
+                        self.addAlert("ooops, failed to create request:" + data.errorcode, AlertType.DANGER);
                     }
                 })
                 .fail(function () {
                     console.log(createrequestURL + ":failed");
+                    self.addAlert("ooops, failed to create request", AlertType.DANGER);
                 })
                 .always(function () {
+                    $(element).button("reset");
                 });
         }
+        
+        public addAlert(message: string, alerttype: string)
+        {
+            var element = '<div style="display: none" class="newalert alert ' + alerttype + '  alert-dismissable fade in" >' +
+                '<button type="button" class="close" data-dismiss = "alert" aria-hidden ="true"> &times; </button>' +
+                message +
+                '</div >';
+            $(element).appendTo($('#mainalerts')).slideDown("fast");
+        }
 
-        public UseCurrentLocation() {
+        public UseCurrentLocation(element: any) {
+            var self = this;
+            $(element).button('loading').attr('disabled', 'disabled');;
             console.log("WIll user current location");
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function (position) {
                     console.log("got current location:" + "lat:" + position.coords.latitude + ",lan:" + position.coords.longitude);
-                    this.request_location("lat:" + position.coords.latitude + ",lan:" + position.coords.longitude);
+                    self.request_location("lat:" + position.coords.latitude + ",lan:" + position.coords.longitude);
+                    $(element).button("reset");
                 },
                     function (error) {
+                        $(element).button("error");
                         switch (error.code) {
                             case error.PERMISSION_DENIED:
                                 console.log("User denied the request for Geolocation.");
@@ -411,10 +436,14 @@ module KarmaTypes {
                                 console.log("navigator.geolocation.getCurrentPosition unknown error occurred:" + error.code);
                                 break;
                         }
+                        self.addAlert("ooops, could not read your current location!", AlertType.WARNING);
+                        $(element).button("reset");
                     });
             }
             else {
                 console.log("!navigator.geolocation");
+                self.addAlert("ooops, could not read your current location!", AlertType.WARNING);
+                $(element).button("reset");
             }
         }
 

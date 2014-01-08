@@ -57,7 +57,16 @@
                 $(closeElem).slideUp();
             });
             */
+        });
+        $(function () {
+            // enable close functionality for alerts created from javascript.
+            $(".newalert").alert('close');
 
+            // enable dismissal of alerts with javascript.
+            $(".newalert").alert();
+
+            // enable buttons
+            $('.btn').button();
         });
 
     </script>
@@ -100,7 +109,8 @@
 
                 <!-- main area -->
                 <div class="col-xs-12 col-sm-12" data-spy="scroll" data-target="#sidebar-nav">
-
+                    <div id="mainalerts">
+                    </div>
                     <!-- ask your friends for help pannel-->
                     <div id="you" class="karmapannel" data-bind="if: activePannel() === 'you'">
                         <h1 class="">you</h1>
@@ -148,7 +158,7 @@
                                                placeholder="enter city,state. we will notify only friends living closer to this location" data-bind="value: request_location">
                                     </div>
                                     <hr class="">
-                                    <button class="btn btn-default pull-left" data-bind="click: UseCurrentLocation" type="button">
+                                    <button class="btn btn-default pull-left" data-loading-text="Reading..." data-bind="click:  function(data,event) { $root.UseCurrentLocation($element)}" type="button">
                                         User current location
                                     </button>
 
@@ -156,7 +166,7 @@
                                         <button class="btn btn-lg btn-default" data-bind="click: GotoPrevRequestPage" type="button">
                                             <span class="glyphicon glyphicon-chevron-left"></span> Previous
                                         </button>
-                                        <button class="btn btn-lg btn-primary" data-bind="click: CreateRequest" type="button">
+                                        <button class="btn btn-lg btn-primary" data-loading-text="Wait..." data-bind="click: function(data,event) { $root.CreateRequest($element)}" type="button">
                                             Submit
                                         </button>
                                     </div>
@@ -197,7 +207,7 @@
                                                       placeholder="Hello friends, Please join karmaweb.!" data-bind="value: $root.inviteText"></textarea>
                                         </div>
                                         <hr class="">
-                                        <button class="btn btn-lg btn-success pull-right" data-bind="click: $root.InviteFriends" type="button">Invite</button>
+                                        <button class="btn btn-lg btn-success pull-right" data-bind="click: function(){$root.InviteFriends($root);}" type="button">Invite</button>
                                     </div>
 
                                 </div>
