@@ -193,17 +193,14 @@
             UpdatePage(session);
         }
 
-        private void UpdatePage(FacebookSession session)
+        private async void UpdatePage(FacebookSession session)
         {
-            if (null != session)
+            if (this.CurrentUser == null && null != session)
             {
                 App.AccessToken = session.AccessToken;
                 App.FacebookId = session.FacebookId;
-                NavigationService.Navigate(new Uri("/BrowserPage.xaml", UriKind.Relative));
-                /*
                 
                 this.ExpiryText.Text = string.Format("Login expires on: {0}", session.Expires.ToString());
-
                 this.ProgressText = "Fetching details from Facebook...";
                 this.ProgressIsVisible = true;
 
@@ -216,8 +213,6 @@
                     user.ProfilePictureUrl = new Uri(string.Format("https://graph.facebook.com/{0}/picture?access_token={1}", user.Id, session.AccessToken));
 
                     this.CurrentUser = user;
-
-                    await this.GetUserStatus(fb);
                 }
                 catch (FacebookOAuthException exception)
                 {
@@ -226,63 +221,20 @@
 
                 this.ProgressText = string.Empty;
                 this.ProgressIsVisible = false;
-               
-                 */
             }
-        }
-
-        /// <summary>
-        /// Gets the user status.
-        /// </summary>
-        /// <param name="fb">The facebook client.</param>
-        /// <returns>
-        /// a task
-        /// </returns>
-        private async Task GetUserStatus(FacebookClient fb)
-        {
-            dynamic statusResult = await fb.GetTaskAsync("me?fields=statuses.limit(1).fields(message)");
-
-            this.StatusText.Text = statusResult.statuses.data[0].message;
         }
 
         #endregion
 
-        /// <summary>
-        /// Handles the OnClick event of the UpdateStatusButton control.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
-        private async void UpdateStatusButton_OnClick(object sender, RoutedEventArgs e)
+        private void EnterClick(object sender, RoutedEventArgs e)
         {
             var session = SessionStorage.Load();
-            if (null == session)
+            if (null != session)
             {
-                return;
+                App.AccessToken = session.AccessToken;
+                App.FacebookId = session.FacebookId;
+                NavigationService.Navigate(new Uri("/BrowserPage.xaml", UriKind.Relative));
             }
-
-            this.ProgressText = "Updating status...";
-            this.ProgressIsVisible = true;
-
-            this.UpdateStatusButton.IsEnabled = false;
-
-            try
-            {
-                var fb = new FacebookClient(session.AccessToken);
-
-                await fb.PostTaskAsync(string.Format("me/feed?message={0}", this.UpdateStatusBox.Text), null);
-
-                await this.GetUserStatus(fb);
-
-                this.UpdateStatusBox.Text = string.Empty;
-            }
-            catch (FacebookOAuthException exception)
-            {
-                MessageBox.Show("Error fetching user data: " + exception.Message);
-            }
-
-            this.ProgressText = string.Empty;
-            this.ProgressIsVisible = false;
-            this.UpdateStatusButton.IsEnabled = true;
         }
     }
 }

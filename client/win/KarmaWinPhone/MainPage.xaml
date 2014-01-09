@@ -174,7 +174,7 @@
                 <StackPanel Margin="0,0,0,36" Orientation="Horizontal" HorizontalAlignment="Center">
                     <Image Height="45" Source="/Assets/Images/Logo.png" Width="45"/>
                     <TextBlock
-                                        Text="Contoso Social"
+                                        Text="Because everybody needs help."
                                         Style="{StaticResource PhoneTextTitle1Style}"
                                         VerticalAlignment="Center"
                                         Foreground="#FFFAD114"
@@ -204,33 +204,7 @@
                         <ImageBrush Stretch="UniformToFill" ImageSource="{Binding CurrentUser.ProfilePictureUrl}" />
                     </Ellipse.Fill>
                 </Ellipse>
-
-                <TextBlock x:Name="StatusText"
-                           Style="{StaticResource PhoneTextNormalStyle}"
-                           TextWrapping="Wrap"
-                           Grid.Column="1"
-                           Foreground="Black"
-                           VerticalAlignment="Top"/>
             </Grid>
-
-            <TextBox x:Name="UpdateStatusBox"
-                     Background="White"
-                     BorderBrush="#FF747474"
-                     SelectionForeground="White"
-                     SelectionBackground="#FFB0B0B0"
-                     BorderThickness="1"
-                     Foreground="#FF272727"
-                     Margin="0,24,0,0" />
-            <Button Content="update status"
-                    x:Name="UpdateStatusButton"
-                    Click="UpdateStatusButton_OnClick"
-                    Foreground="White"
-                    BorderBrush="Black"
-                    Style="{StaticResource ButtonStyle1}"
-                    BorderThickness="0"
-                    Height="78"
-                    Background="#FFFAD114"
-                    Margin="0,-12,0,0" />
 
             <Button Content="logout"
                         VerticalAlignment="Top"
@@ -245,6 +219,17 @@
             <TextBlock x:Name="ExpiryText"
                        Style="{StaticResource PhoneTextSubtleStyle}"
                        Foreground="#FF999999" />
+            
+            <Button Content="Enter"
+                        VerticalAlignment="Top"
+                        Click="EnterClick"
+                        x:Name="EnterButton"
+                        BorderBrush="Black"
+                        Foreground="White"
+                        BorderThickness="0"
+                        Height="78"
+                        Style="{StaticResource ButtonStyle1}" Background="#FFACACAC" Margin="0,12,0,0" />
+
         </StackPanel>
 
     </Grid>
