@@ -57,7 +57,7 @@ namespace KarmaWebApp.Code.API
                 jsonInboxItem.from = inboxItem.from.id;
                 jsonInboxItem.id = inboxItem.requestId;
                 jsonInboxItem.title = inboxItem.title;
-                jsonInboxItem.date = "dummy date"; // TODO: fix this
+                jsonInboxItem.date = inboxItem.dueDate.ToJsonDate();
                 jsonInboxItem.location = inboxItem.location.name;
 
                 if (inboxItem.offeredBy.Contains(this.me))
@@ -78,6 +78,7 @@ namespace KarmaWebApp.Code.API
                 jsonOutboxItem.id = outboxItem.requestId;
                 jsonOutboxItem.location = outboxItem.location.name;
                 jsonOutboxItem.helpOffers = new List<JsonhelpOfferEntry>();
+                jsonOutboxItem.date = outboxItem.dueDate.ToJsonDate();
                 foreach(var offer in outboxItem.offeredBy)
                 {
                     var offerEntry = new JsonhelpOfferEntry();
