@@ -23,7 +23,7 @@
         inbox: [
             {
                  id: "676783107!201312302020",
-                 date: "12/13",
+                 date: "2014/01/13",
                  status: "open",
                  location: "seattle, WA",
                  title: "Need some hardware",
@@ -34,7 +34,7 @@
             },
             {
                 id: "615700133!201312312020",
-                date: "12/23",
+                date: "2014/02/01",
                 status: "open",
                 location: "seattle, WA",
                 title: "a job",
@@ -45,7 +45,7 @@
             },
             {
                 id: "648352020!201412312020",
-                date: "12/13",
+                date: "2014/10/08",
                 status: "open",
                 location: "seattle, WA",
                 title: "some english friends",
@@ -57,7 +57,7 @@
         outbox: [
             {
                 id: "628825055!201412312020",
-                date: "12/13", // TODO: think more about date format
+                date: "2014/12/31",
                 title: "Need a Ride to Airport",
                 status: "open",
                 location: "seattle, WA",
@@ -68,7 +68,7 @@
             },
             {
                 id: "628825055!201412312020",
-                date: "12/15", // TODO: think more about date format
+                date: "2014/11/11",
                 title: "need some peanuts",
                 status: "open",
                 location: "seattle, WA",
@@ -79,7 +79,7 @@
             },
             {
                 id: "628825055!201412312020",
-                date: "12/13", // TODO: think more about date format
+                date: "2015/01/01",
                 title: "a break",
                 status: "open",
                 location: "seattle, WA",

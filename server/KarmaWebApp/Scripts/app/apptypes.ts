@@ -83,15 +83,15 @@ module KarmaTypes {
             /*
             {
                 id: "628825055_201412312020",
-                date: "12/13", // TODO: think more about date format
+                date: "2020/02/30",
                 title: "Need a Ride to Airport",
                 status: "open",
                 location: "seattle, WA",
             }
             */
             this.Id = jsondata.id;
-            this.Date = jsondata.date;
-            this.Name = jsondata.title;
+            this.Date = KarmaViewModel.toDisplayDate(KarmaViewModel.fromServerDateFormat(jsondata.date));
+            this.Name = jsondata.title + " ( " + this.Date + " )";
             this.Status = jsondata.status;
             this.Location = jsondata.location;
         }
@@ -172,7 +172,7 @@ module KarmaTypes {
             /*
             {
                 id: "615700133_201312312020",
-                date: "12/23",
+                date: "2012/12/23",
                 status: "open",
                 location: "seattle, WA",
                 title: "a job",
@@ -282,7 +282,7 @@ module KarmaTypes {
         public static SUCCESS: string = "alert-success";
         public static INFO: string = "alert-info";
         public static WARNING: string = "alert-warning";
-        public static DANGER: string = "alert-dange";
+        public static DANGER: string = "alert-danger";
     }
 
     export class KarmaViewModel {
@@ -374,10 +374,22 @@ module KarmaTypes {
             }
         }
 
+
         public CreateRequest(element: any) {
             $(element).button('loading').attr('disabled', 'disabled');;
             var self = this;
-            var createrequestURL = '/Api/createrequest/?title=' + encodeURIComponent(this.requestText()) + '&date=' + encodeURIComponent(this.requestDateTime()) + '&location=' + encodeURIComponent(this.request_location());
+            var dateObj = this.CheckValidRequestDate(this.requestDateTime());
+            if (dateObj === null)
+            {
+                self.addAlert("The date entered does't look right", AlertType.DANGER);
+                $(element).button("reset");
+                return;
+            }
+            
+            var createrequestURL = '/Api/createrequest/?' +
+                'title=' + encodeURIComponent(this.requestText()) +
+                '&date=' + encodeURIComponent(this.toServerDateFormat(dateObj)) +
+                '&location=' + encodeURIComponent(this.request_location());
             var createRequest = $.getJSON(createrequestURL, function () {
                 console.log(createrequestURL + ":success");
             })
@@ -447,6 +459,77 @@ module KarmaTypes {
             }
         }
 
+        // checks date for mm/dd/yyyy format.
+        public CheckValidRequestDate(strdate:string) : Date
+        {
+            // we should check date for a specific format as coded in commented 
+            // out code below but that becomes too restrictive for input field.
+            // so lets try our luck and see if javascript likes the date entered by user
+            var requestDate = new Date(strdate);
+            if (isNaN(requestDate.getFullYear()))
+                return null;
+
+            var today = new Date(); // gets today's date, and make sure the new date is in future.
+            if (today.getTime() > requestDate.getTime())
+                return null;
+
+            if (requestDate.getFullYear() - today.getFullYear() > 2 ) // lets not allow requests in too far future.
+                return null;
+
+            return requestDate;
+            
+            /*
+            var validformat = /^\d{2}\/\d{2}\/\d{4}$/ //mm/dd/yyyy
+            var returnval = false
+            if (!validformat.test(strdate)) return null;
+            var monthfield = parseInt(strdate.split("/")[0]);
+            var dayfield = parseInt(strdate.split("/")[1]);
+            var yearfield = parseInt(strdate.split("/")[2]);
+            var dayobj = new Date(yearfield, monthfield - 1, dayfield);
+            if ((dayobj.getMonth() + 1 != monthfield) || (dayobj.getDate() != dayfield) || (dayobj.getFullYear() != yearfield))
+                return null;
+            return dayobj;
+            */
+        }
+        
+        // server expects date in "yyyy/MM/dd"
+        public toServerDateFormat(dateObj: Date): string
+        {
+            var monthStr = (dateObj.getMonth() + 1) + "";
+            if (monthStr.length == 1) monthStr = "0" + monthStr;
+            var dateStr = dateObj.getDate() + "";
+            if (dateStr.length == 1) dateStr = "0" + dateStr;
+
+            return dateObj.getFullYear() + "/" + monthStr + "/" + dateStr;
+        }
+
+        // server sends date in "yyyy/MM/dd"
+        static fromServerDateFormat(strdate: string): Date
+        {
+            var validformat = /^\d{4}\/\d{2}\/\d{2}$/ // yyyy/MM/dd
+            if (!validformat.test(strdate)) return null;
+            var yearfield = parseInt(strdate.split("/")[0]);
+            var monthfield = parseInt(strdate.split("/")[1]);
+            var dayfield = parseInt(strdate.split("/")[2]);
+            var dateObj = new Date(yearfield, monthfield - 1, dayfield);
+            if ((dateObj.getMonth() + 1 != monthfield) || (dateObj.getDate() != dayfield) || (dateObj.getFullYear() != yearfield))
+                return null;
+
+            console.log(strdate + "=>" + dateObj);
+            return dateObj;
+        }
+        
+        // Oct 10
+        static toDisplayDate(dateObj: Date): string
+        {
+            var m_names = new Array("Jan", "Feb", "March",
+                "April", "May", "June", "July", "Aug", "Sept",
+                "Oct", "Nov", "Dec");
+
+            var displayStr = m_names[dateObj.getMonth()] + " " + dateObj.getDate();
+            console.log(dateObj + "=>" + displayStr);
+            return displayStr;
+        }
 
         static getURLParameter(name: string) {
             return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [, ""])[1].replace(/\+/g, '%20')) || null;

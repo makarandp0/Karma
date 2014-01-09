@@ -108,7 +108,7 @@ namespace KarmaGraph.Types
     /// </summary>
     public class KarmaDate
     {
-        public const string JASON_DATEFORMAT = "yy/M/d";
+        public const string JASON_DATEFORMAT = "yyyy/MM/dd";
         KarmaDate(DateTime date)
         {
             this.datetime = date;
