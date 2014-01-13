@@ -115,16 +115,16 @@
     <Grid x:Name="LayoutRoot"
           Background="#FFEFEFEF">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" MinHeight="272" />
+            <RowDefinition />
         </Grid.RowDefinitions>
 
         <!--TitlePanel contains the name of the application and page title-->
         <StackPanel x:Name="TitlePanel"
                     Grid.Row="0"
-                    Margin="12,110,12,0"
+                    Margin="12,0"
                     VerticalAlignment="Bottom"
-                    Visibility="{Binding CurrentUser, Converter={StaticResource InvertedNullVisibilityConverter}}">
+                    Visibility="{Binding CurrentUser, Converter={StaticResource InvertedNullVisibilityConverter}}" Height="156">
             <Image Height="100" Source="/Assets/Images/Logo.png"/>
             <TextBlock Style="{StaticResource PhoneTextNormalStyle}"
                        Margin="12,2,12,0"
@@ -140,36 +140,21 @@
         <StackPanel x:Name="ContentPanel"
                     Grid.Row="1"
                     Margin="12,24,12,0">
-            <Button VerticalAlignment="Top"
-                    Foreground="White"
-                    BorderBrush="#3B5998"
-                    Background="#3B5998"
+
+            <Button x:Name="LoginButton"
                     Click="LoginButtonClick"
-                    Padding="0"
-                    Height="74"
-                    x:Name="LoginButton"
+                    Content="Login With Facebook"
                     Visibility="{Binding CurrentUser, Converter={StaticResource InvertedNullVisibilityConverter}}"
-                    HorizontalAlignment="Center"
-                    Width="306"
-                    Margin="0,12,0,0"
-                    Style="{StaticResource ButtonStyle1}"
-                    BorderThickness="0">
-                <StackPanel Orientation="Horizontal"
-                            HorizontalAlignment="Left"
-                            Margin="1,0,0,0">
-                    <Image Source="/Assets/Images/FBLogoWhite.png"
-                           Width="35"
-                           Margin="0,0,12,0" />
-                    <TextBlock Text="Sign in with Facebook"
-                               VerticalAlignment="Center"
-                               FontFamily="Segoe WP Semibold"
-                               FontSize="21.333" />
-                </StackPanel>
-            </Button>
+                    VerticalAlignment="Top"
+                    BorderBrush="Black"
+                    Foreground="White"
+                    BorderThickness="0"
+                    Height="77"
+                    Style="{StaticResource ButtonStyle1}" Background="#FF3B5998" Margin="12,12,0,0" />
         </StackPanel>
 
         <StackPanel Orientation="Vertical"
-                Visibility="{Binding CurrentUser, Converter={StaticResource NullVisibilityConverter}}" Margin="24,70,24,0" Grid.RowSpan="2">
+                Visibility="{Binding CurrentUser, Converter={StaticResource NullVisibilityConverter}}" Margin="24,70,24,27" Grid.RowSpan="2">
             <StackPanel Margin="0" Orientation="Vertical">
                 <StackPanel Margin="0,0,0,36" Orientation="Horizontal" HorizontalAlignment="Center">
                     <Image Height="45" Source="/Assets/Images/Logo.png" Width="45"/>
@@ -177,7 +162,7 @@
                                         Text="Because everybody needs help."
                                         Style="{StaticResource PhoneTextTitle1Style}"
                                         VerticalAlignment="Center"
-                                        Foreground="#FFFAD114"
+                                        Foreground="#FFB84318"
                                         FontSize="21.333"
                                         HorizontalAlignment="Center"
                                         FontFamily="Segoe WP Semibold" Margin="6,0,0,0" FontWeight="Bold" />
@@ -205,7 +190,19 @@
                     </Ellipse.Fill>
                 </Ellipse>
             </Grid>
+            <Button Content="enter"
+                        Click="EnterClick"
+                        x:Name="EnterButton"
+                        VerticalAlignment="Top"
+                        BorderBrush="Black"
+                        Foreground="White"
+                        BorderThickness="0"
+                        Height="77"
+                        Style="{StaticResource ButtonStyle1}" Background="#FF3B5998" Margin="12,12,0,0" />
 
+            <TextBlock x:Name="ExpiryText"
+                       Style="{StaticResource PhoneTextSubtleStyle}"
+                       Foreground="#FF999999" />
             <Button Content="logout"
                         VerticalAlignment="Top"
                         Click="LogoutClick"
@@ -214,21 +211,7 @@
                         Foreground="White"
                         BorderThickness="0"
                         Height="78"
-                        Style="{StaticResource ButtonStyle1}" Background="#FFACACAC" Margin="0,12,0,0" />
-
-            <TextBlock x:Name="ExpiryText"
-                       Style="{StaticResource PhoneTextSubtleStyle}"
-                       Foreground="#FF999999" />
-            
-            <Button Content="Enter"
-                        VerticalAlignment="Top"
-                        Click="EnterClick"
-                        x:Name="EnterButton"
-                        BorderBrush="Black"
-                        Foreground="White"
-                        BorderThickness="0"
-                        Height="78"
-                        Style="{StaticResource ButtonStyle1}" Background="#FFACACAC" Margin="0,12,0,0" />
+                        Style="{StaticResource ButtonStyle1}" Background="#FF3B5998" Margin="12,12,0,0" />
 
         </StackPanel>
 
