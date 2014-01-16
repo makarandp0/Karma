@@ -133,6 +133,12 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\..\..\assets\PiR2_logo_minimal_01.png">
+      <Link>Assets\Images\PiR2_logo_minimal_01.png</Link>
+    </Content>
+    <Content Include="..\..\..\assets\PiR2_logo_minimal_02.png">
+      <Link>Assets\Images\PiR2_logo_minimal_02.png</Link>
+    </Content>
     <Content Include="Assets\AlignmentGrid.png" />
     <Content Include="Assets\ApplicationIcon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
