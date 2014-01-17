@@ -29,6 +29,7 @@ module KarmaTypes {
     export class User {
         public Id: string;
         public Name: string;
+        private FirstName: string;
         public Pic: string;
         public IsMale: boolean;
         constructor(jsonUser: any) {
@@ -37,6 +38,7 @@ module KarmaTypes {
             this.Name = jsonUser.name;
             this.Pic = jsonUser.pic;
             this.IsMale = jsonUser.ismale;
+            this.FirstName = jsonUser.firstname;
         }
         public hehimhis(hehimhis) {
             if (!this.IsMale) {
@@ -48,10 +50,6 @@ module KarmaTypes {
                 if (hehimhis === "Him") return "Her";
             }
             return hehimhis;
-        }
-
-        public FirstName() {
-            return this.Name.split(" ")[0].substring(0, 20); // get 1st part before space, and return only 1st 20 characters.
         }
     }
 

@@ -125,7 +125,7 @@
                             <div class="panel-heading media" data-bind="with: Me">
                                 <img data-bind="attr:{src: Pic}" class="pull-left">
                                 <div data-bind="if: $root.requestOnPage() == 1">
-                                    <div class="content-heading"><h4>You got Friends <span data-bind="text: FirstName() + '!'">!</span></h4></div>
+                                    <div class="content-heading"><h4>You got Friends <span data-bind="text: FirstName + '!'">!</span></h4></div>
                                 </div>
                                 <div data-bind="if: $root.requestOnPage() == 2">
                                     <h4 class=""> You need <span data-bind="text: $root.requestText()">!</span></h4>
@@ -224,23 +224,23 @@
                                 <div class="panel panel-default" data-bind="with: SelectedItem()">
                                     <div class="panel-body">
                                         <div class="realFriend" data-bind="ifnot: IsBlocked">
-                                            if <span data-bind="text: FirstName()"></span> is not really a "friend", you can block <span data-bind="text: hehimhis('him')"></span>.
+                                            if <span data-bind="text: FirstName"></span> is not really a "friend", you can block <span data-bind="text: hehimhis('him')"></span>.
                                             Once blocked <span data-bind="text: hehimhis('he')"></span> will not see any help requests from you and you will not
                                             see any requests from <span data-bind="text: hehimhis('him')"></span>. And don't worry we won't tell on you.
                                             <span data-bind="text: hehimhis('He')"></span> won't know  that you blocked <span data-bind="text: hehimhis('him')"></span>.
                                             <hr class="">
                                             <div class="btn-group pull-right">
-                                                <button class="btn btn-danger" data-bind="click: BlockFriend">Block <span data-bind="text: FirstName()"></span></button>
+                                                <button class="btn btn-danger" data-bind="click: BlockFriend">Block <span data-bind="text: FirstName"></span></button>
                                             </div>
                                         </div>
                                         <div class="blockedFriend" data-bind="if: IsBlocked">
-                                            You have blocked <span data-bind="text: FirstName()"></span>. that means you will not see any help
+                                            You have blocked <span data-bind="text: FirstName"></span>. that means you will not see any help
                                             requests from <span data-bind="text: hehimhis('him')"></span> nor will
                                             <span data-bind="text: hehimhis('he')"></span> see any of your help requests. if you change your mind
                                             you can unblock <span data-bind="text: hehimhis('him')"></span> anytime!
                                             <hr class="">
                                             <div class="btn-group pull-right">
-                                                <button class="btn btn-success" data-bind="click: UnBlockFriend">UnBlock <span data-bind="text: FirstName()"></span></button>
+                                                <button class="btn btn-success" data-bind="click: UnBlockFriend">UnBlock <span data-bind="text: FirstName"></span></button>
                                             </div>
                                         </div>
                                     </div>
@@ -277,7 +277,7 @@
                                 <div class="panel panel-default" data-bind="with: SelectedItem()">
                                     <div class="panel-body">
                                         <div class="pendingrequest" data-bind="if: Response() == 'none'">
-                                            This is your chance to help <span data-bind="text: $data.From.FirstName()"></span>. if you choose to help, we will notify
+                                            This is your chance to help <span data-bind="text: $data.From.FirstName"></span>. if you choose to help, we will notify
                                             <span data-bind="text: $data.From.hehimhis('him')"></span> about it. if <span data-bind="text: $data.From.hehimhis('he')"></span>
                                             hasn't gotten help already,  <span data-bind="text: $data.From.hehimhis('he')"></span> will accept your request and get back to you.
                                             if you choose to not help. its okay! We won't tell <span data-bind="text: $data.From.hehimhis('him')"></span> that you saw the request.
@@ -289,14 +289,14 @@
                                             </div>
                                         </div>
                                         <div class="request_helpoffered" data-bind="if: Response() == 'yes'">
-                                            You offered help to <span data-bind="text: $data.From.FirstName()"></span>. <strong>Thank you!</strong> we will notify
+                                            You offered help to <span data-bind="text: $data.From.FirstName"></span>. <strong>Thank you!</strong> we will notify
                                             <span data-bind="text: $data.From.hehimhis('him')"></span> about it. if <span data-bind="text: $data.From.hehimhis('he')"></span>
                                             hasn't gotten help already,  <span data-bind="text: $data.From.hehimhis('he')"></span> will accept your request and get back to you.
                                             <div class="clearfix"></div>
                                             <hr class="">
                                         </div>
                                         <div class="request_helpdenied" data-bind="if: Response() == 'no'">
-                                            You said you couldnt help <span data-bind="text: $data.From.FirstName()"></span>. <strong>Don't worry!</strong>
+                                            You said you couldnt help <span data-bind="text: $data.From.FirstName"></span>. <strong>Don't worry!</strong>
                                             We won't tell <span data-bind="text: $data.From.hehimhis('him')"></span> that you saw the request.
                                             <div class="clearfix"></div>
                                             <hr class="">
@@ -348,12 +348,12 @@
                                                 </div>
                                                 <div data-bind="if: Response() == 'yes'">
                                                     <img data-bind="attr:{src: From.Pic}">
-                                                    You <strong>accepted</strong> help offer from <span data-bind="text: From.FirstName()"> </span>!
+                                                    You <strong>accepted</strong> help offer from <span data-bind="text: From.FirstName"> </span>!
                                                 </div>
                                                 <div data-bind="if: Response() == 'no'">
                                                     <div class="clearfix"></div>
                                                     <img data-bind="attr:{src: From.Pic}">
-                                                    You <strong>ignored</strong> help offer from <span data-bind="text: From.FirstName()"> </span>!
+                                                    You <strong>ignored</strong> help offer from <span data-bind="text: From.FirstName"> </span>!
                                                 </div>
                                             </div>
                                         </div>

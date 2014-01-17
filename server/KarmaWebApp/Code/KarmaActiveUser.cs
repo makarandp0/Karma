@@ -41,15 +41,18 @@ namespace KarmaWebApp.Code.API
 
         public JsonGetAllResponse GetAll()
         {
+            // me
             var response = new JsonGetAllResponse();
             response.me = JsonUserFromKarmaUser(this.me);
             
+            // friends
             response.friends = new List<JsonFriend>();
             foreach (var friend in this.me.friends)
             {
                 response.friends.Add(JsonFriendFromKarmaUser(this.me, friend));
             }
             
+            // inbox
             response.inbox = new List<JsonInboxEntry>();
             foreach (var inboxItem in this.me.inbox)
             {
@@ -69,7 +72,8 @@ namespace KarmaWebApp.Code.API
 
                 response.inbox.Add(jsonInboxItem);
             }
-            // TODO finish outbox.
+
+            // outbox
             response.outbox = new List<JsonOutboxEntry>();
             foreach (var outboxItem in this.me.outbox)
             {
@@ -157,6 +161,7 @@ namespace KarmaWebApp.Code.API
         {
             to.id = from.id;
             to.name = from.name;
+            to.firstname = from.firstName;
             to.ismale = from.gender == EGender.Male;
             to.pic = from.pic;
         }

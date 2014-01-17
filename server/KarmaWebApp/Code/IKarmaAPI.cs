@@ -45,8 +45,10 @@ namespace KarmaWebApp.Code.API
     {
         public string id { get; set; }
         public string name { get; set; }
+        public string firstname { get; set; }
         public string pic { get; set; }
         public bool ismale { get; set; }
+        
     }
     public class JsonFriend : JsonUser
     {

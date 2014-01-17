@@ -249,6 +249,8 @@ namespace KarmaGraph.Types
         public EGender gender { get; private set; }           // gender
         public string pic { get; private set; }       // picture url
 
+        public string firstName { get; private set; }
+
         public string email { get; private set; }            // email
 
         public Location location = new Location();
@@ -275,6 +277,7 @@ namespace KarmaGraph.Types
         {
             var user = new KarmaUser(userBasic.fbId);
             user.name = userBasic.name;
+            user.firstName = userBasic.firstname;
             user.gender = GenderUtil.FromDbGender(userBasic.gender);
             user.pic = userBasic.pic;
             user.location = LocationUtil.FromDbLocation(userBasic.lat, userBasic.lang, userBasic.location, userBasic.locFlags);
