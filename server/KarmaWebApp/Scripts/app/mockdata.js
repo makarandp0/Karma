@@ -9,7 +9,7 @@
         type: "all1.0", // every json object from our server would have a data type associated with it.
         error: 0,
         errocode: "",
-        me: { id: "628825055", ismale: true, name: "Makarand Patwardhan", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/274191_628825055_1428018580_q.jpg"},
+        me: { id: "628825055", ismale: true, firstname:"Mak", name: "Makarand Patwardhan", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/274191_628825055_1428018580_q.jpg"},
         friends: [
             { blocked: false, id: "676783107",          ismale: true, firstname:"Lloyd", name: "Lloyd Bond", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn2/1117691_676783107_853903468_q.jpg" },
             { blocked: false, id: "100004008272532", ismale: false, firstname: "Jyoti", name: "Vrushali Shrotri", pic: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn2/203272_100004008272532_1822936541_q.jpg" },
