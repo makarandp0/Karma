@@ -40,14 +40,9 @@ namespace KarmaWebApp
             var storageEndpointValue = ConfigurationManager.AppSettings[storageEndpointName];
             var storageAccount = CloudStorageAccount.Parse(storageEndpointValue);
 
-            // create/open people table.
-            var tableClient = storageAccount.CreateCloudTableClient();
-            var peopleTable = tableClient.GetTableReference("karmapeople");
-            peopleTable.CreateIfNotExists();
-
             KarmaBackgroundWorker = new KarmaBackgroundWorker(storageAccount);
+            Database.SetStorageAccount(storageAccount);
 
-            Database.SetTable(peopleTable);
             PeopleGraph.Generate(Database, KarmaBackgroundWorker);
         }
 

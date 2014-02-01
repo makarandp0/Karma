@@ -137,76 +137,6 @@ namespace KarmaDb.Types
         }
 
 
-        public TableResult InsertOrReplace(CloudTable table)
-        {
-            if (!ArekeysValid())
-            {
-                throw new ArgumentException("row key or partition key contains invalid chars");
-            }
-            var insertOp = TableOperation.InsertOrReplace(this);
-            return table.Execute(insertOp);
-        }
-
-        /// <summary>
-        /// this adds any new propperties, but does not delete any existing properties.
-        /// </summary>
-        /// <param name="table"></param>
-        /// <returns></returns>
-        public TableResult InsertOrMerge(CloudTable table)
-        {
-            if (!ArekeysValid())
-            {
-                throw new ArgumentException("row key or partition key contains invalid chars");
-            }
-            this.ETag = "*"; // this tells azure that overwrite the entry even if its modified before us.
-            var insertOp = TableOperation.InsertOrMerge(this);
-            return table.Execute(insertOp);
-        }
-
-
-        public static T Read<T>(CloudTable table, string pk, string rk) where T:DbEntry
-        {
-            var retrieveOperation = TableOperation.Retrieve<DbRequest>(pk, rk);
-            var retrievedResult = table.Execute(retrieveOperation);
-            if (retrievedResult.Result != null)
-            {
-                var dbEntry = (DbEntry)retrievedResult.Result;
-                if (dbEntry != null && dbEntry.EntityType == typeof(T).Name)
-                {
-                    return (T)dbEntry;
-                }
-            }
-            return null;
-        }
-
-        // checks if row key and partition key are valid.
-        bool ArekeysValid()
-        {
-            /*
-             * following are illegal characters.
-                The forward slash (/) character
-                The backslash (\) character
-                The number sign (#) character
-                The question mark (?) character
-                Control characters from U+0000 to U+001F, including:
-                The horizontal tab (\t) character
-                The linefeed (\n) character
-                The carriage return (\r) character
-                Control characters from U+007F to U+009F             * 
-             */
-            char[] illegalChars = {
-                '/', '\\', '#', '?', '\t', '\n', '\r'
-            };
-
-            if (this.RowKey.IndexOfAny(illegalChars) != -1)
-                return false;
-
-            if (this.PartitionKey.IndexOfAny(illegalChars) != -1)
-                return false;
-
-            // there are other characters to consider, but for now dont worry.
-            return true;
-        }
 
     }
 
@@ -246,9 +176,11 @@ namespace KarmaDb.Types
         public string groups { get; set; }              // groups user belongs to
         public int userflags { get; set; }         // various flag values.
 
-        public static DbUserBasic ReadFromDatabase(CloudTable table, string fbId)
+        public static bool GetPartitionRow(string fbId, out string pk, out string rk)
         {
-            return DbEntry.Read<DbUserBasic>(table, fbId, ROW_ID);
+            pk = fbId;
+            rk = ROW_ID;
+            return true;
         }
     }
 
@@ -289,26 +221,6 @@ namespace KarmaDb.Types
         // parameterless constructor only for use by Queries.
         public DbRequest() {}
 
-        public static DbRequest ReadFromDatabase(CloudTable table, string requestId)
-        {
-            try
-            {
-                var keys = requestId.Split(SEPERATOR);
-                if (keys.Length != 2) 
-                {
-                    Debug.Assert(false); // convert to dbgmsg.
-                    return null;
-                }
-
-                return DbEntry.Read<DbRequest>(table, keys[0], keys[1]);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Exception retriving request:{0} from database:{1}", requestId, ex);
-            }
-            return null;
-        }
-
 
         public DbRequest(string pk, string rk)
         {
@@ -341,6 +253,31 @@ namespace KarmaDb.Types
         public string ignoredBy { get; set; }           // people who responded "no" to request.
         public string offerAccepted { get; set; }       // whos offers have been accepted
         public string offersIgnored { get; set; }       // whos offers have been ignored.
+
+        internal static bool GetPartitionRow(string requestId, out string pk, out string rk)
+        {
+            pk = string.Empty;
+            rk = string.Empty;
+
+            try
+            {
+                var keys = requestId.Split(SEPERATOR);
+                if (keys.Length != 2)
+                {
+                    Debug.Assert(false); // convert to dbgmsg.
+                    return false;
+                }
+                pk = keys[0];
+                rk = keys[1];
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception retriving request:{0} Exception:{1}", requestId, ex);
+            }
+
+            return false;
+        }
     }
 
     public class DbGroup : DbEntry

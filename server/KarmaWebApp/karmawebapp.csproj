@@ -145,9 +145,6 @@
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\landing.html" />
     <Content Include="Content\Site.css" />
-    <Content Include="Content\test\license.txt" />
-    <Content Include="Content\test\slider.html" />
-    <Content Include="Content\test\slider.js" />
     <Content Include="Content\ticker-style.css" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
@@ -183,6 +180,12 @@
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />
     <None Include="Scripts\_references.js" />
+    <Content Include="slider\css\style.css" />
+    <Content Include="slider\index.html" />
+    <Content Include="slider\js\index.js" />
+    <Content Include="slider\js\prefixfree.min.js" />
+    <Content Include="slider\license.txt" />
+    <Content Include="slider\README.txt" />
     <Content Include="Views\Home\mock.html" />
     <Content Include="Web.config" />
     <Content Include="Scripts\jquery-1.10.2.min.map" />

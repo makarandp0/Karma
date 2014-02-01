@@ -269,7 +269,7 @@ namespace KarmaGraph
             }
             
             // when we add user to database, we must also add his friends entries in database to link to the friend.
-            // however we dont want to do this async. Create a background task for this.
+            // however we dont want to do this sync. Create a background task for this.
             if (this.Worker.QueueWorkItem("DelayedTask_UpdateFriends", client.FacebookId))
             {
                 // write the new information to database.
