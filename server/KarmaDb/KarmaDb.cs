@@ -197,7 +197,7 @@ namespace KarmaDb
             var table = GetEntryTable(typeof(T).Name);
             if (table != null)
             {
-                var retrieveOperation = TableOperation.Retrieve<DbRequest>(pk, rk);
+                var retrieveOperation = TableOperation.Retrieve<T>(pk, rk);
                 var retrievedResult = table.Execute(retrieveOperation);
                 if (retrievedResult.Result != null)
                 {

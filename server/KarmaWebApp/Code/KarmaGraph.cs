@@ -325,12 +325,15 @@ namespace KarmaGraph
                     // read friend from database.
                     // update the friend entry to add new friend.
                     var dbFriend = this.Database.ReadUserBasic(friend.id);
-                    if (!string.IsNullOrEmpty(dbFriend.karmaFriends))
+                    if (!dbFriend.karmaFriends.Contains(userId))
                     {
-                        dbFriend.karmaFriends += ",";
+                        if (!string.IsNullOrEmpty(dbFriend.karmaFriends))
+                        {
+                            dbFriend.karmaFriends += ",";
+                        }
+                        dbFriend.karmaFriends += userId;
+                        this.Database.InsertOrReplace(dbFriend);
                     }
-                    dbFriend.karmaFriends += userId;
-                    this.Database.InsertOrReplace(dbFriend);
                 }
             }
         }
@@ -355,7 +358,10 @@ namespace KarmaGraph
             var friendsNearBy = GetNearByFriends(user, location.lat, location.lan);
             dbRequest.delieverTo = FillStringWithUsers(friendsNearBy);
 
+            // save to database
             var result = Database.InsertOrReplace(dbRequest);
+
+            // add to graph.
             AddRequestToGraph(dbRequest);
 
             return KarmaRequest.FromDB(dbRequest,this);

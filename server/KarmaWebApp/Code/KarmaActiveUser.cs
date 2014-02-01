@@ -64,7 +64,16 @@ namespace KarmaWebApp.Code.API
                 jsonInboxItem.location = inboxItem.location.name;
 
                 if (inboxItem.offeredBy.Contains(this.me))
-                    jsonInboxItem.response = "yes";
+                {
+                    if (inboxItem.acecptedFrom.Contains(this.me))
+                    {
+                        jsonInboxItem.response = "yesyes";
+                    }
+                    else
+                    {
+                        jsonInboxItem.response = "yes";
+                    }
+                }
                 else if (inboxItem.ignoredBy.Contains(this.me))
                     jsonInboxItem.response = "no";
                 else

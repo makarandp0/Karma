@@ -15,7 +15,7 @@ using Microsoft.WindowsAzure.Storage.Table;
 
 namespace KarmaWebApp
 {
-    
+
     public class Global : HttpApplication
     {
         void Application_Start(object sender, EventArgs e)

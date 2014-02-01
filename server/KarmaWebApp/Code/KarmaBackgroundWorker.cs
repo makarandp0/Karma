@@ -1,4 +1,5 @@
-﻿using Microsoft.WindowsAzure.Storage;
+﻿using KarmaWeb.Utilities;
+using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Queue;
 using Microsoft.WindowsAzure.Storage.Table;
 using System;
@@ -10,7 +11,7 @@ using System.Web;
 
 namespace KarmaWebApp.Code
 {
-    public class KarmaBackgroundWorker
+    public class KarmaBackgroundWorker : KarmaObject
     {
         private Thread     _Backgroundworker;
         private CloudQueue _WorkerQueue;
@@ -46,8 +47,15 @@ namespace KarmaWebApp.Code
             _WorkerQueue = queueClient.GetQueueReference("workqueue");
             _WorkerQueue.CreateIfNotExists();
 
-            _Backgroundworker = new Thread(this.DoWork);
+            
         }
+
+        public void Start()
+        {
+            _Backgroundworker = new Thread(this.DoWork);
+            _Backgroundworker.Start();
+        }
+
 
 
         string EncodeMessage(string workType, string workId)
@@ -95,7 +103,21 @@ namespace KarmaWebApp.Code
 
         private bool ProcessMessage(string msgType, string workId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                WorkItemDelegate workItem;
+                if (_WorkItems.TryGetValue(msgType, out workItem))
+                {
+                    workItem.Invoke(workId);
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("failed to process message:{0}, workId:{1}, Ex:{2}", msgType, workId, ex);
+            }
+
+            return false;
         }
 
         
@@ -109,7 +131,6 @@ namespace KarmaWebApp.Code
 
         internal bool QueueWorkItem(string workType, string workId, TimeSpan? showAfter = null)
         {
-
             // make sure we understand the work item.
             try
             {
@@ -132,7 +153,7 @@ namespace KarmaWebApp.Code
             }
             catch(Exception ex)
             {
-                Logger.WriteLine("Failed to add work item to the queue:" + ex);
+                Logger.Error("Failed to add work item to the queue:" + ex);
             }
 
             return false;
@@ -145,5 +166,6 @@ namespace KarmaWebApp.Code
             // for now just signal an event.
             _workAvailableEvent.Set();
         }
+
     }
 }

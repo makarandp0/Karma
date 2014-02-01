@@ -553,6 +553,7 @@ module KarmaTypes {
                 .done(function (data) {
                     if (!data.error) {
                         myViewModel.ReadFromJSON(data);
+                        document.title = myViewModel.Me().Name +"'s Karma";
                     }
                     else {
                         // myViewModel.friendsPanelHeader("Error retriving Friends" + data.errorcode);

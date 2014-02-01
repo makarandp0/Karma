@@ -66,7 +66,7 @@ namespace KarmaWebApp.Code.API
 
     public class JsonInboxEntry : JsonrequestEntry
     {
-        public string response { get; set; } // response of the curernt user: none, yes, no
+        public string response { get; set; } // response of the curernt user: none, yes, no, yesyes
         public string from { get; set; }     // id of the friend who created this request.
     }
 

@@ -298,6 +298,11 @@
                                             <div class="clearfix"></div>
                                             <hr class="">
                                         </div>
+                                        <div class="request_helpaccepted" data-bind="if: Response() == 'yesyes'">
+                                            <span data-bind="text: $data.From.FirstName"></span> has accepted your help offer! Please get in touch with <span data-bind="text: $data.From.hehimhis('him')"></span> and sync up!
+                                            <div class="clearfix"></div>
+                                            <hr class="">
+                                        </div>
                                     </div>
                                 </div>
                             </div><!-- /InboxDetails -->

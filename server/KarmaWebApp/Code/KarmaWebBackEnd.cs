@@ -21,7 +21,7 @@ namespace KarmaWebApp
         private static Graph PeopleGraph = new Graph();
         private static KarmaDb.KarmaDb Database = new KarmaDb.KarmaDb();
         private static KarmaBackEnd BackEnd = new KarmaBackEnd();
-        private static KarmaBackgroundWorker KarmaBackgroundWorker;
+        private static KarmaBackgroundWorker worker;
 
         // private static CloudTable PeopleTable;
         private const int NUM_FRIENDS_TO_SEND_REQUEST_PER_BATCH = 3;
@@ -40,10 +40,11 @@ namespace KarmaWebApp
             var storageEndpointValue = ConfigurationManager.AppSettings[storageEndpointName];
             var storageAccount = CloudStorageAccount.Parse(storageEndpointValue);
 
-            KarmaBackgroundWorker = new KarmaBackgroundWorker(storageAccount);
+            worker = new KarmaBackgroundWorker(storageAccount);
             Database.SetStorageAccount(storageAccount);
 
-            PeopleGraph.Generate(Database, KarmaBackgroundWorker);
+            PeopleGraph.Generate(Database, worker);
+            worker.Start();
         }
 
         private void DelayedTask_ProcessRequest(string workId)
